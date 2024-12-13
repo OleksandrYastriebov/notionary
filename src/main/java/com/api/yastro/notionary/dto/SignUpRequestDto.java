@@ -1,4 +1,4 @@
-package com.api.yastro.notionary.controller;
+package com.api.yastro.notionary.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class RegistrationRequest {
+public class SignUpRequestDto {
 
     private String firstName;
     private String lastName;

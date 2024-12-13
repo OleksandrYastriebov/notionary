@@ -1,37 +1,43 @@
 package com.api.yastro.notionary.service;
 
 import com.api.yastro.notionary.controller.EmailValidator;
-import com.api.yastro.notionary.controller.RegistrationRequest;
+import com.api.yastro.notionary.dto.SignInRequestDto;
+import com.api.yastro.notionary.dto.SignUpRequestDto;
 import com.api.yastro.notionary.service.email.EmailSender;
 import com.api.yastro.notionary.entity.ConfirmationToken;
 import com.api.yastro.notionary.entity.User;
 import com.api.yastro.notionary.entity.UserRole;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
-public class RegistrationService {
+public class AuthenticationService {
 
     private final EmailValidator emailValidator;
     private final UserService userService;
     private final TokenConfirmationService tokenConfirmationService;
     private final EmailSender emailSender;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public RegistrationService(EmailValidator emailValidator, UserService userService,
-                               TokenConfirmationService tokenConfirmationService, EmailSender emailSender, JwtService jwtService) {
+    public AuthenticationService(EmailValidator emailValidator, UserService userService,
+                                 TokenConfirmationService tokenConfirmationService, EmailSender emailSender,
+                                 JwtService jwtService, AuthenticationManager authenticationManager) {
         this.emailValidator = emailValidator;
         this.userService = userService;
         this.tokenConfirmationService = tokenConfirmationService;
         this.emailSender = emailSender;
         this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
-    public String register(RegistrationRequest request) {
+    public String signUp(SignUpRequestDto request) {
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
             throw new IllegalStateException(String.format("Email %s is invalid.", request.getEmail()));
@@ -52,6 +58,18 @@ public class RegistrationService {
         return jwtService.generateToken(user);
     }
 
+    public String signIn(SignInRequestDto signInRequestDto) {
+        String userEmail = signInRequestDto.getEmail();
+        String userPassword = signInRequestDto.getPassword();
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                userEmail,
+                userPassword
+        ));
+
+        return jwtService.generateToken(userService.loadUserByUsername(userEmail));
+    }
+
     @Transactional
     public String confirmToken(String token) {
         ConfirmationToken confirmationToken = tokenConfirmationService
@@ -59,7 +77,7 @@ public class RegistrationService {
                 .orElseThrow(() ->
                         new IllegalStateException("Token not found"));
 
-        if (confirmationToken.getConfirmedAt() != null && userService.isUserEnabled(confirmationToken.getUser().getEmail())) {
+        if (userService.isUserEnabled(confirmationToken.getUser().getEmail())) {
             throw new IllegalStateException("email already confirmed");
         }
 
@@ -69,7 +87,6 @@ public class RegistrationService {
             throw new IllegalStateException("token expired");
         }
 
-        tokenConfirmationService.setConfirmedAt(token);
         userService.enableAppUser(
                 confirmationToken.getUser().getEmail());
         tokenConfirmationService.deleteTokenFromDatabase(token);
