@@ -8,11 +8,11 @@
 		<version>3.4.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.api.yastro</groupId>
+	<groupId>com.api.notionary</groupId>
 	<artifactId>wishlist</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>wishlist</name>
-	<description>Wishlist project</description>
+	<name>notionary</name>
+	<description>Notionary project</description>
 	<url/>
 	<licenses>
 		<license/>
