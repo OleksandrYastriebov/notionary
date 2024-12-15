@@ -1,7 +1,10 @@
 package com.api.notionary.service;
 
+import com.api.notionary.dto.UserDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
+import com.api.notionary.exception.UserNotFoundException;
+import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,18 +23,27 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenConfirmationService tokenConfirmationService;
+    private final Mapper mapper;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       TokenConfirmationService tokenConfirmationService) {
+                       TokenConfirmationService tokenConfirmationService, Mapper mapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenConfirmationService = tokenConfirmationService;
+        this.mapper = mapper;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email).orElseThrow(() ->
                 new UsernameNotFoundException(String.format(EMAIL_NOT_FOUND_MESSAGE, email)));
+    }
+
+    public UserDto findUserById(Long id) {
+        User user = userRepository
+                .findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", id)));
+        return mapper.mapUserToDto(user);
     }
 
     public String signUpUser(User user) {
@@ -68,5 +80,13 @@ public class UserService implements UserDetailsService {
     public boolean isUserEnabled(String email) {
         return userRepository.findEnabledByEmail(email).orElseThrow(() ->
                 new IllegalStateException("No 'enabled' flag found"));
+    }
+
+    public void deleteUserById(Long id) {
+        if (findUserById(id) == null) {
+            throw new UserNotFoundException(
+                    String.format("*ERROR* Trying to delete user with id %s. User not found", id));
+        }
+        userRepository.deleteById(id);
     }
 }

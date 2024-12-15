@@ -30,14 +30,15 @@ public class WebSecurityConfig {
     public WebSecurityConfig(@Lazy UserService userService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userService = userService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/sign-up**", "/api/sign-in/**", "/api/confirm-email").permitAll()
+                        .requestMatchers("/api/sign-up/**", "/api/sign-in/**", "/api/confirm-email/**").permitAll()
+                        .requestMatchers("/api/wishlist/**").permitAll()
+                        .requestMatchers("/api/user/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

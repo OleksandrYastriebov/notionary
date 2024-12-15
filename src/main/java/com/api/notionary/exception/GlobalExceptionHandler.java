@@ -1,5 +1,6 @@
 package com.api.notionary.exception;
 
+import com.api.notionary.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -13,15 +14,22 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final String TIMESTAMP = "timestamp";
+    private static final String STATUS = "status";
+    private static final String ERROR = "error";
+    private static final String MESSAGE = "message";
+    private static final String PATH = "path";
+    private static final String DETAILS = "details";
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
         Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("timestamp", LocalDateTime.now());
-        errorDetails.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        errorDetails.put("error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        errorDetails.put("message", ex.getMessage());
-        errorDetails.put("path", request.getDescription(false).replace("uri=", ""));
-        errorDetails.put("details", getStackTraceAsString(ex));
+        errorDetails.put(TIMESTAMP, LocalDateTime.now());
+        errorDetails.put(STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorDetails.put(ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        errorDetails.put(MESSAGE, ex.getMessage());
+        errorDetails.put(PATH, request.getDescription(false).replace("uri=", ""));
+        errorDetails.put(DETAILS, getStackTraceAsString(ex));
 
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -29,13 +37,37 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex, WebRequest request) {
         Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("timestamp", LocalDateTime.now());
-        errorDetails.put("status", HttpStatus.BAD_REQUEST.value());
-        errorDetails.put("error", HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorDetails.put("message", ex.getMessage());
-        errorDetails.put("path", request.getDescription(false).replace("uri=", ""));
-        errorDetails.put("details", getStackTraceAsString(ex));
+        errorDetails.put(TIMESTAMP, LocalDateTime.now());
+        errorDetails.put(STATUS, HttpStatus.BAD_REQUEST.value());
+        errorDetails.put(ERROR, HttpStatus.BAD_REQUEST.getReasonPhrase());
+        errorDetails.put(MESSAGE, ex.getMessage());
+        errorDetails.put(PATH, request.getDescription(false).replace("uri=", ""));
+        errorDetails.put(DETAILS, getStackTraceAsString(ex));
 
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
+        errorDetails.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WishlistNotFoundException.class)
+    public ResponseEntity<Object> handleWishlistNotFoundException(WishlistNotFoundException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
+        errorDetails.put(MESSAGE, ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WishlistItemNotFoundException.class)
+    public ResponseEntity<Object> handleWishlistItemNotFoundException(WishlistItemNotFoundException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
+        errorDetails.put(MESSAGE, ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 

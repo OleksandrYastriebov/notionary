@@ -7,20 +7,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Data
-@Table(name="wishlist_item")
+@Table(name = "wishlist_item")
 public class WishListItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
 
     @ManyToOne
     @JoinColumn(name = "wishlist_id", nullable = false)
@@ -29,12 +30,20 @@ public class WishListItem {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "url")
+    private String url;
+
+    @Column(name = "price")
+    private Double price;
+
     @Column(name = "description")
     private String description;
 
     @Column(name = "is_checked", nullable = false)
     private Boolean isChecked = false;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
-
+    @PrePersist
+    protected void onCreate() {
+        this.id = UUID.randomUUID().toString().replace("-", "");
+    }
 }
