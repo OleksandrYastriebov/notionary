@@ -1,10 +1,9 @@
 package com.api.notionary.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -34,12 +33,14 @@ public class WishList {
     private String title;
 
     @Column(name = "is_public", nullable = false)
-    private Boolean isPublic = true;
+    private Boolean isPublic;
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<WishListItem> items;
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<WishlistAccess> accesses;
 
     private LocalDateTime createdAt;
@@ -48,7 +49,8 @@ public class WishList {
     protected void onCreate() {
         this.id = UUID.randomUUID()
                 .toString()
-                .replace("-", "");
+                .replace("-", "")
+                .substring(0, 15);
         this.createdAt = LocalDateTime.now();
     }
 }

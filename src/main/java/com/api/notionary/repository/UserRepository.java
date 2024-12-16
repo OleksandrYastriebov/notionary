@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
@@ -22,5 +23,20 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.enabled FROM User u WHERE u.email = ?1")
     Optional<Boolean> findEnabledByEmail(String email);
+
+    /**
+     * Finds all users with "enabled = false" property and expired confirmation token;
+     * */
+    @Query("""
+        SELECT u 
+        FROM User u 
+        WHERE u.enabled = false 
+        AND u.id IN (
+            SELECT ct.user.id 
+            FROM ConfirmationToken ct 
+            WHERE ct.expiresAt < CURRENT_TIMESTAMP
+        )
+    """)
+    List<User> findUsersWithExpiredConfirmationTokenAndDisabled();
 
 }

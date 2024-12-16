@@ -2,6 +2,7 @@ package com.api.notionary.security;
 
 import com.api.notionary.service.JwtService;
 import com.api.notionary.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -39,7 +42,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-
         var authHeader = request.getHeader(HEADER_NAME);
         if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
@@ -47,11 +49,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         var jwt = authHeader.substring(BEARER_PREFIX.length());
-        var email = jwtService.extractEmail(jwt);
+
+        String email;
+        try {
+            email = jwtService.extractEmail(jwt);
+        } catch (ExpiredJwtException ex) {
+            setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token has expired. Please refresh.");
+            return;
+        } catch (Exception ex) {
+            setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is invalid or expired.");
+            return;
+        }
 
         if (StringUtils.isNotEmpty(email) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userService
-                    .loadUserByUsername(email);
+            UserDetails userDetails = userService.loadUserByUsername(email);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -65,8 +76,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);
+            } else {
+                setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is invalid or expired.");
+                return;
             }
         }
         filterChain.doFilter(request, response);
     }
+
+    private void setErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType("application/json");
+        response.getWriter().write(String.format(
+                "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
+                LocalDateTime.now(), status.value(), status.getReasonPhrase(), message
+        ));
+    }
+
 }

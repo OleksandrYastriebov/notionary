@@ -6,6 +6,8 @@ import com.api.notionary.entity.User;
 import com.api.notionary.exception.UserNotFoundException;
 import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,11 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
 @Service
 public class UserService implements UserDetailsService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
     private static final String EMAIL_NOT_FOUND_MESSAGE = "User with email: %s not found";
 
     private final UserRepository userRepository;
@@ -88,5 +92,19 @@ public class UserService implements UserDetailsService {
                     String.format("*ERROR* Trying to delete user with id %s. User not found", id));
         }
         userRepository.deleteById(id);
+        LOGGER.info("User with id {} was removed from repository.", id);
+    }
+
+    public List<UserDto> getAllDisabledUsers() {
+        List<User> disabledUsers = userRepository.findUsersWithExpiredConfirmationTokenAndDisabled();
+        return disabledUsers.stream()
+                .map(mapper::mapUserToDto)
+                .toList();
+    }
+
+    public void deleteUsers(List<UserDto> disabledUsers) {
+        disabledUsers.stream()
+                .map(UserDto::getId)
+                .forEach(this::deleteUserById);
     }
 }

@@ -1,6 +1,6 @@
 package com.api.notionary.security.config;
 
-import com.api.notionary.constants.Constant;
+import com.api.notionary.util.constants.Constant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;

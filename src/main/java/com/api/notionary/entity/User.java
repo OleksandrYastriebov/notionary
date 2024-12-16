@@ -69,10 +69,6 @@ public class User implements UserDetails {
     @JsonIgnore
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    private List<WishList> wishlists;
-
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
@@ -81,6 +77,14 @@ public class User implements UserDetails {
 
     @JsonIgnore
     private Boolean enabled = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<WishList> wishlists;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ConfirmationToken> confirmationTokens;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
