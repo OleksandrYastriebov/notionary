@@ -1,6 +1,7 @@
 package com.api.notionary.service;
 
 import com.api.notionary.dto.WishlistItemDto;
+import com.api.notionary.dto.WishlistItemIsCheckedRequestDto;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
 import com.api.notionary.exception.WishlistItemNotFoundException;
@@ -39,6 +40,7 @@ public class WishListItemService {
         return mapper.mapWishlistItemToDto(wishlistItem);
     }
 
+    @Transactional
     public WishlistItemDto addWishListItem(String wishlistId, WishlistItemDto wishlistItemDto) {
         WishList wishlist = wishListRepository.findById(wishlistId).orElseThrow(() ->
                 new WishlistNotFoundException(String.format("Wishlist with id: %s was not found.", wishlistId)));
@@ -64,6 +66,40 @@ public class WishListItemService {
         LOGGER.info("Removing wishlist item: {} from the wishlist {}", itemId, wishlistId);
 
         wishlistItemRepository.deleteByIdAndWishListId(itemId, wishlistId);
+    }
+
+    @Transactional
+    public WishlistItemDto updateWishlistItem(WishlistItemDto wishlistItemDto, String wishlistId, String itemId) {
+        LOGGER.info("Start updating wishlist item {}", itemId);
+
+        WishListItem wishListItem = wishlistItemRepository.findByIdAndWishListId(itemId, wishlistId)
+                .orElseThrow(() -> new WishlistItemNotFoundException(
+                        String.format("Wishlist item %s in wishlist %s not found", itemId, wishlistId)));
+
+        if (wishlistItemDto.getTitle() != null) {
+            wishListItem.setTitle(wishlistItemDto.getTitle());
+        }
+        if (wishlistItemDto.getPrice() != null) {
+            wishListItem.setPrice(wishlistItemDto.getPrice());
+        }
+        if (wishlistItemDto.getUrl() != null) {
+            wishListItem.setUrl(wishlistItemDto.getUrl());
+        }
+        if (wishlistItemDto.getDescription() != null) {
+            wishListItem.setDescription(wishlistItemDto.getDescription());
+        }
+        if (wishlistItemDto.getIsChecked() != null) {
+            wishListItem.setIsChecked(wishlistItemDto.getIsChecked());
+        }
+        LOGGER.info("Wishlist item {} updated successfully", itemId);
+
+        return mapper.mapWishlistItemToDto(wishListItem);
+    }
+
+    @Transactional
+    public void updateIsChecked(WishlistItemIsCheckedRequestDto isCheckedDto, String wishlistId, String itemId) {
+        LOGGER.info("Updating isChecked to {} in wishlist item {} in wishlist {}.", isCheckedDto.getIsChecked(), itemId, wishlistId);
+        wishlistItemRepository.updateIsChecked(itemId, wishlistId, isCheckedDto.getIsChecked());
     }
 }
 

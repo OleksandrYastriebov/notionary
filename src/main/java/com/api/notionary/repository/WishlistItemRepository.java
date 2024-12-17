@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface WishlistItemRepository extends JpaRepository<WishListItem, String> {
 
     Optional<WishListItem> findByIdAndWishListId(String wishlistItemId, String wishlistId);
+
     List<WishListItem> findAllByWishListId(String wishlistId);
 
     @Modifying
@@ -22,5 +23,11 @@ public interface WishlistItemRepository extends JpaRepository<WishListItem, Stri
     @Query("DELETE FROM WishListItem w WHERE w.id = :wishlistItemId AND w.wishList.id = :wishlistId")
     void deleteByIdAndWishListId(@Param("wishlistItemId") String wishlistItemId, @Param("wishlistId") String wishlistId);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE WishListItem w SET w.isChecked = :isChecked WHERE w.id = :wishlistItemId AND w.wishList.id = :wishlistId")
+    void updateIsChecked(@Param("wishlistItemId") String wishlistItemId,
+                         @Param("wishlistId") String wishlistId,
+                         @Param("isChecked") Boolean isChecked);
 
 }

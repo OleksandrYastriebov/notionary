@@ -1,4 +1,4 @@
-package com.api.notionary.controller;
+package com.api.notionary.service.email;
 
 import org.springframework.stereotype.Service;
 

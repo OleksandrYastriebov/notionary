@@ -1,12 +1,12 @@
 package com.api.notionary.service;
 
-import com.api.notionary.controller.EmailValidator;
 import com.api.notionary.dto.SignInRequestDto;
 import com.api.notionary.dto.SignUpRequestDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.UserRole;
 import com.api.notionary.service.email.EmailSender;
+import com.api.notionary.service.email.EmailValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.api.notionary</groupId>
-	<artifactId>wishlist</artifactId>
+	<artifactId>notionary</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>notionary</name>
 	<description>Notionary project</description>

@@ -2,13 +2,14 @@ package com.api.notionary.service;
 
 import com.api.notionary.dto.WishlistDto;
 import com.api.notionary.dto.WishlistItemDto;
+import com.api.notionary.dto.WishlistTitleRequestDto;
+import com.api.notionary.dto.WishlistVisibilityRequestDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.exception.WishlistNotFoundException;
 import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.UserRepository;
 import com.api.notionary.repository.WishListRepository;
-import com.api.notionary.repository.WishlistItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,12 +91,12 @@ public class WishlistService {
     }
 
     @Transactional
-    public void changeVisibility(String wishlistId, Boolean isPublic) {
-        wishListRepository.updateVisibility(wishlistId, isPublic);
+    public void updateVisibility(String wishlistId, WishlistVisibilityRequestDto wishlistVisibilityRequestDto) {
+        wishListRepository.updateVisibility(wishlistId, wishlistVisibilityRequestDto.getIsPublic());
     }
 
     @Transactional
-    public void changeTitle(String wishlistId, String title) {
-        wishListRepository.updateTitle(wishlistId, title);
+    public void updateTitle(String wishlistId, WishlistTitleRequestDto wishlistTitleRequestDto) {
+        wishListRepository.updateTitle(wishlistId, wishlistTitleRequestDto.getTitle());
     }
 }
