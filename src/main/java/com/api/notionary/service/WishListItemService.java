@@ -9,14 +9,15 @@ import com.api.notionary.exception.WishlistNotFoundException;
 import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.WishListRepository;
 import com.api.notionary.repository.WishlistItemRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class WishListItemService {
 
@@ -25,14 +26,6 @@ public class WishListItemService {
     private final WishlistItemRepository wishlistItemRepository;
     private final WishListRepository wishListRepository;
     private final Mapper mapper;
-
-    @Autowired
-    public WishListItemService(WishlistItemRepository wishlistItemRepository, WishListRepository wishListRepository,
-                               Mapper mapper) {
-        this.wishListRepository = wishListRepository;
-        this.wishlistItemRepository = wishlistItemRepository;
-        this.mapper = mapper;
-    }
 
     public WishlistItemDto findWishlistItemByIdAndWishlistId(String wishlistItemId, String wishlistId) {
         WishListItem wishlistItem = wishlistItemRepository.findByIdAndWishListId(wishlistItemId, wishlistId).orElseThrow(() ->

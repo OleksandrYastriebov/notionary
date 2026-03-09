@@ -6,11 +6,9 @@ import com.api.notionary.entity.User;
 import com.api.notionary.exception.UserNotFoundException;
 import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,30 +16,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-
+@RequiredArgsConstructor
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
-    private static final String EMAIL_NOT_FOUND_MESSAGE = "User with email: %s not found";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenConfirmationService tokenConfirmationService;
     private final Mapper mapper;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       TokenConfirmationService tokenConfirmationService, Mapper mapper) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.tokenConfirmationService = tokenConfirmationService;
-        this.mapper = mapper;
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new UsernameNotFoundException(String.format(EMAIL_NOT_FOUND_MESSAGE, email)));
-    }
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() ->
@@ -76,10 +59,6 @@ public class UserService implements UserDetailsService {
         );
         tokenConfirmationService.saveConfirmationToken(confirmationToken);
         return token;
-    }
-
-    public UserDetailsService userDetailsService() {
-        return this::loadUserByUsername;
     }
 
     public int enableAppUser(String email) {

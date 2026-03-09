@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
         errorDetails.put(PATH, request.getDescription(false).replace("uri=", ""));
         log.error(getStackTraceAsString(ex));
 
-        return new ResponseEntity<>(errorDetails, getHttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorDetails,/* getHttpHeaders(), */HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -133,10 +133,10 @@ public class GlobalExceptionHandler {
         return sb.toString();
     }
 
-    private HttpHeaders getHttpHeaders() {
+/*    private HttpHeaders getHttpHeaders() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173");
         httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         return httpHeaders;
-    }
+    }*/
 }

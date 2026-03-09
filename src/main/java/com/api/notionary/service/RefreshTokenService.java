@@ -1,13 +1,12 @@
 package com.api.notionary.service;
 
 import com.api.notionary.entity.RefreshToken;
-import com.api.notionary.entity.User;
 import com.api.notionary.exception.TokenRefreshException;
 import com.api.notionary.exception.UserNotFoundException;
 import com.api.notionary.repository.RefreshTokenRepository;
 import com.api.notionary.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class RefreshTokenService {
     @Value("${refresh.token.expiration.sec}")
@@ -22,12 +22,6 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
-    }
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -55,9 +49,9 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public int deleteByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new UserNotFoundException(String.format("User with id [%s] not found", userId)));
-        return refreshTokenRepository.deleteByUser(user);
+    public void deleteByUserId(Long userId) {
+       /* User user = userRepository.findById(userId).orElseThrow(() ->
+                new UserNotFoundException(String.format("User with id [%s] not found", userId)));*/
+        refreshTokenRepository.deleteByUserId(userId);
     }
 }

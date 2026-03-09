@@ -31,7 +31,7 @@ public class WishlistAccess {
     @JoinColumn(name = "wishlist_id", nullable = false)
     private WishList wishList;
 
-    @Column(name = "granted_user_email", nullable = false)
+    @Column(name = "granted_user_email", nullable = false, length = 80)
     private String grantedUserEmail;
 
     private LocalDateTime createdAt = LocalDateTime.now();

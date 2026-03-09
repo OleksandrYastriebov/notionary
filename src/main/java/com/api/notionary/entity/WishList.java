@@ -37,7 +37,7 @@ public class WishList {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
     @Column(name = "is_public", nullable = false)

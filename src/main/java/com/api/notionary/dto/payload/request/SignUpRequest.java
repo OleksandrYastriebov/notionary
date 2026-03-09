@@ -1,5 +1,6 @@
 package com.api.notionary.dto.payload.request;
 
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class SignUpRequest {
 
     private String firstName;
     private String lastName;
+    @Email(message = "Email is not valid")
     private String email;
     private String username;
     private String password;

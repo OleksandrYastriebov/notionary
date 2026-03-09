@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,7 +22,7 @@ public class WishlistItemDto {
     private WishList wishList;
     private String title;
     private String url;
-    private Double price;
+    private BigDecimal price;
     private String description;
     private Boolean isChecked;
 

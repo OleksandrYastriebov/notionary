@@ -32,7 +32,7 @@ public class WishListItem {
     @JsonIgnore
     private WishList wishList;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
     @Column(name = "url")

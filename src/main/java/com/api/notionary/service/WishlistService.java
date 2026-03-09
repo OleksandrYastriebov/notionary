@@ -10,12 +10,13 @@ import com.api.notionary.exception.WishlistNotFoundException;
 import com.api.notionary.helper.Mapper;
 import com.api.notionary.repository.UserRepository;
 import com.api.notionary.repository.WishListRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class WishlistService {
 
@@ -23,15 +24,6 @@ public class WishlistService {
     private final UserRepository userRepository;
     private final WishListItemService wishListItemService;
     private final Mapper mapper;
-
-    @Autowired
-    public WishlistService(WishListRepository wishListRepository, UserRepository userRepository,
-                           WishListItemService wishListItemService, Mapper mapper) {
-        this.wishListRepository = wishListRepository;
-        this.userRepository = userRepository;
-        this.wishListItemService = wishListItemService;
-        this.mapper = mapper;
-    }
 
     public WishlistDto findWishlistById(String wishlistId) {
         WishList wishlist = wishListRepository

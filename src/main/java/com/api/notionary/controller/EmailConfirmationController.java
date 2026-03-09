@@ -1,14 +1,17 @@
 package com.api.notionary.controller;
 
+import com.api.notionary.entity.ApiResponse;
 import com.api.notionary.service.AuthenticationService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@Slf4j
+@RestController
 @RequestMapping("/api")
 public class EmailConfirmationController {
 
@@ -20,12 +23,13 @@ public class EmailConfirmationController {
     }
 
     @GetMapping(path = "/confirm-email")
-    public String confirm(@RequestParam("token") String token, Model model) {
+    public ResponseEntity<ApiResponse> confirmEmail(@RequestParam("token") String token) {
         try {
-            return authenticationService.confirmToken(token);
-        } catch (Exception ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "error";
+            ApiResponse result = authenticationService.confirmToken(token);
+            return ResponseEntity.ok(result);
+        } catch (IllegalStateException ex) {
+            log.error("Unexpected error during token confirmation. ", ex);
+            return ResponseEntity.badRequest().body(new ApiResponse(ex.getMessage()));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.api.notionary.controller;
 
+import com.api.notionary.entity.ApiResponse;
 import com.api.notionary.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +22,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
-        return ResponseEntity.ok().body(String.format("User with id %s was successfully removed.", id));
+        return ResponseEntity.ok(new ApiResponse(String.format("User with id %s was successfully removed.", id)));
     }
-
 }

@@ -27,7 +27,7 @@ public class ConfirmationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token", nullable = false, length = 80)
     private String token;
 
     @Column(name = "local_date_time", nullable = false)
