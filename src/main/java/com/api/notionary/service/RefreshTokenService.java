@@ -24,10 +24,11 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
 
     @Autowired
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository)  {
+    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
     }
+
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
@@ -35,7 +36,8 @@ public class RefreshTokenService {
     public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
 
-        refreshToken.setUser(userRepository.findById(userId).get());
+        refreshToken.setUser(userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format("No User found with the following ID: %s", userId))));
         refreshToken.setExpiryDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
         refreshToken.setToken(UUID.randomUUID().toString());
 

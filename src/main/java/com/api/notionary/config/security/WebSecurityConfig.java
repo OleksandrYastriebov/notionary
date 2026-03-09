@@ -1,4 +1,4 @@
-package com.api.notionary.security.config;
+package com.api.notionary.config.security;
 
 import com.api.notionary.security.JwtAuthenticationFilter;
 import com.api.notionary.service.UserService;

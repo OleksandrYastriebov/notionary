@@ -1,4 +1,4 @@
-package com.api.notionary.security.config;
+package com.api.notionary.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class WishListItem {
     private String url;
 
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "description")
     private String description;
@@ -51,8 +52,7 @@ public class WishListItem {
         this.isChecked = false;
         this.id = UUID.randomUUID()
                 .toString()
-                .replace("-", "")
-                .substring(0, 15);
+                .replace("-", "");
     }
 
     @Override

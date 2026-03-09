@@ -18,6 +18,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -32,12 +34,13 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+    private final TemplateEngine templateEngine;
 
     @Autowired
     public AuthenticationService(EmailValidator emailValidator, UserService userService,
                                  TokenConfirmationService tokenConfirmationService, EmailSender emailSender,
                                  JwtService jwtService, AuthenticationManager authenticationManager,
-                                 RefreshTokenService refreshTokenService) {
+                                 RefreshTokenService refreshTokenService, TemplateEngine templateEngine) {
         this.emailValidator = emailValidator;
         this.userService = userService;
         this.tokenConfirmationService = tokenConfirmationService;
@@ -45,6 +48,7 @@ public class AuthenticationService {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenService = refreshTokenService;
+        this.templateEngine = templateEngine;
     }
 
     public Map<String, String> signUp(SignUpRequest request) {
@@ -120,7 +124,13 @@ public class AuthenticationService {
     }
 
     private String buildEmail(String name, String link) {
-        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("link", link);
+
+        return templateEngine.process("email-confirmation", context);
+
+        /*return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +
                 "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
                 "\n" +
@@ -185,6 +195,6 @@ public class AuthenticationService {
                 "    </tr>\n" +
                 "  </tbody></table><div class=\"yj6qo\"></div><div class=\"adL\">\n" +
                 "\n" +
-                "</div></div>";
+                "</div></div>";*/
     }
 }

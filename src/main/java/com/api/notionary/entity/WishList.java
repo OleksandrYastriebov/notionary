@@ -57,8 +57,7 @@ public class WishList {
     protected void onCreate() {
         this.id = UUID.randomUUID()
                 .toString()
-                .replace("-", "")
-                .substring(0, 15);
+                .replace("-", "");
         this.createdAt = LocalDateTime.now();
     }
 

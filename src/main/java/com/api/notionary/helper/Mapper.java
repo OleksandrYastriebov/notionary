@@ -6,12 +6,14 @@ import com.api.notionary.dto.WishlistItemDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class Mapper {
-    private ModelMapper modelMapper = new ModelMapper();
+    private ModelMapper modelMapper;
 
     /* Wishlist mappings */
 
