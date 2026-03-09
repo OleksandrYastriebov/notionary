@@ -22,6 +22,8 @@ public class JwtService {
 
     @Value("${token.signing.key}")
     private String jwtSigningKey;
+    @Value("${jwt.token.expiration.ms}")
+    private Long jwtExpirationMs;
 
     public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -51,7 +53,7 @@ public class JwtService {
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSignInKey(), Jwts.SIG.HS256).compact();
     }
 

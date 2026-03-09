@@ -1,19 +1,26 @@
 package com.api.notionary.service;
 
-import com.api.notionary.dto.SignInRequestDto;
-import com.api.notionary.dto.SignUpRequestDto;
+import com.api.notionary.dto.payload.request.SignInRequest;
+import com.api.notionary.dto.payload.request.SignUpRequest;
+import com.api.notionary.dto.payload.request.TokenRefreshRequest;
+import com.api.notionary.dto.payload.response.JwtResponse;
+import com.api.notionary.dto.payload.response.TokenRefreshResponse;
 import com.api.notionary.entity.ConfirmationToken;
+import com.api.notionary.entity.RefreshToken;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.UserRole;
+import com.api.notionary.exception.TokenRefreshException;
 import com.api.notionary.service.email.EmailSender;
 import com.api.notionary.service.email.EmailValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class AuthenticationService {
@@ -24,20 +31,23 @@ public class AuthenticationService {
     private final EmailSender emailSender;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     @Autowired
     public AuthenticationService(EmailValidator emailValidator, UserService userService,
                                  TokenConfirmationService tokenConfirmationService, EmailSender emailSender,
-                                 JwtService jwtService, AuthenticationManager authenticationManager) {
+                                 JwtService jwtService, AuthenticationManager authenticationManager,
+                                 RefreshTokenService refreshTokenService) {
         this.emailValidator = emailValidator;
         this.userService = userService;
         this.tokenConfirmationService = tokenConfirmationService;
         this.emailSender = emailSender;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.refreshTokenService = refreshTokenService;
     }
 
-    public String signUp(SignUpRequestDto request) {
+    public Map<String, String> signUp(SignUpRequest request) {
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail) {
             throw new IllegalStateException(String.format("Email %s is invalid.", request.getEmail()));
@@ -55,19 +65,36 @@ public class AuthenticationService {
         emailSender.send(request.getEmail(), buildEmail(request.getFirstName(),
                 "http://localhost:8080/api/confirm-email?token=" + confirmationToken));
 
-        return jwtService.generateToken(user);
+        return Map.of("token", jwtService.generateToken(user));
     }
 
-    public String signIn(SignInRequestDto signInRequestDto) {
-        String userEmail = signInRequestDto.getEmail();
-        String userPassword = signInRequestDto.getPassword();
+    public JwtResponse signIn(SignInRequest signInRequest) {
+        String userEmail = signInRequest.getEmail();
+        String userPassword = signInRequest.getPassword();
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                userEmail,
-                userPassword
-        ));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEmail, userPassword));
 
-        return jwtService.generateToken(userService.loadUserByUsername(userEmail));
+        UserDetails userDetails = userService.loadUserByUsername(userEmail);
+        User user = userService.findByEmail(userEmail);
+
+        String jwtToken = jwtService.generateToken(userDetails);
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+
+        return new JwtResponse(jwtToken, refreshToken, user.getId(), userEmail);
+    }
+
+    public TokenRefreshResponse refresh(TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtService.generateToken(user);
+                    return new TokenRefreshResponse(token, requestRefreshToken);
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
+                        "Refresh token is not in database!"));
     }
 
     @Transactional
@@ -75,22 +102,21 @@ public class AuthenticationService {
         ConfirmationToken confirmationToken = tokenConfirmationService
                 .getToken(token)
                 .orElseThrow(() ->
-                        new IllegalStateException("Token not found"));
+                        new IllegalStateException("Email already confirmed or Token is outdated."));
 
         if (userService.isUserEnabled(confirmationToken.getUser().getEmail())) {
-            throw new IllegalStateException("email already confirmed");
+            throw new IllegalStateException("Email already confirmed.");
         }
 
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
 
         if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("token expired");
+            throw new IllegalStateException("Confirmation token expired.");
         }
 
-        userService.enableAppUser(
-                confirmationToken.getUser().getEmail());
+        userService.enableAppUser(confirmationToken.getUser().getEmail());
         tokenConfirmationService.deleteTokenFromDatabase(token);
-        return "confirmed";
+        return "confirmation";
     }
 
     private String buildEmail(String name, String link) {

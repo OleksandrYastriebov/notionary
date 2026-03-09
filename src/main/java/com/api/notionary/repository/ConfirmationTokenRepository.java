@@ -16,6 +16,6 @@ public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationT
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM ConfirmationToken c WHERE c.token = ?1")
+    @Query("DELETE FROM ConfirmationToken c WHERE c.token = :token")
     void deleteByToken(String token);
 }

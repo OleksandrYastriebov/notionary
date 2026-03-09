@@ -1,8 +1,8 @@
 package com.api.notionary.controller;
 
 import com.api.notionary.dto.WishlistDto;
-import com.api.notionary.dto.WishlistTitleRequestDto;
-import com.api.notionary.dto.WishlistVisibilityRequestDto;
+import com.api.notionary.dto.payload.request.WishlistTitleRequest;
+import com.api.notionary.dto.payload.request.WishlistVisibilityRequest;
 import com.api.notionary.entity.User;
 import com.api.notionary.service.WishlistService;
 import com.api.notionary.util.CredentialUtils;
@@ -48,6 +48,10 @@ public class WishlistController {
     @GetMapping("/{wishlistId}")
     public ResponseEntity<?> getWishlist(@PathVariable String wishlistId, Authentication authentication) {
 
+        if (wishlistService.isPublic(wishlistId)) {
+            return ResponseEntity.ok().body(wishlistService.findWishlistWithItemsById(wishlistId));
+        }
+
         String userEmail = CredentialUtils.getAuthenticatedUserEmail(authentication);
 
         if (!wishlistService.isWishlistOwner(wishlistId, userEmail) && !wishlistService.isPublic(wishlistId)) {
@@ -85,7 +89,7 @@ public class WishlistController {
 
     @PatchMapping("/{wishlistId}/visibility")
     public ResponseEntity<?> changeVisibility(@PathVariable String wishlistId,
-                                              @Valid @RequestBody(required = false) WishlistVisibilityRequestDto isPublicDto,
+                                              @Valid @RequestBody(required = false) WishlistVisibilityRequest isPublicDto,
                                               Authentication authentication) {
         if (isPublicDto == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -104,7 +108,7 @@ public class WishlistController {
 
     @PatchMapping("/{wishlistId}/title")
     public ResponseEntity<?> changeTitle(@PathVariable String wishlistId,
-                                         @Valid @RequestBody(required = false) WishlistTitleRequestDto titleDto,
+                                         @Valid @RequestBody(required = false) WishlistTitleRequest titleDto,
                                          Authentication authentication) {
         if (titleDto == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

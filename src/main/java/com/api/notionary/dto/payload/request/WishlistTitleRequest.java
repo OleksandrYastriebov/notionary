@@ -1,4 +1,4 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class WishlistTitleRequestDto {
+public class WishlistTitleRequest {
 
     @NotNull(message = "Field title is required and cannot be null")
     @NotBlank(message = "Field title is required and cannot be empty")

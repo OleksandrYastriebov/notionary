@@ -1,9 +1,7 @@
 package com.api.notionary.dto;
 
 import com.api.notionary.entity.User;
-import com.api.notionary.entity.WishListItem;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

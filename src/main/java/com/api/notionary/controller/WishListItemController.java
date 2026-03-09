@@ -1,7 +1,7 @@
 package com.api.notionary.controller;
 
 import com.api.notionary.dto.WishlistItemDto;
-import com.api.notionary.dto.WishlistItemIsCheckedRequestDto;
+import com.api.notionary.dto.payload.request.WishlistItemIsCheckedRequest;
 import com.api.notionary.service.WishListItemService;
 import com.api.notionary.service.WishlistService;
 import com.api.notionary.util.CredentialUtils;
@@ -93,7 +93,7 @@ public class WishListItemController {
     }
 
     @PatchMapping("/{wishlistId}/wish/{itemId}/checked")
-    public ResponseEntity<?> updateIsChecked(@Valid @RequestBody(required = false) WishlistItemIsCheckedRequestDto isCheckedDto,
+    public ResponseEntity<?> updateIsChecked(@Valid @RequestBody(required = false) WishlistItemIsCheckedRequest isCheckedDto,
                                              @PathVariable String wishlistId,
                                              @PathVariable String itemId,
                                              Authentication authentication) {

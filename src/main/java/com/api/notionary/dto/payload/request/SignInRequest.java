@@ -1,4 +1,4 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class SignInRequestDto {
+public class SignInRequest {
 
     private String email;
     private String password;

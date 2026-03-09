@@ -43,6 +43,11 @@ public class UserService implements UserDetailsService {
                 new UsernameNotFoundException(String.format(EMAIL_NOT_FOUND_MESSAGE, email)));
     }
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() ->
+                new UserNotFoundException(String.format("User with email %s can not be found.", email)));
+    }
+
     public UserDto findUserById(Long id) {
         User user = userRepository
                 .findById(id)

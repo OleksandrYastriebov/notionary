@@ -1,4 +1,4 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.payload.request;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class SignUpRequestDto {
+public class SignUpRequest {
 
     private String firstName;
     private String lastName;

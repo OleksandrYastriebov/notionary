@@ -36,9 +36,14 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/sign-up/**", "/api/sign-in/**", "/api/confirm-email/**").permitAll()
+                        .requestMatchers("/api/sign-up/**",
+                                "/api/sign-in/**",
+                                "/api/confirm-email/**",
+                                "/api/refreshtoken/**",
+                                "/api/sign-out/**").permitAll()
                         .requestMatchers("/api/wishlist/**").permitAll()
                         .requestMatchers("/api/user/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

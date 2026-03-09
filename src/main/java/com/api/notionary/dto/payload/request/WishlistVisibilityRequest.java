@@ -1,4 +1,4 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.payload.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,8 +14,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class WishlistItemIsCheckedRequestDto {
+public class WishlistVisibilityRequest {
 
-    @NotNull(message = "isChecked field is required and cannot be null")
-    private Boolean isChecked;
+    @NotNull(message = "isPublic field is required and cannot be null")
+    private Boolean isPublic;
 }

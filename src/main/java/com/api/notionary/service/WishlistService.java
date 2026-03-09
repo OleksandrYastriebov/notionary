@@ -2,8 +2,8 @@ package com.api.notionary.service;
 
 import com.api.notionary.dto.WishlistDto;
 import com.api.notionary.dto.WishlistItemDto;
-import com.api.notionary.dto.WishlistTitleRequestDto;
-import com.api.notionary.dto.WishlistVisibilityRequestDto;
+import com.api.notionary.dto.payload.request.WishlistTitleRequest;
+import com.api.notionary.dto.payload.request.WishlistVisibilityRequest;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.exception.WishlistNotFoundException;
@@ -91,12 +91,12 @@ public class WishlistService {
     }
 
     @Transactional
-    public void updateVisibility(String wishlistId, WishlistVisibilityRequestDto wishlistVisibilityRequestDto) {
-        wishListRepository.updateVisibility(wishlistId, wishlistVisibilityRequestDto.getIsPublic());
+    public void updateVisibility(String wishlistId, WishlistVisibilityRequest wishlistVisibilityRequest) {
+        wishListRepository.updateVisibility(wishlistId, wishlistVisibilityRequest.getIsPublic());
     }
 
     @Transactional
-    public void updateTitle(String wishlistId, WishlistTitleRequestDto wishlistTitleRequestDto) {
-        wishListRepository.updateTitle(wishlistId, wishlistTitleRequestDto.getTitle());
+    public void updateTitle(String wishlistId, WishlistTitleRequest wishlistTitleRequest) {
+        wishListRepository.updateTitle(wishlistId, wishlistTitleRequest.getTitle());
     }
 }

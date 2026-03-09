@@ -1,9 +1,13 @@
 package com.api.notionary.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     private static final String TIMESTAMP = "timestamp";
@@ -21,7 +26,6 @@ public class GlobalExceptionHandler {
     private static final String ERROR = "error";
     private static final String MESSAGE = "message";
     private static final String PATH = "path";
-    private static final String DETAILS = "details";
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
@@ -31,9 +35,9 @@ public class GlobalExceptionHandler {
         errorDetails.put(ERROR, HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         errorDetails.put(MESSAGE, ex.getMessage());
         errorDetails.put(PATH, request.getDescription(false).replace("uri=", ""));
-        errorDetails.put(DETAILS, getStackTraceAsString(ex));
+        log.error(getStackTraceAsString(ex));
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorDetails, getHttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(IllegalStateException.class)
@@ -44,7 +48,7 @@ public class GlobalExceptionHandler {
         errorDetails.put(ERROR, HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorDetails.put(MESSAGE, ex.getMessage());
         errorDetails.put(PATH, request.getDescription(false).replace("uri=", ""));
-        errorDetails.put(DETAILS, getStackTraceAsString(ex));
+        log.error(getStackTraceAsString(ex));
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
@@ -54,7 +58,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
         errorDetails.put(MESSAGE, ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(WishlistNotFoundException.class)
@@ -62,7 +66,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
         errorDetails.put(MESSAGE, ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(WishlistItemNotFoundException.class)
@@ -70,7 +74,36 @@ public class GlobalExceptionHandler {
         Map<String, Object> errorDetails = new HashMap<>();
         errorDetails.put(STATUS, HttpStatus.NOT_FOUND.value());
         errorDetails.put(MESSAGE, ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.UNAUTHORIZED.value());
+        errorDetails.put(MESSAGE, "Invalid Email or Password.");
+        errorDetails.put(TIMESTAMP, LocalDateTime.now());
+        log.error(getStackTraceAsString(ex));
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Object> handleDisabledException(DisabledException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.FORBIDDEN.value());
+        errorDetails.put(MESSAGE, "Account is locked. Confirm your email address.");
+        errorDetails.put(TIMESTAMP, LocalDateTime.now());
+        log.error(getStackTraceAsString(ex));
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(TokenRefreshException.class)
+    public ResponseEntity<Object> handleTokenRefreshException(TokenRefreshException ex) {
+        Map<String, Object> errorDetails = new HashMap<>();
+        errorDetails.put(STATUS, HttpStatus.FORBIDDEN.value());
+        errorDetails.put(MESSAGE, ex.getMessage());
+
+        return new ResponseEntity<>(errorDetails, /*getHttpHeaders(), */HttpStatus.FORBIDDEN);
     }
 
 
@@ -79,6 +112,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Invalid or missing request body: " + ex.getLocalizedMessage());
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -97,5 +131,12 @@ public class GlobalExceptionHandler {
             sb.append(element.toString()).append("\n");
         }
         return sb.toString();
+    }
+
+    private HttpHeaders getHttpHeaders() {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173");
+        httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+        return httpHeaders;
     }
 }

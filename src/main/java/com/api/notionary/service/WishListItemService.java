@@ -1,7 +1,7 @@
 package com.api.notionary.service;
 
 import com.api.notionary.dto.WishlistItemDto;
-import com.api.notionary.dto.WishlistItemIsCheckedRequestDto;
+import com.api.notionary.dto.payload.request.WishlistItemIsCheckedRequest;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
 import com.api.notionary.exception.WishlistItemNotFoundException;
@@ -97,7 +97,7 @@ public class WishListItemService {
     }
 
     @Transactional
-    public void updateIsChecked(WishlistItemIsCheckedRequestDto isCheckedDto, String wishlistId, String itemId) {
+    public void updateIsChecked(WishlistItemIsCheckedRequest isCheckedDto, String wishlistId, String itemId) {
         LOGGER.info("Updating isChecked to {} in wishlist item {} in wishlist {}.", isCheckedDto.getIsChecked(), itemId, wishlistId);
         wishlistItemRepository.updateIsChecked(itemId, wishlistId, isCheckedDto.getIsChecked());
     }

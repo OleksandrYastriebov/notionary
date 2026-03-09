@@ -8,12 +8,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "wishlist_access")
 public class WishlistAccess {
 
@@ -30,4 +35,23 @@ public class WishlistAccess {
     private String grantedUserEmail;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof WishlistAccess that)) return false;
+        return Objects.equals(grantedUserEmail, that.getGrantedUserEmail()) &&
+                Objects.equals(
+                        wishList != null ? wishList.getId() : null,
+                        that.getWishList() != null ? that.getWishList().getId() : null
+                );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                grantedUserEmail,
+                wishList != null ? wishList.getId() : null
+        );
+    }
 }

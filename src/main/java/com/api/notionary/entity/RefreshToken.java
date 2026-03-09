@@ -2,6 +2,7 @@ package com.api.notionary.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,42 +16,31 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "confirmation_token")
-public class ConfirmationToken {
-
+@Table(name = "refresh_token")
+public class RefreshToken {
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "local_date_time", nullable = false)
-    private LocalDateTime localDateTime;
+    @Column(name = "expires_at", nullable = false, unique = true)
+    private LocalDateTime expiryDate;
 
-    @Column(name = "expires_at", nullable = false)
-    private LocalDateTime expiresAt;
-
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    public ConfirmationToken(String token, LocalDateTime localDateTime, LocalDateTime expiresAt, User user) {
-        this.token = token;
-        this.localDateTime = localDateTime;
-        this.expiresAt = expiresAt;
-        this.user = user;
-    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ConfirmationToken other)) return false;
+        if (!(o instanceof RefreshToken other)) return false;
         return token != null && token.equals(other.getToken());
     }
 

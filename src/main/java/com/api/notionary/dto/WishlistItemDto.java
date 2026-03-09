@@ -24,7 +24,6 @@ public class WishlistItemDto {
     private String description;
     private Boolean isChecked;
 
-
     @Override
     public String toString() {
         return "WishlistItemDto{" +
