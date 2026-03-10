@@ -2,6 +2,7 @@ package com.api.notionary.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -18,6 +20,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 @Entity
 @Table(name = "confirmation_token")
 public class ConfirmationToken {
@@ -27,22 +30,23 @@ public class ConfirmationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", nullable = false, length = 80)
+    @Column(name = "token", nullable = false, unique = true, length = 50)
     private String token;
 
-    @Column(name = "local_date_time", nullable = false)
-    private LocalDateTime localDateTime;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime created_at;
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id")
+    @ToString.Exclude
     private User user;
 
-    public ConfirmationToken(String token, LocalDateTime localDateTime, LocalDateTime expiresAt, User user) {
+    public ConfirmationToken(String token, LocalDateTime created_at, LocalDateTime expiresAt, User user) {
         this.token = token;
-        this.localDateTime = localDateTime;
+        this.created_at = created_at;
         this.expiresAt = expiresAt;
         this.user = user;
     }

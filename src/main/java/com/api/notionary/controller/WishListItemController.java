@@ -2,13 +2,12 @@ package com.api.notionary.controller;
 
 import com.api.notionary.dto.WishlistItemDto;
 import com.api.notionary.dto.payload.request.WishlistItemIsCheckedRequest;
-import com.api.notionary.entity.ApiResponse;
+import com.api.notionary.dto.ApiResponse;
 import com.api.notionary.service.WishListItemService;
 import com.api.notionary.service.WishlistService;
 import com.api.notionary.util.CredentialUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,7 +35,8 @@ public class WishListItemController {
 
     @PostMapping("/{wishlistId}")
     public ResponseEntity<?> createWishListItem(@PathVariable String wishlistId,
-                                                @RequestBody(required = false) WishlistItemDto wishlistItemDto, Authentication authentication) {
+                                                @RequestBody(required = false) WishlistItemDto wishlistItemDto,
+                                                Authentication authentication) {
         if (wishlistItemDto == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(REQUEST_BODY_IS_MISSING_OR_INVALID_MESSAGE));
@@ -77,7 +77,8 @@ public class WishListItemController {
 
     @PutMapping("/{wishlistId}/wish/{itemId}")
     public ResponseEntity<?> updateWishlistItem(@PathVariable String wishlistId, @PathVariable String itemId,
-                                                @RequestBody(required = false) WishlistItemDto wishlistItemDto, Authentication authentication) {
+                                                @RequestBody(required = false) WishlistItemDto wishlistItemDto,
+                                                Authentication authentication) {
         if (wishlistItemDto == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse(REQUEST_BODY_IS_MISSING_OR_INVALID_MESSAGE));

@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @Table(name = "refresh_token")
 public class RefreshToken {
@@ -27,14 +29,15 @@ public class RefreshToken {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "token", nullable = false, length = 80)
+    @Column(name = "token", nullable = false, unique = true, length = 50)
     private String token;
 
-    @Column(name = "expires_at", nullable = false, unique = true)
-    private LocalDateTime expiryDate;
+    @Column(name = "expires_at", nullable = false)
+    private LocalDateTime expiresAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
     private User user;
 
     @Override

@@ -6,7 +6,7 @@ import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
 import com.api.notionary.exception.WishlistItemNotFoundException;
 import com.api.notionary.exception.WishlistNotFoundException;
-import com.api.notionary.helper.Mapper;
+import com.api.notionary.util.Mapper;
 import com.api.notionary.repository.WishListRepository;
 import com.api.notionary.repository.WishlistItemRepository;
 import lombok.RequiredArgsConstructor;

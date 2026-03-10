@@ -3,7 +3,7 @@ package com.api.notionary.controller;
 import com.api.notionary.dto.WishlistDto;
 import com.api.notionary.dto.payload.request.WishlistTitleRequest;
 import com.api.notionary.dto.payload.request.WishlistVisibilityRequest;
-import com.api.notionary.entity.ApiResponse;
+import com.api.notionary.dto.ApiResponse;
 import com.api.notionary.entity.User;
 import com.api.notionary.service.WishlistService;
 import com.api.notionary.util.CredentialUtils;

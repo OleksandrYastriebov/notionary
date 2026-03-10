@@ -5,7 +5,7 @@ import com.api.notionary.dto.payload.request.SignUpRequest;
 import com.api.notionary.dto.payload.request.TokenRefreshRequest;
 import com.api.notionary.dto.payload.response.JwtResponse;
 import com.api.notionary.dto.payload.response.TokenRefreshResponse;
-import com.api.notionary.entity.ApiResponse;
+import com.api.notionary.dto.ApiResponse;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.RefreshToken;
 import com.api.notionary.entity.User;

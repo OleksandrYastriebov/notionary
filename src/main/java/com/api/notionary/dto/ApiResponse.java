@@ -1,4 +1,4 @@
-package com.api.notionary.entity;
+package com.api.notionary.dto;
 
 public record ApiResponse(String message) {
 }

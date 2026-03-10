@@ -4,7 +4,7 @@ import com.api.notionary.dto.UserDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
 import com.api.notionary.exception.UserNotFoundException;
-import com.api.notionary.helper.Mapper;
+import com.api.notionary.util.Mapper;
 import com.api.notionary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

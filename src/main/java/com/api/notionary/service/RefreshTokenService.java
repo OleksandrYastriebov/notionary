@@ -32,7 +32,7 @@ public class RefreshTokenService {
 
         refreshToken.setUser(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("No User found with the following ID: %s", userId))));
-        refreshToken.setExpiryDate(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
+        refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         refreshToken = refreshTokenRepository.save(refreshToken);
@@ -40,7 +40,7 @@ public class RefreshTokenService {
     }
 
     public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }

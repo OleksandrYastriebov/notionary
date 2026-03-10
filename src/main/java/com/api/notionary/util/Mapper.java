@@ -1,4 +1,4 @@
-package com.api.notionary.helper;
+package com.api.notionary.util;
 
 import com.api.notionary.dto.UserDto;
 import com.api.notionary.dto.WishlistDto;
