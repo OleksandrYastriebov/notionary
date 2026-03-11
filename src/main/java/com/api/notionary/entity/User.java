@@ -70,9 +70,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Column
     private boolean locked = false;
 
+    @Column
     private boolean enabled = false;
+
+    private boolean deleted = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

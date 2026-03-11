@@ -39,7 +39,7 @@ public class AuthenticationService {
     public ApiResponseWrapper signUp(SignUpRequest request) {
         User user = request.toEntity();
         String confirmationToken = userService.signUpUser(user);
-        String activationLink = String.format("%s/api/confirm-email?token=%s", appUrl, confirmationToken);
+        String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, confirmationToken);
         emailSenderService.sendConfirmationEmail(user.getEmail(), user.getFirstName(), activationLink);
 
         return new ApiResponseWrapper("User registered successfully. Please check your email to activate your account.");
@@ -81,7 +81,7 @@ public class AuthenticationService {
     public ApiResponseWrapper confirmToken(String token) {
         ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
-                .orElseThrow(() -> new UserAlreadyActivatedException("Email already confirmed or Token is outdated."));
+                .orElseThrow(() -> new UserAlreadyActivatedException("Email is already confirmed or Token is outdated."));
 
         User user = confirmationToken.getUser();
 

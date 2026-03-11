@@ -28,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public String signUpUser(User user) {
@@ -55,8 +56,19 @@ public class UserService {
     @PreAuthorize("#id == #currentUser.id or hasRole('ROLE_ADMIN')")
     public void deleteUserById(Long id, User currentUser) {
         User userToDelete = getUserEntityById(id);
-        userRepository.delete(userToDelete);
-        log.info("User with id {} was removed from repository by {}.", id, currentUser.getEmail());
+
+        String randomHash = UUID.randomUUID().toString().substring(0, 8);
+        userToDelete.setEmail("deleted_" + randomHash + "@notionary.deleted");
+        userToDelete.setFirstName("Deleted");
+        userToDelete.setLastName("User");
+
+        userToDelete.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+        userToDelete.setEnabled(false);
+        userToDelete.setDeleted(true);
+
+        refreshTokenService.deleteByUserId(userToDelete.getId());
+        log.info("User with email {} was anonymized and soft-deleted.", currentUser.getEmail());
     }
 
     @Transactional

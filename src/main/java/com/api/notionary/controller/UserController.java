@@ -32,7 +32,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @Operation(summary = "Delete user by ID.",
             description = "Permanently deletes a user account and all associated data. This action cannot be undone."
     )
