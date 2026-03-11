@@ -18,18 +18,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class SignUpRequest {
 
+    private static final String THE_INPUT_IS_TOO_LONG = "The input is too long. Max 50 characters.";
+
     @NotBlank(message = "First Name cannot be empty")
+    @Size(max = 50, message = THE_INPUT_IS_TOO_LONG)
     private String firstName;
 
     @NotBlank(message = "Last Name cannot be empty")
+    @Size(max = 50, message = THE_INPUT_IS_TOO_LONG)
     private String lastName;
 
     @Email(message = "Email format is invalid")
     @NotBlank(message = "Email can not be empty")
+    @Size(max = 100, message = "The input is too long. Max 100 characters.")
     private String email;
 
     @NotBlank(message = "Password can not be empty")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Size(min = 8, max = 100, message = "Password must be at least 8 but not longer than 100 characters")
     private String password;
 
     public User toEntity() {

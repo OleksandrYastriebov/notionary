@@ -46,7 +46,8 @@ public class WebSecurityConfig {
                                 "/js/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/wishlists", "/api/v1/wishlists/").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()
                         .requestMatchers(
                                 "/api/v1/wishlists/**",

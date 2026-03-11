@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +33,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "user")
+@SQLRestriction("is_deleted = false")
 public class User implements UserDetails {
     public User(String firstName,
                 String lastName,
@@ -76,6 +78,7 @@ public class User implements UserDetails {
     @Column
     private boolean enabled = false;
 
+    @Column(name = "is_deleted")
     private boolean deleted = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

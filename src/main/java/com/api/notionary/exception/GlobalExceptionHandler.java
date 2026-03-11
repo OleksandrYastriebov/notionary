@@ -124,7 +124,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoResourceFoundException( NoResourceFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException ex, WebRequest request) {
         log.warn("Resource not found: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Resource Not Found", "The requested endpoint or resource does not exist. Please check the URL.", request);
     }
@@ -132,6 +132,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, "Username not found", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), "Rate limit exceeded", request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {

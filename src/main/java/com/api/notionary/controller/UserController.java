@@ -5,6 +5,8 @@ import com.api.notionary.controller.docs.ApiNotFundErrorDoc;
 import com.api.notionary.controller.docs.ApiUnauthorizedErrorDoc;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
+import com.api.notionary.security.interceptop.RateLimitPlan;
+import com.api.notionary.security.interceptop.RateLimited;
 import com.api.notionary.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,13 +23,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
-@RestController
-@RequestMapping("/api/v1/users")
 @Tag(
         name = "Users",
         description = "Methods for working with users"
 )
+@RateLimited(action = RateLimitPlan.MUTATION)
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;

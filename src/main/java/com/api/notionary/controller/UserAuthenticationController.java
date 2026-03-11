@@ -8,6 +8,8 @@ import com.api.notionary.dto.token.JwtDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.dto.token.TokenRefreshDto;
 import com.api.notionary.entity.User;
+import com.api.notionary.security.interceptop.RateLimitPlan;
+import com.api.notionary.security.interceptop.RateLimited;
 import com.api.notionary.service.AuthenticationService;
 import com.api.notionary.service.RefreshTokenService;
 import jakarta.validation.Valid;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
+@RateLimited(action = RateLimitPlan.AUTH)
 @RequestMapping("/api/v1")
 public class UserAuthenticationController {
 

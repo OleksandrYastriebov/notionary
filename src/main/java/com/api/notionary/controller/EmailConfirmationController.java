@@ -1,6 +1,8 @@
 package com.api.notionary.controller;
 
 import com.api.notionary.dto.ApiResponseWrapper;
+import com.api.notionary.security.interceptop.RateLimitPlan;
+import com.api.notionary.security.interceptop.RateLimited;
 import com.api.notionary.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ public class EmailConfirmationController {
     private final AuthenticationService authenticationService;
 
     @GetMapping(path = "/confirm-email")
+    @RateLimited(action = RateLimitPlan.MUTATION)
     public ResponseEntity<ApiResponseWrapper> confirmEmail(@RequestParam("token") String token) {
         return ResponseEntity.ok(authenticationService.confirmToken(token));
     }

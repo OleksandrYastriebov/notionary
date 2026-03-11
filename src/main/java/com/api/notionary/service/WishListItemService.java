@@ -14,6 +14,7 @@ import com.api.notionary.repository.WishListItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class WishListItemService {
+
+    @Value("${app.limits.max-items-per-list}")
+    private int maxWishlistsPerWishlist;
 
     private final WishListItemRepository wishListItemRepository;
     private final WishListService wishListService;
@@ -39,6 +43,12 @@ public class WishListItemService {
 
     @Transactional
     public WishListItemDto createWishListItem(String wishListId, CreateWishListItemRequest createWishListItemRequest, User user) {
+        WishListDto wishListDto = wishListService.findWishlistById(wishListId, user);
+
+        if (wishListDto.getWishListItems().size() >= maxWishlistsPerWishlist) {
+            throw new IllegalStateException("Maximum Wishlist item limit per reached.");
+        }
+
         WishList wishList = wishListService.getWishlistEntityForOwner(wishListId, user);
         return wishListItemRepository.save(createWishListItemRequest.toEntity(wishList)).toDto();
     }

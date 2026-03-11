@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +21,9 @@ public class RefreshTokenService {
     @Value("${token.refresh.expiration.sec}")
     private Long refreshTokenDurationSec;
 
+    @Value("${token.refresh.max.sessions.count}")
+    private int maxSessions;
+
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
 
@@ -28,15 +32,19 @@ public class RefreshTokenService {
     }
 
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(userId);
 
+        if (activeTokens.size() >= maxSessions) {
+            refreshTokenRepository.delete(activeTokens.getFirst());
+        }
+
+        RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("No User found with the following ID: %s", userId))));
         refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
         refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+        return refreshTokenRepository.save(refreshToken);
     }
 
     public void verifyExpiration(RefreshToken token) {

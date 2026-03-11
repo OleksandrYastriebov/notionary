@@ -40,7 +40,7 @@ public class WishListItem {
     @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @Column(name = "url", length = 1000)
+    @Column(name = "url", length = 2048)
     private String url;
 
     @Column(name = "price")

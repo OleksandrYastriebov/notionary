@@ -2,7 +2,10 @@ package com.api.notionary.dto.payload.request.wishlistitem;
 
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
+import org.hibernate.validator.constraints.URL;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,16 +20,19 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class CreateWishListItemRequest {
 
-    @Size(min = 1, message = "Title can not be empty")
+    @NotBlank(message = "Title cannot be empty")
+    @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
 
-    @Size(min = 1, message = "Url can not be empty")
+    @Size(max = 2048, message = "URL is too long")
+    @URL(message = "Invalid URL format")
     private String url;
 
-    @DecimalMin(value = "0.0", message = "Price must be greater than or equal to 0")
+    @DecimalMin(value = "0.0", message = "Price must be positive")
+    @Digits(integer = 8, fraction = 2, message = "Price format is invalid (e.g. 12345678.99)")
     private BigDecimal price;
 
-    @Size(min = 1, message = "Description can not be empty")
+    @Size(max = 1000, message = "Description should not more than 1000 characters")
     private String description;
 
     public WishListItem toEntity(WishList wishList) {

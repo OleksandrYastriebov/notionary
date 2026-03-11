@@ -6,6 +6,8 @@ import com.api.notionary.dto.wishlist.WishListContainerDto;
 import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
+import com.api.notionary.security.interceptop.RateLimitPlan;
+import com.api.notionary.security.interceptop.RateLimited;
 import com.api.notionary.service.WishListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
+@RateLimited(action = RateLimitPlan.MUTATION)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/wishlists")

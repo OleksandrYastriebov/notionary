@@ -13,4 +13,6 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
 
     @EntityGraph(attributePaths = {"items"})
     List<WishList> findByUser(User user);
+
+    int countByUser(User user);
 }

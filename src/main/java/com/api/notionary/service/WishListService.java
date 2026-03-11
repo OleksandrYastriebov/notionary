@@ -9,6 +9,7 @@ import com.api.notionary.entity.WishList;
 import com.api.notionary.exception.WishlistNotFoundException;
 import com.api.notionary.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class WishListService {
+
+    @Value("${app.limits.max-wishlists}")
+    private int maxWishlistsPerAccount;
 
     private final WishListRepository wishListRepository;
 
@@ -34,6 +38,11 @@ public class WishListService {
 
     @Transactional
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
+
+        if (wishListRepository.countByUser(user) >= maxWishlistsPerAccount) {
+            throw new IllegalStateException("Maximum limit WishLists per account reached.");
+        }
+
         WishList wishlist = createWishlistRequest.toEntity(user);
         return wishListRepository.save(wishlist).toDto();
     }
