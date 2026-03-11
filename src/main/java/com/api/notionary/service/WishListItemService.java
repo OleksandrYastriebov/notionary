@@ -1,98 +1,67 @@
 package com.api.notionary.service;
 
-import com.api.notionary.dto.WishlistItemDto;
-import com.api.notionary.dto.payload.request.WishlistItemIsCheckedRequest;
+import com.api.notionary.dto.payload.request.wishlistitem.CreateWishListItemRequest;
+import com.api.notionary.dto.payload.request.wishlistitem.UpdateWishListItemRequest;
+import com.api.notionary.dto.payload.request.wishlistitem.WishlistItemIsCheckedRequest;
+import com.api.notionary.dto.wishlistitem.WishListItemDto;
+import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishListItem;
 import com.api.notionary.exception.WishlistItemNotFoundException;
-import com.api.notionary.exception.WishlistNotFoundException;
-import com.api.notionary.util.Mapper;
-import com.api.notionary.repository.WishListRepository;
-import com.api.notionary.repository.WishlistItemRepository;
+import com.api.notionary.repository.WishListItemRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class WishListItemService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WishListItemService.class);
+    private final WishListItemRepository wishListItemRepository;
+    private final WishListService wishListService;
 
-    private final WishlistItemRepository wishlistItemRepository;
-    private final WishListRepository wishListRepository;
-    private final Mapper mapper;
-
-    public WishlistItemDto findWishlistItemByIdAndWishlistId(String wishlistItemId, String wishlistId) {
-        WishListItem wishlistItem = wishlistItemRepository.findByIdAndWishListId(wishlistItemId, wishlistId).orElseThrow(() ->
-                new WishlistItemNotFoundException(String.format("Wishlist item with id: %s and wishlistId: %s was not found.", wishlistItemId, wishlistId)));
-        return mapper.mapWishlistItemToDto(wishlistItem);
+    public WishListItemDto findWishlistItemByIdAndWishlistId(String wishlistId, String itemId, User user) {
+        wishListService.findWishlistById(wishlistId, user);
+        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
+        return wishlistItem.toDto();
     }
 
     @Transactional
-    public WishlistItemDto addWishListItem(String wishlistId, WishlistItemDto wishlistItemDto) {
-        WishList wishlist = wishListRepository.findById(wishlistId).orElseThrow(() ->
-                new WishlistNotFoundException(String.format("Wishlist with id: %s was not found.", wishlistId)));
-        wishlistItemDto.setWishList(wishlist);
-        WishListItem wishListItem = mapper.mapWishlistItemToEntity(wishlistItemDto);
-
-        LOGGER.info("Adding a wishlist item: {} to the wishlist: {}", wishlistItemDto, wishlistId);
-
-        return mapper.mapWishlistItemToDto(wishlistItemRepository.save(wishListItem));
-    }
-
-    public List<WishlistItemDto> findAllWishlistItemsById(String wishlistId) {
-        List<WishListItem> wishListItems = wishlistItemRepository.findAllByWishListId(wishlistId);
-        return wishListItems.stream().map(mapper::mapWishlistItemToDto).toList();
+    public WishListItemDto createWishListItem(String wishlistId, CreateWishListItemRequest createWishListItemRequest, User user) {
+        WishList wishList = wishListService.getWishlistEntityForOwner(wishlistId, user);
+        return wishListItemRepository.save(createWishListItemRequest.toEntity(wishList)).toDto();
     }
 
     @Transactional
-    public void deleteWishlistItem(String wishlistId, String itemId) {
-        if (findWishlistItemByIdAndWishlistId(itemId, wishlistId) == null) {
-            throw new WishlistItemNotFoundException(
-                    String.format("*ERROR* Trying to delete wishlist item with id %s. Wishlist item not found", wishlistId));
-        }
-        LOGGER.info("Removing wishlist item: {} from the wishlist {}", itemId, wishlistId);
-
-        wishlistItemRepository.deleteByIdAndWishListId(itemId, wishlistId);
+    public void deleteWishlistItem(String wishlistId, String itemId, User user) {
+        wishListService.getWishlistEntityForOwner(wishlistId, user);
+        WishListItem wishListItem = getWishlistItem(wishlistId, itemId);
+        wishListItemRepository.delete(wishListItem);
     }
 
     @Transactional
-    public WishlistItemDto updateWishlistItem(WishlistItemDto wishlistItemDto, String wishlistId, String itemId) {
-        LOGGER.info("Start updating wishlist item {}", itemId);
-
-        WishListItem wishListItem = wishlistItemRepository.findByIdAndWishListId(itemId, wishlistId)
-                .orElseThrow(() -> new WishlistItemNotFoundException(
-                        String.format("Wishlist item %s in wishlist %s not found", itemId, wishlistId)));
-
-        if (wishlistItemDto.getTitle() != null) {
-            wishListItem.setTitle(wishlistItemDto.getTitle());
-        }
-        if (wishlistItemDto.getPrice() != null) {
-            wishListItem.setPrice(wishlistItemDto.getPrice());
-        }
-        if (wishlistItemDto.getUrl() != null) {
-            wishListItem.setUrl(wishlistItemDto.getUrl());
-        }
-        if (wishlistItemDto.getDescription() != null) {
-            wishListItem.setDescription(wishlistItemDto.getDescription());
-        }
-        if (wishlistItemDto.getIsChecked() != null) {
-            wishListItem.setIsChecked(wishlistItemDto.getIsChecked());
-        }
-        LOGGER.info("Wishlist item {} updated successfully", itemId);
-
-        return mapper.mapWishlistItemToDto(wishListItem);
+    public WishListItemDto updateWishlistItem(UpdateWishListItemRequest updateWishListItemRequest, String wishlistId,
+                                              String itemId, User user) {
+        wishListService.getWishlistEntityForOwner(wishlistId, user);
+        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
+        updateWishListItemRequest.updateEntity(wishlistItem);
+        return wishlistItem.toDto();
     }
 
     @Transactional
-    public void updateIsChecked(WishlistItemIsCheckedRequest isCheckedDto, String wishlistId, String itemId) {
-        LOGGER.info("Updating isChecked to {} in wishlist item {} in wishlist {}.", isCheckedDto.getIsChecked(), itemId, wishlistId);
-        wishlistItemRepository.updateIsChecked(itemId, wishlistId, isCheckedDto.getIsChecked());
+    public void toggleIsChecked(String wishlistId, String itemId, WishlistItemIsCheckedRequest request, User user) {
+        wishListService.findWishlistById(wishlistId, user);
+        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
+        wishlistItem.setIsChecked(request.getIsChecked());
     }
+
+    private @NonNull WishListItem getWishlistItem(String wishlistId, String itemId) {
+        return wishListItemRepository.findByIdAndWishListId(itemId, wishlistId).orElseThrow(() ->
+                new WishlistItemNotFoundException(String.format("Wishlist item with id: %s and wishlistId: %s was not found.", itemId, wishlistId)));
+    }
+
 }
 

@@ -1,10 +1,14 @@
 package com.api.notionary.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,8 +20,8 @@ import org.springframework.web.context.request.WebRequest;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest webRequest) {
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorResponse> handleAllExceptions(Throwable ex, WebRequest webRequest) {
         log.error("Unexpected error occurred", ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Hidden for security reasons",
                 "Internal Server Error", webRequest);
@@ -31,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundExceptions(RuntimeException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundExceptions(EntityNotFoundException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
@@ -43,7 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ErrorResponse> handleDisabledException(DisabledException ex, WebRequest webRequest) {
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(),
-                "Account is locked.Confirm your email address.", webRequest);
+                "Account is locked. Confirm your email address.", webRequest);
     }
 
     @ExceptionHandler(TokenRefreshException.class)
@@ -62,24 +66,60 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest webRequest) {
         String errorMessage = ex.getFieldError() != null
                 ? ex.getFieldError().getDefaultMessage()
-                : "Invalid data";
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                : "Invalid method arguments";
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Error",
                 "Validation failed: " + errorMessage, webRequest);
     }
 
     @ExceptionHandler(InvalidFormatException.class)
     public ResponseEntity<ErrorResponse> handleInvalidFormat(InvalidFormatException ex, WebRequest webRequest) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Format Error",
                 "Invalid request body format: " + ex.getMessage(), webRequest);
+    }
+
+    @ExceptionHandler(MessagingException.class)
+    public ResponseEntity<ErrorResponse> handleMessagingException(MessagingException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Mail send Exception",
+                "Error trying to send email: " + ex.getMessage(), webRequest);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Access denied",
+                "Trying to get access to protected resource. " + ex.getMessage(), webRequest);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "User already exists in repository.", webRequest);
+    }
+
+    @ExceptionHandler(UserAlreadyActivatedException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyActivatedException(UserAlreadyActivatedException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(),
+                "Conflict.", webRequest);
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Token is expired.", webRequest);
+    }
+
+    @ExceptionHandler(TokenInvalidException.class)
+    public ResponseEntity<ErrorResponse> handleTokenInvalidException(TokenInvalidException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
+                "Token is invalid.", webRequest);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 status.value(),
                 exceptionMessage,
-                request != null ? request.getDescription(false).replace("uri=", "") : ""
+                getRequestPath(request)
         );
-        return new ResponseEntity<>(errorResponse, status);
+        return new ResponseEntity<>(errorResponse, buildHeaders(), status);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage,
@@ -88,14 +128,18 @@ public class GlobalExceptionHandler {
                 status.value(),
                 exceptionMessage,
                 message,
-                request != null ? request.getDescription(false).replace("uri=", "") : ""
+                getRequestPath(request)
         );
-        return new ResponseEntity<>(errorResponse, status);
+        return new ResponseEntity<>(errorResponse, buildHeaders(), status);
     }
-/*    private HttpHeaders getHttpHeaders() {
+
+    private String getRequestPath(WebRequest request) {
+        return request != null ? request.getDescription(false).replace("uri=", "") : "";
+    }
+
+    private HttpHeaders buildHeaders() {
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173");
-        httpHeaders.add(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return httpHeaders;
-    }*/
+    }
 }

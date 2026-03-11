@@ -1,6 +1,6 @@
 package com.api.notionary.controller;
 
-import com.api.notionary.dto.ApiResponse;
+import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,19 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class EmailConfirmationController {
 
     private final AuthenticationService authenticationService;
 
     @GetMapping(path = "/confirm-email")
-    public ResponseEntity<ApiResponse> confirmEmail(@RequestParam("token") String token) {
+    public ResponseEntity<ApiResponseWrapper> confirmEmail(@RequestParam("token") String token) {
         try {
-            ApiResponse result = authenticationService.confirmToken(token);
+            ApiResponseWrapper result = authenticationService.confirmToken(token);
             return ResponseEntity.ok(result);
         } catch (IllegalStateException ex) {
             log.error("Unexpected error during token confirmation. ", ex);
-            return ResponseEntity.badRequest().body(new ApiResponse(ex.getMessage()));
+            return ResponseEntity.badRequest().body(new ApiResponseWrapper(ex.getMessage()));
         }
     }
 }

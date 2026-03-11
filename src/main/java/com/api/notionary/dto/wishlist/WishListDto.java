@@ -1,31 +1,30 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.wishlist;
 
+import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.api.notionary.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
 @ToString
-public class WishlistDto {
+public class WishListDto {
 
     private String id;
     @JsonIgnore
+    @ToString.Exclude
     private User user;
-    private List<WishlistItemDto> wishListItems = List.of();
+    private List<WishListItemDto> wishListItems = List.of();
     private String title;
-    private Boolean isPublic;
+    private Boolean isPublic = false;
     private LocalDateTime createdAt;
 
 }

@@ -50,8 +50,11 @@ public class RefreshTokenService {
 
     @Transactional
     public void deleteByUserId(Long userId) {
-       /* User user = userRepository.findById(userId).orElseThrow(() ->
-                new UserNotFoundException(String.format("User with id [%s] not found", userId)));*/
         refreshTokenRepository.deleteByUserId(userId);
+    }
+
+    @Transactional
+    public void deleteByToken(String token) {
+        refreshTokenRepository.deleteByToken(token);
     }
 }

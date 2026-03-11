@@ -1,34 +1,26 @@
 package com.api.notionary.util.scheduling;
 
-import com.api.notionary.dto.UserDto;
 import com.api.notionary.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class UserCleanupJob {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserCleanupJob.class);
 
     private final UserService userService;
 
     /**
-     * Run every month
+     * Remove from database users who have not verified their account.
+     * Run cleanup job every night
      */
-    @Scheduled(cron = "0 0 0 1 * ?")
+    @Scheduled(cron = "0 0 3 * * *")
     public void removeDisabledUsers() {
-        LOGGER.info("Starting UserCleanupJob.");
-        List<UserDto> expiredUsers = userService.getAllDisabledUsers();
-
-        if (!expiredUsers.isEmpty()) {
-            LOGGER.info("Removing unconfirmed expired users: {}", expiredUsers);
-            userService.deleteUsers(expiredUsers);
-        }
+        log.info("Starting UserCleanupJob...");
+        userService.cleanupUnverifiedUsers();
+        log.info("Finished UserCleanupJob.");
     }
 }

@@ -2,11 +2,11 @@ package com.api.notionary.config.security;
 
 import com.api.notionary.security.JwtAuthenticationFilter;
 import com.api.notionary.service.UserDetailsServiceImpl;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.api.notionary.util.constants.Constant.JSON_CONTENT_TYPE;
+
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -36,19 +38,37 @@ public class WebSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/sign-up/**",
-                                "/api/sign-in/**",
-                                "/api/confirm-email/**",
-                                "/api/refreshtoken/**",
-                                "/api/sign-out/**",
+                        .requestMatchers(
+                                "/api/v1/sign-up/**",
+                                "/api/v1/sign-in/**",
+                                "/api/v1/confirm-email/**",
+                                "/api/v1/refres-htoken/**",
                                 "/css/**",
-                                "/js/**").permitAll()
-                        .requestMatchers("/api/wishlist/**", "/api/user/**").authenticated()
+                                "/js/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/*").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()
+                        .requestMatchers(
+                                "/api/v1/wishlists/**",
+                                "/api/v1/user/**",
+                                "/api/v1/sign-out**").authenticated()
                         .anyRequest().authenticated()
-                )
+                ).exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType(JSON_CONTENT_TYPE);
+                            response.getWriter().write("{\"message\": \"Unauthorized: Authorization Token is missing or invalid.\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType(JSON_CONTENT_TYPE);
+                            response.getWriter().write("{\"message\": \"Access Denied: You don't have enough permissions.\"}");
+                        }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -59,15 +79,13 @@ public class WebSecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }

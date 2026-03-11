@@ -1,4 +1,4 @@
-package com.api.notionary.dto;
+package com.api.notionary.dto.wishlistitem;
 
 import com.api.notionary.entity.WishList;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
@@ -14,11 +15,11 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-public class WishlistItemDto {
+public class WishListItemDto {
 
     private String id;
     @JsonIgnore
+    @ToString.Exclude
     private WishList wishList;
     private String title;
     private String url;
@@ -26,16 +27,4 @@ public class WishlistItemDto {
     private String description;
     private Boolean isChecked;
 
-    @Override
-    public String toString() {
-        return "WishlistItemDto{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", url='" + url + '\'' +
-                ", price=" + price +
-                ", description='" + description + '\'' +
-                ", wishlistId='" + wishList.getId() + '\'' +
-                ", isChecked=" + isChecked +
-                '}';
-    }
 }

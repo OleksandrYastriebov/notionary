@@ -1,17 +1,17 @@
 package com.api.notionary.security;
 
+import com.api.notionary.exception.ErrorResponse;
 import com.api.notionary.service.UserDetailsServiceImpl;
 import com.api.notionary.service.JwtService;
-import io.jsonwebtoken.ExpiredJwtException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
+
+import static com.api.notionary.util.constants.Constant.JSON_CONTENT_TYPE;
 
 @RequiredArgsConstructor
 @Component
@@ -31,15 +32,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
+            @Nonnull HttpServletRequest request,
+            @Nonnull HttpServletResponse response,
+            @Nonnull FilterChain filterChain
     ) throws ServletException, IOException {
         var authHeader = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.isEmpty(authHeader) || !StringUtils.startsWith(authHeader, BEARER_PREFIX)) {
+        if (!StringUtils.isNotBlank(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -49,11 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email;
         try {
             email = jwtService.extractEmail(jwt);
-        } catch (ExpiredJwtException ex) {
-            setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token has expired. Please refresh.");
-            return;
         } catch (Exception ex) {
-            setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is invalid or expired.");
+            setErrorResponse(response, "Token has expired or invalid.", request.getRequestURI());
             return;
         }
 
@@ -73,23 +72,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);
             } else {
-                setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Token is invalid or expired.");
+                setErrorResponse(response, "Token has expired or invalid.", request.getRequestURI());
                 return;
             }
         }
         filterChain.doFilter(request, response);
     }
 
-    private void setErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
-        //response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173");
-        //response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+    private void setErrorResponse(HttpServletResponse response, String message, String path) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(JSON_CONTENT_TYPE);
+        response.setCharacterEncoding("UTF-8");
 
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json");
-        response.getWriter().write(String.format(
-                "{\"timestamp\":\"%s\",\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
-                LocalDateTime.now(), status.value(), status.getReasonPhrase(), message
-        ));
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                message,
+                path
+        );
+        response.getWriter().write(objectMapper.writeValueAsString(error));
     }
 
 }

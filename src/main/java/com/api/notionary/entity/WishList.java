@@ -1,5 +1,6 @@
 package com.api.notionary.entity;
 
+import com.api.notionary.dto.wishlist.WishListDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,6 +15,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -60,6 +62,12 @@ public class WishList {
     @ToString.Exclude
     private List<WishlistAccess> accesses = new ArrayList<>();
 
+    public WishList(User user, String title, Boolean isPublic) {
+        this.user = user;
+        this.title = title;
+        this.isPublic = isPublic;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.id = UUID.randomUUID()
@@ -80,5 +88,18 @@ public class WishList {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    public WishListDto toDto() {
+        return new WishListDto(
+                id,
+                user,
+                items.stream()
+                        .map(WishListItem::toDto)
+                        .toList(),
+                title,
+                isPublic,
+                createdAt
+        );
     }
 }

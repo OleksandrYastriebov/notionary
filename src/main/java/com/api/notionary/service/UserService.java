@@ -1,94 +1,74 @@
 package com.api.notionary.service;
 
-import com.api.notionary.dto.UserDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
+import com.api.notionary.exception.UserAlreadyExistsException;
 import com.api.notionary.exception.UserNotFoundException;
-import com.api.notionary.util.Mapper;
 import com.api.notionary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TokenConfirmationService tokenConfirmationService;
-    private final Mapper mapper;
+    private final ConfirmationTokenService confirmationTokenService;
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() ->
-                new UserNotFoundException(String.format("User with email %s can not be found.", email)));
-    }
-
-    public UserDto findUserById(Long id) {
-        User user = userRepository
-                .findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", id)));
-        return mapper.mapUserToDto(user);
-    }
-
+    @Transactional
     public String signUpUser(User user) {
-        boolean userExists = userRepository.findByEmail(user.getEmail()).isPresent();
-        if (userExists) {
-            throw new IllegalStateException("Email already taken");
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("Email already taken.");
         }
 
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-
         user.setPassword(encodedPassword);
-
         userRepository.save(user);
-
         String token = UUID.randomUUID().toString();
+
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token,
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(1),
                 user
         );
-        tokenConfirmationService.saveConfirmationToken(confirmationToken);
+
+        confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
     }
 
-    public int enableAppUser(String email) {
-        return userRepository.enableAppUser(email);
+    @Transactional
+    @PreAuthorize("#id == #currentUser.id or hasRole('ROLE_ADMIN')")
+    public void deleteUserById(Long id, User currentUser) {
+        User userToDelete = getUserEntityById(id);
+        userRepository.delete(userToDelete);
+        log.info("User with id {} was removed from repository by {}.", id, currentUser.getEmail());
     }
 
-    public boolean isUserEnabled(String email) {
-        return userRepository.findEnabledByEmail(email).orElseThrow(() ->
-                new IllegalStateException("No 'enabled' flag found"));
-    }
-
-    public void deleteUserById(Long id) {
-        if (findUserById(id) == null) {
-            throw new UserNotFoundException(
-                    String.format("*ERROR* Trying to delete user with id %s. User not found", id));
+    @Transactional
+    public void cleanupUnverifiedUsers() {
+        List<Long> idsToDelete = userRepository.findIdsOfExpiredAndDisabledUsers();
+        if (idsToDelete.isEmpty()) {
+            log.info("No expired unverified users found for cleanup.");
+            return;
         }
-        userRepository.deleteById(id);
-        LOGGER.info("User with id {} was removed from repository.", id);
+        confirmationTokenService.deleteTokensByUserIds(idsToDelete);
+        userRepository.bulkDeleteByIds(idsToDelete);
+        log.info("Cleanup Job: Successfully removed {} unverified expired users.", idsToDelete.size());
     }
 
-    public List<UserDto> getAllDisabledUsers() {
-        List<User> disabledUsers = userRepository.findUsersWithExpiredConfirmationTokenAndDisabled();
-        return disabledUsers.stream()
-                .map(mapper::mapUserToDto)
-                .toList();
-    }
-
-    public void deleteUsers(List<UserDto> disabledUsers) {
-        disabledUsers.stream()
-                .map(UserDto::getId)
-                .forEach(this::deleteUserById);
+    private User getUserEntityById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", id)));
     }
 }

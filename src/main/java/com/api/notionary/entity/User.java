@@ -97,7 +97,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + userRole.name());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
         return Collections.singletonList(authority);
     }
 
@@ -142,4 +142,5 @@ public class User implements UserDetails {
     public int hashCode() {
         return Objects.hashCode(email);
     }
+
 }

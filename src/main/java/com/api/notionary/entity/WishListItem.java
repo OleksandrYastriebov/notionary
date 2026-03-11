@@ -1,5 +1,6 @@
 package com.api.notionary.entity;
 
+import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "wishlist_item")
 public class WishListItem {
 
@@ -49,7 +52,16 @@ public class WishListItem {
     private String description;
 
     @Column(name = "is_checked", nullable = false)
-    private Boolean isChecked;
+    private Boolean isChecked = false;
+
+    public WishListItem(WishList wishList, String title, String url,
+                        String description, BigDecimal price) {
+        this.wishList = wishList;
+        this.title = title;
+        this.description = description;
+        this.url = url;
+        this.price = price;
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -72,6 +84,18 @@ public class WishListItem {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode(); // Консистентно с WishList
+        return getClass().hashCode();
+    }
+
+    public WishListItemDto toDto() {
+        return new WishListItemDto(
+                id,
+                wishList,
+                title,
+                url,
+                price,
+                description,
+                isChecked
+        );
     }
 }

@@ -1,16 +1,17 @@
 package com.api.notionary.service;
 
-import com.api.notionary.dto.payload.request.SignInRequest;
-import com.api.notionary.dto.payload.request.SignUpRequest;
-import com.api.notionary.dto.payload.request.TokenRefreshRequest;
-import com.api.notionary.dto.payload.response.JwtResponse;
-import com.api.notionary.dto.payload.response.TokenRefreshResponse;
-import com.api.notionary.dto.ApiResponse;
+import com.api.notionary.dto.payload.request.user.SignInRequest;
+import com.api.notionary.dto.payload.request.user.SignUpRequest;
+import com.api.notionary.dto.payload.request.token.TokenRefreshRequest;
+import com.api.notionary.dto.token.JwtDto;
+import com.api.notionary.dto.ApiResponseWrapper;
+import com.api.notionary.dto.token.TokenRefreshDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.RefreshToken;
 import com.api.notionary.entity.User;
-import com.api.notionary.entity.UserRole;
+import com.api.notionary.exception.TokenExpiredException;
 import com.api.notionary.exception.TokenRefreshException;
+import com.api.notionary.exception.UserAlreadyActivatedException;
 import com.api.notionary.service.email.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,76 +30,72 @@ public class AuthenticationService {
 
     private final EmailSenderService emailSenderService;
     private final UserService userService;
-    private final TokenConfirmationService tokenConfirmationService;
+    private final ConfirmationTokenService confirmationTokenService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
 
-    public ApiResponse signUp(SignUpRequest request) {
-
-        User user = new User(
-                request.getFirstName(),
-                request.getLastName(),
-                request.getEmail(),
-                request.getPassword(),
-                LocalDateTime.now(),
-                UserRole.USER);
-
+    @Transactional
+    public ApiResponseWrapper signUp(SignUpRequest request) {
+        User user = request.toEntity();
         String confirmationToken = userService.signUpUser(user);
         String activationLink = String.format("%s/api/confirm-email?token=%s", appUrl, confirmationToken);
         emailSenderService.sendConfirmationEmail(user.getEmail(), user.getFirstName(), activationLink);
 
-        return new ApiResponse("User registered successfully. Please check your email to activate your account.");
+        return new ApiResponseWrapper("User registered successfully. Please check your email to activate your account.");
     }
 
-    public JwtResponse signIn(SignInRequest signInRequest) {
+    @Transactional
+    public JwtDto signIn(SignInRequest signInRequest) {
         String userEmail = signInRequest.getEmail();
         String userPassword = signInRequest.getPassword();
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEmail, userPassword));
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEmail, userPassword));
 
-        User user = userService.findByEmail(userEmail);
+        User user = (User) authentication.getPrincipal();
 
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
-        return new JwtResponse(jwtToken, refreshToken, user.getId(), userEmail);
-    }
-
-    public TokenRefreshResponse refresh(TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
-
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    String token = jwtService.generateToken(user);
-                    return new TokenRefreshResponse(token, requestRefreshToken);
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
-                        "Refresh token is not in database!"));
+        return new JwtDto(jwtToken, refreshToken, user.getId(), userEmail);
     }
 
     @Transactional
-    public ApiResponse confirmToken(String token) {
-        ConfirmationToken confirmationToken = tokenConfirmationService
+    public TokenRefreshDto refreshToken(TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
+
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+
+        refreshTokenService.verifyExpiration(refreshToken);
+        User user = refreshToken.getUser();
+        refreshTokenService.deleteByToken(requestRefreshToken);
+
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
+        String jwt = jwtService.generateToken(user);
+
+        return new TokenRefreshDto(jwt, newRefreshToken.getToken());
+    }
+
+    @Transactional
+    public ApiResponseWrapper confirmToken(String token) {
+        ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
-                .orElseThrow(() ->
-                        new IllegalStateException("Email already confirmed or Token is outdated."));
+                .orElseThrow(() -> new UserAlreadyActivatedException("Email already confirmed or Token is outdated."));
 
-        if (userService.isUserEnabled(confirmationToken.getUser().getEmail())) {
-            throw new IllegalStateException("Email already confirmed.");
+        User user = confirmationToken.getUser();
+
+        if (Boolean.TRUE.equals(user.getEnabled())) {
+            throw new UserAlreadyActivatedException("Email is already confirmed. You can log in now.");
         }
 
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Confirmation token expired.");
+        if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new TokenExpiredException("Confirmation token expired. Please request a new one.");
         }
 
-        userService.enableAppUser(confirmationToken.getUser().getEmail());
-        tokenConfirmationService.deleteTokenFromDatabase(token);
-        return new ApiResponse("Account activated");
+        user.setEnabled(true);
+        confirmationTokenService.deleteTokenFromDatabase(confirmationToken);
+        return new ApiResponseWrapper("Account is successfully activated.");
     }
 
 }

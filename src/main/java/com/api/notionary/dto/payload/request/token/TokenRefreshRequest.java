@@ -1,20 +1,18 @@
-package com.api.notionary.dto.payload.request;
+package com.api.notionary.dto.payload.request.token;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@NoArgsConstructor
 public class TokenRefreshRequest {
 
-    @NotBlank(message = "*ERROR* 'RefreshToken' must be not blank or null")
+    @NotBlank(message = "Refresh token is required for logout")
     private String refreshToken;
 
 }
