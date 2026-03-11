@@ -39,18 +39,11 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public RefreshToken verifyExpiration(RefreshToken token) {
+    public void verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
-
-        return token;
-    }
-
-    @Transactional
-    public void deleteByUserId(Long userId) {
-        refreshTokenRepository.deleteByUserId(userId);
     }
 
     @Transactional

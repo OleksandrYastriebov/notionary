@@ -3,6 +3,7 @@ package com.api.notionary.controller;
 import com.api.notionary.dto.payload.request.wishlistitem.CreateWishListItemRequest;
 import com.api.notionary.dto.payload.request.wishlistitem.UpdateWishListItemRequest;
 import com.api.notionary.dto.payload.request.wishlistitem.WishlistItemIsCheckedRequest;
+import com.api.notionary.dto.wishlistitem.WishListItemContainerDto;
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
@@ -35,6 +36,13 @@ public class WishListItemController {
                                                               @AuthenticationPrincipal User user) {
         WishListItemDto savedItem = wishListItemService.createWishListItem(wishlistId, createWishListItemRequest, user);
         return ResponseEntity.created(URI.create("/api/v1/wishlists/" + wishlistId + "/wishes/" + savedItem.getId())).body(savedItem);
+    }
+
+    @GetMapping("/{wishlistId}/wishes")
+    public ResponseEntity<WishListItemContainerDto> getAllWishlistItemsForWishlist(@PathVariable String wishlistId,
+                                                                                   @AuthenticationPrincipal User user) {
+        WishListItemContainerDto wishListItemContainerDto = wishListItemService.findAllWishListItemsForWishList(wishlistId, user);
+        return ResponseEntity.ok(wishListItemContainerDto);
     }
 
     @GetMapping("/{wishlistId}/wishes/{wishlistItemId}")

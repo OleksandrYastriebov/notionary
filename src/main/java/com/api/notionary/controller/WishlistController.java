@@ -2,6 +2,7 @@ package com.api.notionary.controller;
 
 import com.api.notionary.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.notionary.dto.payload.request.wishlist.UpdateWishlistRequest;
+import com.api.notionary.dto.wishlist.WishListContainerDto;
 import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
@@ -29,7 +30,7 @@ public class WishlistController {
     private final WishListService wishlistService;
 
     @GetMapping
-    public ResponseEntity<?> getWishlists(@AuthenticationPrincipal User user) {
+    public ResponseEntity<WishListContainerDto> getWishlists(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok().body(wishlistService.getWishlistsForUser(user));
     }
 

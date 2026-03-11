@@ -1,6 +1,5 @@
 package com.api.notionary.entity;
 
-import com.api.notionary.dto.token.TokenRefreshDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

@@ -3,6 +3,8 @@ package com.api.notionary.service;
 import com.api.notionary.dto.payload.request.wishlistitem.CreateWishListItemRequest;
 import com.api.notionary.dto.payload.request.wishlistitem.UpdateWishListItemRequest;
 import com.api.notionary.dto.payload.request.wishlistitem.WishlistItemIsCheckedRequest;
+import com.api.notionary.dto.wishlist.WishListDto;
+import com.api.notionary.dto.wishlistitem.WishListItemContainerDto;
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
@@ -23,30 +25,36 @@ public class WishListItemService {
     private final WishListItemRepository wishListItemRepository;
     private final WishListService wishListService;
 
-    public WishListItemDto findWishlistItemByIdAndWishlistId(String wishlistId, String itemId, User user) {
-        wishListService.findWishlistById(wishlistId, user);
-        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
+    public WishListItemDto findWishlistItemByIdAndWishlistId(String wishListId, String itemId, User user) {
+        wishListService.findWishlistById(wishListId, user);
+        WishListItem wishlistItem = getWishlistItem(wishListId, itemId);
         return wishlistItem.toDto();
     }
 
+    public WishListItemContainerDto findAllWishListItemsForWishList(String wishListId, User user) {
+        WishListDto wishList = wishListService.findWishlistById(wishListId, user);
+        return new WishListItemContainerDto(wishList.getWishListItems());
+    }
+
+
     @Transactional
-    public WishListItemDto createWishListItem(String wishlistId, CreateWishListItemRequest createWishListItemRequest, User user) {
-        WishList wishList = wishListService.getWishlistEntityForOwner(wishlistId, user);
+    public WishListItemDto createWishListItem(String wishListId, CreateWishListItemRequest createWishListItemRequest, User user) {
+        WishList wishList = wishListService.getWishlistEntityForOwner(wishListId, user);
         return wishListItemRepository.save(createWishListItemRequest.toEntity(wishList)).toDto();
     }
 
     @Transactional
-    public void deleteWishlistItem(String wishlistId, String itemId, User user) {
-        wishListService.getWishlistEntityForOwner(wishlistId, user);
-        WishListItem wishListItem = getWishlistItem(wishlistId, itemId);
+    public void deleteWishlistItem(String wishListId, String itemId, User user) {
+        wishListService.getWishlistEntityForOwner(wishListId, user);
+        WishListItem wishListItem = getWishlistItem(wishListId, itemId);
         wishListItemRepository.delete(wishListItem);
     }
 
     @Transactional
-    public WishListItemDto updateWishlistItem(UpdateWishListItemRequest updateWishListItemRequest, String wishlistId,
+    public WishListItemDto updateWishlistItem(UpdateWishListItemRequest updateWishListItemRequest, String wishListId,
                                               String itemId, User user) {
-        wishListService.getWishlistEntityForOwner(wishlistId, user);
-        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
+        wishListService.getWishlistEntityForOwner(wishListId, user);
+        WishListItem wishlistItem = getWishlistItem(wishListId, itemId);
         updateWishListItemRequest.updateEntity(wishlistItem);
         return wishlistItem.toDto();
     }
@@ -58,9 +66,9 @@ public class WishListItemService {
         wishlistItem.setChecked(request.getIsChecked());
     }
 
-    private @NonNull WishListItem getWishlistItem(String wishlistId, String itemId) {
-        return wishListItemRepository.findByIdAndWishListId(itemId, wishlistId).orElseThrow(() ->
-                new WishlistItemNotFoundException(String.format("Wishlist item with id: %s and wishlistId: %s was not found.", itemId, wishlistId)));
+    private @NonNull WishListItem getWishlistItem(String wishListId, String itemId) {
+        return wishListItemRepository.findByIdAndWishListId(itemId, wishListId).orElseThrow(() ->
+                new WishlistItemNotFoundException(String.format("Wishlist item with id: %s and wishlistId: %s was not found.", itemId, wishListId)));
     }
 
 }

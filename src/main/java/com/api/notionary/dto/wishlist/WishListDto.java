@@ -4,7 +4,6 @@ import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.api.notionary.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
