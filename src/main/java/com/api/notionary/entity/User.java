@@ -1,5 +1,6 @@
 package com.api.notionary.entity;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -86,6 +87,7 @@ public class User implements UserDetails {
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @Override
+    @Nonnull
     public Collection<? extends GrantedAuthority> getAuthorities() {
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
         return Collections.singletonList(authority);
@@ -97,6 +99,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @Nonnull
     public String getUsername() {
         return email;
     }
