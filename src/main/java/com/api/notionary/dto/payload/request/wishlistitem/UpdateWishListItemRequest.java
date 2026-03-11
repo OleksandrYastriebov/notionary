@@ -35,6 +35,6 @@ public class UpdateWishListItemRequest {
         if (this.url != null) existingItem.setUrl(this.url);
         if (this.price != null) existingItem.setPrice(this.price);
         if (this.description != null) existingItem.setDescription(this.description);
-        if (this.isChecked != null) existingItem.setIsChecked(this.isChecked);
+        if (this.isChecked != null) existingItem.setChecked(this.isChecked);
     }
 }

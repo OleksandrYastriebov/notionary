@@ -8,7 +8,5 @@ public class Constant {
 
     public static final String X_REQUESTED_WITH = "X-Requested-With";
     public static final String REQUEST_BODY_IS_MISSING_OR_INVALID_MESSAGE = "Request body is missing or invalid.";
-    public static final String JSON_CONTENT_TYPE = "application/json";
-
 
 }

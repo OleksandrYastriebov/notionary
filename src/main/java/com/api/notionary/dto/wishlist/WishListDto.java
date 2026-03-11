@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -22,7 +23,7 @@ public class WishListDto {
     @JsonIgnore
     @ToString.Exclude
     private User user;
-    private List<WishListItemDto> wishListItems = List.of();
+    private List<WishListItemDto> wishListItems = new ArrayList<>();
     private String title;
     private Boolean isPublic = false;
     private LocalDateTime createdAt;

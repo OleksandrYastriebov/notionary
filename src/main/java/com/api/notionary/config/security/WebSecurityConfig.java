@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -21,8 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static com.api.notionary.util.constants.Constant.JSON_CONTENT_TYPE;
 
 @RequiredArgsConstructor
 @Configuration
@@ -42,7 +41,7 @@ public class WebSecurityConfig {
                                 "/api/v1/sign-up/**",
                                 "/api/v1/sign-in/**",
                                 "/api/v1/confirm-email/**",
-                                "/api/v1/refres-htoken/**",
+                                "/api/v1/refresh-token/**",
                                 "/css/**",
                                 "/js/**",
                                 "/swagger-ui/**",
@@ -52,17 +51,17 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/api/v1/wishlists/**",
                                 "/api/v1/user/**",
-                                "/api/v1/sign-out**").authenticated()
+                                "/api/v1/sign-out/**").authenticated()
                         .anyRequest().authenticated()
                 ).exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType(JSON_CONTENT_TYPE);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.getWriter().write("{\"message\": \"Unauthorized: Authorization Token is missing or invalid.\"}");
                         })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType(JSON_CONTENT_TYPE);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                             response.getWriter().write("{\"message\": \"Access Denied: You don't have enough permissions.\"}");
                         }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

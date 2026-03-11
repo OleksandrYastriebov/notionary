@@ -1,7 +1,5 @@
 package com.api.notionary.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,7 +31,6 @@ import java.util.Objects;
 @ToString
 @Entity
 @Table(name = "user")
-@JsonIgnoreProperties({"authorities", "accountNonExpired", "credentialsNonExpired", "accountNonLocked"})
 public class User implements UserDetails {
     public User(String firstName,
                 String lastName,
@@ -64,34 +61,27 @@ public class User implements UserDetails {
     private String email;
 
     @Column(name = "password", nullable = false, length = 100)
-    @JsonIgnore
     private String password;
 
     @Column
-    @JsonIgnore
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
-    @JsonIgnore
-    private Boolean locked = false;
+    private boolean locked = false;
 
-    @JsonIgnore
-    private Boolean enabled = false;
+    private boolean enabled = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<WishList> wishlists = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<ConfirmationToken> confirmationTokens = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<RefreshToken> refreshTokens = new ArrayList<>();
 

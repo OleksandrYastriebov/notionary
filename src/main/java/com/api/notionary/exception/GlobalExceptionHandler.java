@@ -1,6 +1,7 @@
 package com.api.notionary.exception;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import io.jsonwebtoken.JwtException;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -111,6 +112,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleTokenInvalidException(TokenInvalidException ex, WebRequest webRequest) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
                 "Token is invalid.", webRequest);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex, WebRequest request) {
+        log.warn("JWT Verification failed: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Token error",
+                "Token has expired or is invalid.", request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {

@@ -85,7 +85,7 @@ public class AuthenticationService {
 
         User user = confirmationToken.getUser();
 
-        if (Boolean.TRUE.equals(user.getEnabled())) {
+        if (user.isEnabled()) {
             throw new UserAlreadyActivatedException("Email is already confirmed. You can log in now.");
         }
 

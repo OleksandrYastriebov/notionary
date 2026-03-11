@@ -55,7 +55,7 @@ public class WishListItemService {
     public void toggleIsChecked(String wishlistId, String itemId, WishlistItemIsCheckedRequest request, User user) {
         wishListService.findWishlistById(wishlistId, user);
         WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
-        wishlistItem.setIsChecked(request.getIsChecked());
+        wishlistItem.setChecked(request.getIsChecked());
     }
 
     private @NonNull WishListItem getWishlistItem(String wishlistId, String itemId) {

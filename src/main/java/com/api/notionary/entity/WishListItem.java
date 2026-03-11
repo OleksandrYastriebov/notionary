@@ -1,7 +1,6 @@
 package com.api.notionary.entity;
 
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +34,6 @@ public class WishListItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wishlist_id", nullable = false)
-    @JsonIgnore
     @ToString.Exclude
     private WishList wishList;
 
@@ -52,7 +50,7 @@ public class WishListItem {
     private String description;
 
     @Column(name = "is_checked", nullable = false)
-    private Boolean isChecked = false;
+    private boolean isChecked = false;
 
     public WishListItem(WishList wishList, String title, String url,
                         String description, BigDecimal price) {
@@ -65,9 +63,7 @@ public class WishListItem {
 
     @PrePersist
     protected void onCreate() {
-        if (this.isChecked == null) {
-            this.isChecked = false;
-        }
+        this.isChecked = false;
         this.id = UUID.randomUUID()
                 .toString()
                 .replace("-", "");

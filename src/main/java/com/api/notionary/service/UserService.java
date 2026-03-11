@@ -7,6 +7,7 @@ import com.api.notionary.exception.UserNotFoundException;
 import com.api.notionary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class UserService {
+
+    @Value("${token.confirmation.expiration.days}")
+    private int tokenExpirationDays;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -39,7 +43,7 @@ public class UserService {
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token,
                 LocalDateTime.now(),
-                LocalDateTime.now().plusDays(1),
+                LocalDateTime.now().plusDays(tokenExpirationDays),
                 user
         );
 

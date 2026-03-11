@@ -1,7 +1,6 @@
 package com.api.notionary.entity;
 
 import com.api.notionary.dto.wishlist.WishListDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +14,6 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -53,12 +51,10 @@ public class WishList {
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<WishListItem> items = new ArrayList<>();
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
     @ToString.Exclude
     private List<WishlistAccess> accesses = new ArrayList<>();
 
