@@ -1,8 +1,6 @@
 package com.api.notionary.dto.wishlist;
 
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
-import com.api.notionary.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

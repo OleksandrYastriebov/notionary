@@ -3,7 +3,6 @@ package com.api.notionary.dto.payload.request.wishlistitem;
 import com.api.notionary.entity.WishListItem;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
