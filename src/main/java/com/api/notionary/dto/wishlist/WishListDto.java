@@ -19,9 +19,7 @@ import java.util.List;
 public class WishListDto {
 
     private String id;
-    @JsonIgnore
-    @ToString.Exclude
-    private User user;
+    private Long userId;
     private List<WishListItemDto> wishListItems = new ArrayList<>();
     private String title;
     private Boolean isPublic = false;

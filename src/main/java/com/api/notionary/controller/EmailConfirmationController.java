@@ -20,12 +20,6 @@ public class EmailConfirmationController {
 
     @GetMapping(path = "/confirm-email")
     public ResponseEntity<ApiResponseWrapper> confirmEmail(@RequestParam("token") String token) {
-        try {
-            ApiResponseWrapper result = authenticationService.confirmToken(token);
-            return ResponseEntity.ok(result);
-        } catch (IllegalStateException ex) {
-            log.error("Unexpected error during token confirmation. ", ex);
-            return ResponseEntity.badRequest().body(new ApiResponseWrapper(ex.getMessage()));
-        }
+        return ResponseEntity.ok(authenticationService.confirmToken(token));
     }
 }

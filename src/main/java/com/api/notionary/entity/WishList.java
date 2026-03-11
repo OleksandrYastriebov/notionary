@@ -89,7 +89,7 @@ public class WishList {
     public WishListDto toDto() {
         return new WishListDto(
                 id,
-                user,
+                user.getId(),
                 items.stream()
                         .map(WishListItem::toDto)
                         .toList(),

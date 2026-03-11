@@ -86,7 +86,7 @@ public class WishListItem {
     public WishListItemDto toDto() {
         return new WishListItemDto(
                 id,
-                wishList,
+                wishList.getId(),
                 title,
                 url,
                 price,
