@@ -30,7 +30,7 @@ public class WishListService {
         if (Boolean.TRUE.equals(wishlist.getIsPublic())) {
             return wishlist.toDto();
         }
-        if (user == null || !isWishlistOwner(wishlistId, user.getEmail())) {
+        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
             throw new AccessDeniedException("This is a private wishlist. You don't have permissions to see it.");
         }
         return wishlist.toDto();
@@ -68,7 +68,7 @@ public class WishListService {
     }
 
     public boolean isWishlistOwner(String wishlistId, String userEmail) {
-        return userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
+        return !userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
     }
 
     private WishList getWishlistById(String wishlistId) {
@@ -79,7 +79,7 @@ public class WishListService {
     public WishList getWishlistEntityForOwner(String wishlistId, User user) {
         WishList wishList = getWishlistById(wishlistId);
 
-        if (user == null || !isWishlistOwner(wishlistId, user.getEmail())) {
+        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
             throw new AccessDeniedException("You need to be owner to modify this wishlist.");
         }
         return wishList;
