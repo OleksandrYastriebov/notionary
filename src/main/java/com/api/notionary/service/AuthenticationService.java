@@ -52,7 +52,7 @@ public class AuthenticationService {
     @Transactional
     public JwtDto signIn(SignInRequest signInRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(signInRequest.email(), signInRequest.password())
         );
 
         User user = (User) authentication.getPrincipal();
@@ -65,7 +65,7 @@ public class AuthenticationService {
 
     @Transactional
     public TokenRefreshDto refreshToken(TokenRefreshRequest request) {
-        String requestToken = request.getRefreshToken();
+        String requestToken = request.refreshToken();
 
         RefreshToken refreshToken = refreshTokenService.findByToken(requestToken)
                 .orElseThrow(() -> new TokenRefreshException(requestToken, "Refresh token is not in database!"));
@@ -114,6 +114,14 @@ public class AuthenticationService {
         sendActivationEmail(user, newToken);
 
         return new ApiResponseWrapper("A new confirmation email has been sent. Please check your inbox.");
+    }
+
+    @Transactional
+    public ApiResponseWrapper logout(String refreshToken, User user) {
+        if (user != null) {
+            refreshTokenService.deleteByToken(refreshToken);
+        }
+        return new ApiResponseWrapper("Log out successful!");
     }
 
     private void sendActivationEmail(User user, String token) {

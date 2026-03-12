@@ -1,26 +1,25 @@
 package com.api.notionary.dto.token;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class JwtDto {
+@Schema(description = "JWT Token response containing access and refresh tokens")
+public record JwtDto(
+        @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI...")
+        String jwtToken,
 
-    private String jwtToken;
-    private String type = "Bearer";
-    private String refreshToken;
-    private Long id;
-    private String email;
+        @Schema(description = "Token type", example = "Bearer", defaultValue = "Bearer")
+        String type,
 
+        @Schema(description = "Refresh token string", example = "550e8400-e29b-41d4-a716-446655440000")
+        String refreshToken,
+
+        @Schema(description = "Unique user identifier", example = "10")
+        Long id,
+
+        @Schema(description = "User email address", example = "john.doe@notionary.app")
+        String email
+) {
     public JwtDto(String jwtToken, String refreshToken, Long id, String email) {
-        this.jwtToken = jwtToken;
-        this.refreshToken = refreshToken;
-        this.id = id;
-        this.email = email;
+        this(jwtToken, "Bearer", refreshToken, id, email);
     }
 }

@@ -1,27 +1,32 @@
 package com.api.notionary.dto.wishlist;
 
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-public class WishListDto {
+@Schema(description = "Details of a wishlist including its items")
+public record WishListDto(
+        @Schema(description = "Unique wishlist identifier", example = "uuid-1234")
+        String id,
 
-    private String id;
-    private Long userId;
-    private List<WishListItemDto> wishListItems = new ArrayList<>();
-    private String title;
-    private Boolean isPublic = false;
-    private String imageUrl;
-    private LocalDateTime createdAt;
+        @Schema(description = "Owner's user ID", example = "10")
+        Long userId,
 
+        @Schema(description = "List of items in this wishlist")
+        List<WishListItemDto> wishListItems,
+
+        @Schema(description = "Title of the wishlist", example = "My Birthday Wishlist")
+        String title,
+
+        @Schema(description = "Visibility status", example = "false")
+        Boolean isPublic,
+
+        @Schema(description = "Cover image URL", example = "https://example.com/cover.jpg")
+        String imageUrl,
+
+        @Schema(description = "Creation timestamp")
+        LocalDateTime createdAt
+) {
 }

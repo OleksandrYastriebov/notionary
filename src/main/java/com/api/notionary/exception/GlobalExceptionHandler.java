@@ -13,6 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -59,7 +60,6 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), webRequest);
     }
 
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest webRequest) {
         log.warn("Malformed or missing request body: {}", ex.getMessage());
@@ -70,9 +70,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest webRequest) {
-        String errorMessage = ex.getFieldError() != null
-                ? ex.getFieldError().getDefaultMessage()
-                : "Invalid method arguments";
+        String errorMessage = ex.getFieldError() != null ? ex.getFieldError().getDefaultMessage() : "Invalid method arguments";
         return buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation Error",
                 "Validation failed: " + errorMessage, webRequest);
     }
@@ -149,23 +147,20 @@ public class GlobalExceptionHandler {
                 String.format("Required request parameter '%s' is not present.", parameterName), webRequest);
     }
 
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex, WebRequest webRequest) {
+        return buildErrorResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type",
+                String.format("Content type '%s' not supported. Please use 'multipart/form-data'.", ex.getContentType()), webRequest);
+    }
+
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                exceptionMessage,
-                getRequestPath(request)
-        );
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), exceptionMessage, getRequestPath(request));
         return new ResponseEntity<>(errorResponse, buildHeaders(), status);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage,
                                                              String message, WebRequest request) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                status.value(),
-                exceptionMessage,
-                message,
-                getRequestPath(request)
-        );
+        ErrorResponse errorResponse = new ErrorResponse(status.value(), exceptionMessage, message, getRequestPath(request));
         return new ResponseEntity<>(errorResponse, buildHeaders(), status);
     }
 

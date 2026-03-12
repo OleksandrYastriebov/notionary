@@ -29,10 +29,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(
-        name = "Users",
-        description = "Methods for working with users"
-)
+@Tag(name = "Users", description = "Methods for working with users")
 @RateLimited(action = RateLimitPlan.DEFAULT)
 @RequiredArgsConstructor
 @RestController
@@ -42,14 +39,14 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "Get current user profile", description = "Returns the profile data of the currently authenticated user.")
+    @ApiUnauthorizedErrorDoc
     @GetMapping("/me")
     public ResponseEntity<UserProfileDto> getCurrentUserProfile(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(new UserProfileDto(user));
     }
 
     @Operation(summary = "Delete user by ID.",
-            description = "Permanently deletes a user account and all associated data. This action cannot be undone."
-    )
+            description = "Permanently deletes a user account and all associated data. This action cannot be undone.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "User with id 1 was successfully removed.",
             content = @Content(schema = @Schema(implementation = ApiResponseWrapper.class)))})
     @ApiNotFoundErrorDoc
@@ -65,7 +62,8 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponseWrapper(String.format("User with id %s was successfully removed.", id)));
     }
 
-    @Operation(summary = "Update current user profile")
+    @Operation(summary = "Update current user profile", description = "Updates the first name, last name, or avatar URL of the authenticated user.")
+    @ApiUnauthorizedErrorDoc
     @PatchMapping("/me")
     @RateLimited(action = RateLimitPlan.MUTATION)
     public ResponseEntity<UserProfileDto> updateUserProfile(@AuthenticationPrincipal User user,

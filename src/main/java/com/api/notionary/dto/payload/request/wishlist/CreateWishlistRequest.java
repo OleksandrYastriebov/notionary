@@ -2,37 +2,31 @@ package com.api.notionary.dto.payload.request.wishlist;
 
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class CreateWishlistRequest {
+@Schema(description = "Payload for creating a new wishlist")
+public record CreateWishlistRequest(
+        @Schema(description = "Name of the wishlist", example = "My Birthday Wishlist", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "Title can not be empty")
+        @Size(max = 100, message = "Title is too long. Max 100 characters.")
+        String title,
 
-    @NotBlank(message = "Title can not be empty")
-    @Size(max = 100, message = "Title is too long. Max 100 characters.")
-    private String title;
+        @Schema(description = "Visibility of the wishlist", example = "true", defaultValue = "false")
+        Boolean isPublic,
 
-    private Boolean isPublic;
-
-    @Size(max = 2048, message = "Image URL is too long")
-    @URL(message = "Invalid URL format")
-    private String imageUrl;
-
+        @Schema(description = "Cover image URL for the wishlist", example = "https://example.com/cover.jpg")
+        @Size(max = 2048, message = "Image URL is too long")
+        @URL(message = "Invalid URL format")
+        String imageUrl
+) {
     public WishList toEntity(User user) {
         return new WishList(
                 user,
                 title,
                 isPublic != null ? isPublic : false,
-                imageUrl
-        );
-
+                imageUrl);
     }
 }

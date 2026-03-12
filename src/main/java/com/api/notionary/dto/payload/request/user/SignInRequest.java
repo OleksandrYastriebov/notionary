@@ -1,28 +1,21 @@
 package com.api.notionary.dto.payload.request.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class SignInRequest {
+@Schema(description = "Request payload for user authentication")
+public record SignInRequest(
+        @Schema(description = "User email", example = "john.doe@notionary.app", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Email(message = "Email format is invalid")
+        @NotBlank(message = "Email can not be empty")
+        @Size(max = 100, message = "The input is too long. Max 100 characters.")
+        String email,
 
-    private static final String THE_INPUT_IS_TOO_LONG = "The input is too long. Max 100 characters.";
-
-    @Email(message = "Email format is invalid")
-    @NotBlank(message = "Email can not be empty")
-    @Size(max = 100, message = THE_INPUT_IS_TOO_LONG)
-    private String email;
-
-    @NotBlank(message = "Password can not be empty")
-    @Size(max = 100, message = THE_INPUT_IS_TOO_LONG)
-    private String password;
-
+        @Schema(description = "User password", example = "SecurePass123!", requiredMode = Schema.RequiredMode.REQUIRED)
+        @NotBlank(message = "Password can not be empty")
+        @Size(max = 100, message = "The input is too long. Max 100 characters.")
+        String password
+) {
 }

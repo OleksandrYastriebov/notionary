@@ -38,7 +38,7 @@ public class WishListItemService {
 
     public WishListItemContainerDto findAllWishListItemsForWishList(String wishListId, User user) {
         WishListDto wishList = wishListService.findWishlistById(wishListId, user);
-        return new WishListItemContainerDto(wishList.getWishListItems());
+        return new WishListItemContainerDto(wishList.wishListItems());
     }
 
 
@@ -46,7 +46,7 @@ public class WishListItemService {
     public WishListItemDto createWishListItem(String wishListId, CreateWishListItemRequest createWishListItemRequest, User user) {
         WishListDto wishListDto = wishListService.findWishlistById(wishListId, user);
 
-        if (wishListDto.getWishListItems().size() >= maxWishlistsPerWishlist) {
+        if (wishListDto.wishListItems().size() >= maxWishlistsPerWishlist) {
             throw new IllegalStateException("Maximum Wishlist item limit per reached.");
         }
 
@@ -74,7 +74,7 @@ public class WishListItemService {
     public void toggleIsChecked(String wishlistId, String itemId, WishlistItemIsCheckedRequest request, User user) {
         wishListService.findWishlistById(wishlistId, user);
         WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
-        wishlistItem.setChecked(request.getIsChecked());
+        wishlistItem.setChecked(request.isChecked());
     }
 
     private @NonNull WishListItem getWishlistItem(String wishListId, String itemId) {
