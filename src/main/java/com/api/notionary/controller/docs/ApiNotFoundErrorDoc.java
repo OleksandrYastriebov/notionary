@@ -19,5 +19,5 @@ import java.lang.annotation.Target;
         @ApiResponse(responseCode = "404", description = "Not Found - User doesn't exist",
                 content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ErrorResponse.class)))
 })
-public @interface ApiNotFundErrorDoc {
+public @interface ApiNotFoundErrorDoc {
 }

@@ -1,8 +1,8 @@
 package com.api.notionary.controller;
 
 import com.api.notionary.dto.ApiResponseWrapper;
-import com.api.notionary.security.interceptop.RateLimitPlan;
-import com.api.notionary.security.interceptop.RateLimited;
+import com.api.notionary.security.interceptor.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
+@RateLimited(action = RateLimitPlan.DEFAULT)
 public class EmailConfirmationController {
 
     private final AuthenticationService authenticationService;
 
     @GetMapping(path = "/confirm-email")
-    @RateLimited(action = RateLimitPlan.MUTATION)
     public ResponseEntity<ApiResponseWrapper> confirmEmail(@RequestParam("token") String token) {
         return ResponseEntity.ok(authenticationService.confirmToken(token));
     }

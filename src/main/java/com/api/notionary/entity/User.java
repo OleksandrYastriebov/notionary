@@ -66,16 +66,17 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "user_role")
     private UserRole userRole;
 
-    @Column
+    @Column(name = "is_locked")
     private boolean locked = false;
 
-    @Column
+    @Column(name = "is_enabled")
     private boolean enabled = false;
 
     @Column(name = "is_deleted")

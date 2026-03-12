@@ -1,4 +1,4 @@
-package com.api.notionary.security.interceptop;
+package com.api.notionary.security.interceptor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

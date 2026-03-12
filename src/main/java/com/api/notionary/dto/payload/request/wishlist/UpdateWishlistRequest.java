@@ -10,8 +10,7 @@ import lombok.Setter;
 @Setter
 public class UpdateWishlistRequest {
 
-    @NotBlank(message = "Title can not be empty")
-    @Size(max = 100, message = "Title is too long. Max 100 characters.")
+    @Size(min = 1, max = 100, message = "Title is too long. Max 100 characters.")
     private String title;
     private Boolean isPublic;
 

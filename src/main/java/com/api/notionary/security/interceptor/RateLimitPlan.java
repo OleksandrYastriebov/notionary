@@ -1,4 +1,4 @@
-package com.api.notionary.security.interceptop;
+package com.api.notionary.security.interceptor;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

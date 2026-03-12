@@ -7,8 +7,8 @@ import com.api.notionary.dto.wishlistitem.WishListItemContainerDto;
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
-import com.api.notionary.security.interceptop.RateLimitPlan;
-import com.api.notionary.security.interceptop.RateLimited;
+import com.api.notionary.security.interceptor.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.WishListItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
-@RateLimited(action = RateLimitPlan.MUTATION)
+@RateLimited(action = RateLimitPlan.DEFAULT)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/wishlists")
@@ -33,6 +33,7 @@ public class WishListItemController {
 
     private final WishListItemService wishListItemService;
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @PostMapping("/{wishlistId}")
     public ResponseEntity<WishListItemDto> createWishListItem(@PathVariable String wishlistId,
                                                               @Valid @RequestBody CreateWishListItemRequest createWishListItemRequest,
@@ -56,6 +57,7 @@ public class WishListItemController {
         return ResponseEntity.ok(wishlistItemDto);
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @DeleteMapping("/{wishlistId}/wishes/{itemId}")
     public ResponseEntity<ApiResponseWrapper> deleteWishListItem(@PathVariable String wishlistId,
                                                                  @PathVariable String itemId,
@@ -65,6 +67,7 @@ public class WishListItemController {
                 String.format("Wishlist item with id: %s was successfully removed from the wishlist: %s", itemId, wishlistId)));
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @PatchMapping("/{wishlistId}/wishes/{itemId}")
     public ResponseEntity<WishListItemDto> updateWishlistItem(@PathVariable String wishlistId,
                                                               @PathVariable String itemId,
@@ -73,6 +76,7 @@ public class WishListItemController {
         return ResponseEntity.ok().body(wishListItemService.updateWishlistItem(updateWishListItemRequest, wishlistId, itemId, user));
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @PatchMapping("/{wishlistId}/wishes/{itemId}/checked")
     public ResponseEntity<ApiResponseWrapper> toggleItemCheck(@PathVariable String wishlistId,
                                                               @PathVariable String itemId,

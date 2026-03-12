@@ -6,8 +6,8 @@ import com.api.notionary.dto.wishlist.WishListContainerDto;
 import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.entity.User;
-import com.api.notionary.security.interceptop.RateLimitPlan;
-import com.api.notionary.security.interceptop.RateLimited;
+import com.api.notionary.security.interceptor.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.WishListService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
-@RateLimited(action = RateLimitPlan.MUTATION)
+@RateLimited(action = RateLimitPlan.DEFAULT)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/wishlists")
@@ -42,6 +42,7 @@ public class WishlistController {
         return ResponseEntity.ok(wishlistService.findWishlistById(wishlistId, user));
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @PostMapping
     public ResponseEntity<?> createWishList(@RequestBody CreateWishlistRequest createWishlistRequest,
                                             @AuthenticationPrincipal User user) {
@@ -49,12 +50,14 @@ public class WishlistController {
         return ResponseEntity.created(URI.create("/api/v1/wishlists/" + wishlist.getId())).body(wishlist);
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @DeleteMapping("/{wishlistId}")
     public ResponseEntity<ApiResponseWrapper> deleteWishList(@PathVariable String wishlistId, @AuthenticationPrincipal User user) {
         wishlistService.deleteWishList(wishlistId, user);
         return ResponseEntity.ok(new ApiResponseWrapper(String.format("Wishlist with id %s was successfully removed from database", wishlistId)));
     }
 
+    @RateLimited(action = RateLimitPlan.MUTATION)
     @PatchMapping("/{wishlistId}")
     public ResponseEntity<ApiResponseWrapper> updateWishlist(@PathVariable String wishlistId,
                                                              @Valid @RequestBody UpdateWishlistRequest updateWishlistRequest,

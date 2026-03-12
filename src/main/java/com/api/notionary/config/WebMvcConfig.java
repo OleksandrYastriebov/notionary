@@ -1,6 +1,6 @@
 package com.api.notionary.config;
 
-import com.api.notionary.security.interceptop.RateLimitInterceptor;
+import com.api.notionary.security.interceptor.RateLimitInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

@@ -1,4 +1,4 @@
-package com.api.notionary.security.interceptop;
+package com.api.notionary.security.interceptor;
 
 import com.api.notionary.exception.RateLimitExceededException;
 import com.api.notionary.service.RateLimitService;

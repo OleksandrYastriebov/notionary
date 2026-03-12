@@ -1,6 +1,6 @@
 package com.api.notionary.service;
 
-import com.api.notionary.security.interceptop.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimitPlan;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.bucket4j.Bandwidth;

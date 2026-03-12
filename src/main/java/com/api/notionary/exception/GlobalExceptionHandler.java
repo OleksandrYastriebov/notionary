@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
-        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), "Rate limit exceeded", request);
+        return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), "Rate limit exceeded", request);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {
