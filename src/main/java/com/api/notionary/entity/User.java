@@ -32,7 +32,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @SQLRestriction("is_deleted = false")
 public class User implements UserDetails {
     public User(String firstName,

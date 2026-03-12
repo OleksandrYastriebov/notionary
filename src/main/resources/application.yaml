@@ -38,9 +38,10 @@ server:
 spring:
   datasource:
 #    url: ${DATABASE_URL}
-    url: jdbc:mysql://${DB_HOST:localhost}:3306/${DATABASE_NAME}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:postgresql://ep-divine-mouse-alb0as1v-pooler.c-3.eu-central-1.aws.neon.tech:5432/${DATABASE_NAME}?sslmode=require
     username: ${DATABASE_LOGIN}
     password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 15
       minimum-idle: 2
@@ -55,8 +56,6 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        globally_quoted_identifiers: true
         format_sql: false
 
   servlet:
