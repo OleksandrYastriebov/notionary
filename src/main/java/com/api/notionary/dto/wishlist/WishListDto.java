@@ -21,6 +21,7 @@ public class WishListDto {
     private List<WishListItemDto> wishListItems = new ArrayList<>();
     private String title;
     private Boolean isPublic = false;
+    private String imageUrl;
     private LocalDateTime createdAt;
 
 }

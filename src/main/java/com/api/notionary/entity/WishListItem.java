@@ -49,16 +49,20 @@ public class WishListItem {
     @Column(name = "description", length = 1000)
     private String description;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked = false;
 
     public WishListItem(WishList wishList, String title, String url,
-                        String description, BigDecimal price) {
+                        String description, BigDecimal price, String imageUrl) {
         this.wishList = wishList;
         this.title = title;
         this.description = description;
         this.url = url;
         this.price = price;
+        this.imageUrl = imageUrl;
     }
 
     @PrePersist
@@ -91,6 +95,7 @@ public class WishListItem {
                 url,
                 price,
                 description,
+                imageUrl,
                 isChecked
         );
     }

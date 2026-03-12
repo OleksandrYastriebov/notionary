@@ -35,13 +35,18 @@ public class CreateWishListItemRequest {
     @Size(max = 1000, message = "Description should not more than 1000 characters")
     private String description;
 
+    @Size(max = 2048, message = "Image URL is too long")
+    @URL(message = "Invalid URL format")
+    private String imageUrl;
+
     public WishListItem toEntity(WishList wishList) {
         return new WishListItem(
                 wishList,
                 title,
                 url,
                 description,
-                price
+                price,
+                imageUrl
         );
     }
 

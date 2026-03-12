@@ -11,6 +11,7 @@ public record UserProfileDto(
         String firstName,
         String lastName,
         String email,
+        String avatarUrl,
         LocalDateTime createdAt
 ) {
     public UserProfileDto(User user) {
@@ -19,6 +20,7 @@ public record UserProfileDto(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
+                user.getAvatarUrl(),
                 user.getCreatedAt()
         );
     }

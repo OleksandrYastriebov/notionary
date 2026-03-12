@@ -34,11 +34,16 @@ public class UpdateWishListItemRequest {
 
     private Boolean isChecked;
 
+    @Size(max = 2048, message = "Image URL is too long")
+    @URL(message = "Invalid URL format")
+    private String imageUrl;
+
     public void updateEntity(WishListItem existingItem) {
         if (this.title != null) existingItem.setTitle(this.title);
         if (this.url != null) existingItem.setUrl(this.url);
         if (this.price != null) existingItem.setPrice(this.price);
         if (this.description != null) existingItem.setDescription(this.description);
         if (this.isChecked != null) existingItem.setChecked(this.isChecked);
+        if (this.imageUrl != null) existingItem.setImageUrl(this.imageUrl);
     }
 }

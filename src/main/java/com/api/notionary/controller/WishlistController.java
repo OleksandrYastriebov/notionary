@@ -44,7 +44,7 @@ public class WishlistController {
 
     @RateLimited(action = RateLimitPlan.MUTATION)
     @PostMapping
-    public ResponseEntity<?> createWishList(@RequestBody CreateWishlistRequest createWishlistRequest,
+    public ResponseEntity<WishListDto> createWishList(@Valid @RequestBody CreateWishlistRequest createWishlistRequest,
                                             @AuthenticationPrincipal User user) {
         WishListDto wishlist = wishlistService.createWishlist(createWishlistRequest, user);
         return ResponseEntity.created(URI.create("/api/v1/wishlists/" + wishlist.getId())).body(wishlist);

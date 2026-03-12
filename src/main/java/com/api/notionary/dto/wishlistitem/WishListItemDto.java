@@ -17,6 +17,7 @@ public class WishListItemDto {
     private String url;
     private BigDecimal price;
     private String description;
+    private String imageUrl;
     private Boolean isChecked;
 
 }

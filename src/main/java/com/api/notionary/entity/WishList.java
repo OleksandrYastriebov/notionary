@@ -47,6 +47,9 @@ public class WishList {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -58,10 +61,11 @@ public class WishList {
     @ToString.Exclude
     private List<WishlistAccess> accesses = new ArrayList<>();
 
-    public WishList(User user, String title, Boolean isPublic) {
+    public WishList(User user, String title, Boolean isPublic, String imageUrl) {
         this.user = user;
         this.title = title;
         this.isPublic = isPublic;
+        this.imageUrl = imageUrl;
     }
 
     @PrePersist
@@ -95,6 +99,7 @@ public class WishList {
                         .toList(),
                 title,
                 isPublic,
+                imageUrl,
                 createdAt
         );
     }

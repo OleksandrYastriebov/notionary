@@ -1,5 +1,7 @@
 package com.api.notionary.service;
 
+import com.api.notionary.dto.payload.request.user.UpdateUserRequest;
+import com.api.notionary.dto.user.UserProfileDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
 import com.api.notionary.exception.UserAlreadyExistsException;
@@ -83,8 +85,16 @@ public class UserService {
         log.info("Cleanup Job: Successfully removed {} unverified expired users.", idsToDelete.size());
     }
 
+    @Transactional
+    public UserProfileDto updateUser(User currentUser, UpdateUserRequest request) {
+        User user = getUserEntityById(currentUser.getId());
+        request.updateEntity(user);
+        return new UserProfileDto(user);
+    }
+
     private User getUserEntityById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", id)));
     }
+
 }
