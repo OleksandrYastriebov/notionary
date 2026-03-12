@@ -11,13 +11,13 @@ token:
     key: ${TOKEN_SIGNING_KEY}
   refresh:
     expiration:
-      sec: 600
+      sec: 2629800
     max:
       sessions:
         count: 5
   jwt:
     expiration:
-      ms: 6000000
+      ms: 900000
   confirmation:
     expiration:
       days: 1
@@ -50,6 +50,7 @@ spring:
       max-lifetime: 1200000
 
   jpa:
+    open-in-view: false
     show-sql: false
     generate-ddl: false
     hibernate:
@@ -86,6 +87,9 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+logging:
+  level:
+    org.springframework.core.events.SpringDocAppInitializer: ERROR
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}

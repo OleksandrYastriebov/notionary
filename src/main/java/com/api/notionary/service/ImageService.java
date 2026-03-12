@@ -3,6 +3,7 @@ package com.api.notionary.service;
 import com.cloudinary.Cloudinary;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,11 +19,7 @@ public class ImageService {
 
     public String uploadImage(MultipartFile file) {
         try {
-            Map<String, Object> uploadParams = Map.of(
-                    "folder", "notionary-wishlists",
-                    "fetch_format", "webp",
-                    "quality", "auto"
-            );
+            Map<String, Object> uploadParams = generateUparamsMap();
 
             @SuppressWarnings("unchecked")
             Map<String, Object> uploadResult = (Map<String, Object>) cloudinary.uploader()
@@ -39,5 +36,13 @@ public class ImageService {
             log.error("Failed to upload image to Cloudinary", ex);
             throw new IllegalStateException("Failed to upload image. Please try again later.", ex);
         }
+    }
+
+    private @NonNull Map<String, Object> generateUparamsMap() {
+        return Map.of(
+                "folder", "notionary-wishlists",
+                "fetch_format", "webp",
+                "quality", "auto"
+        );
     }
 }

@@ -38,15 +38,14 @@ public class WebSecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                "/api/v1/resend-confirmation-email",
+                                "/api/v1/confirm-email/**",
+                                "/api/v1/refresh-token/**",
                                 "/api/v1/sign-up/**",
                                 "/api/v1/sign-in/**",
-                                "/api/v1/confirm-email/**",
                                 "/api/v1/health",
-                                "/api/v1/refresh-token/**",
                                 "/css/**",
-                                "/js/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**").permitAll()
+                                "/js/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists", "/api/v1/wishlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()
@@ -54,6 +53,7 @@ public class WebSecurityConfig {
                                 "/api/v1/wishlists/**",
                                 "/api/v1/user/**",
                                 "/api/v1/sign-out/**").authenticated()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_DEVELOPER")
                         .anyRequest().authenticated()
                 ).exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {

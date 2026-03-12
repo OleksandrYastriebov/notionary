@@ -14,6 +14,7 @@ import com.api.notionary.exception.TokenRefreshException;
 import com.api.notionary.exception.UserAlreadyActivatedException;
 import com.api.notionary.service.email.EmailSenderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,6 +26,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Service
 public class AuthenticationService {
+
+    private static final String EMAIL_CONFIRMED_LOG_IN = "Email is already confirmed. You can log in now.";
+
     @Value("${app.url.backend}")
     private String appUrl;
 
@@ -39,37 +43,37 @@ public class AuthenticationService {
     public ApiResponseWrapper signUp(SignUpRequest request) {
         User user = request.toEntity();
         String confirmationToken = userService.signUpUser(user);
-        String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, confirmationToken);
-        emailSenderService.sendConfirmationEmail(user.getEmail(), user.getFirstName(), activationLink);
+
+        sendActivationEmail(user, confirmationToken);
 
         return new ApiResponseWrapper("User registered successfully. Please check your email to activate your account.");
     }
 
     @Transactional
     public JwtDto signIn(SignInRequest signInRequest) {
-        String userEmail = signInRequest.getEmail();
-        String userPassword = signInRequest.getPassword();
-
-        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userEmail, userPassword));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword())
+        );
 
         User user = (User) authentication.getPrincipal();
 
         String jwtToken = jwtService.generateToken(user);
         String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
-        return new JwtDto(jwtToken, refreshToken, user.getId(), userEmail);
+        return new JwtDto(jwtToken, refreshToken, user.getId(), user.getEmail());
     }
 
     @Transactional
     public TokenRefreshDto refreshToken(TokenRefreshRequest request) {
-        String requestRefreshToken = request.getRefreshToken();
+        String requestToken = request.getRefreshToken();
 
-        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestToken)
+                .orElseThrow(() -> new TokenRefreshException(requestToken, "Refresh token is not in database!"));
 
         refreshTokenService.verifyExpiration(refreshToken);
         User user = refreshToken.getUser();
-        refreshTokenService.deleteByToken(requestRefreshToken);
+
+        refreshTokenService.deleteByToken(requestToken);
 
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
         String jwt = jwtService.generateToken(user);
@@ -79,14 +83,13 @@ public class AuthenticationService {
 
     @Transactional
     public ApiResponseWrapper confirmToken(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenService
-                .getToken(token)
-                .orElseThrow(() -> new UserAlreadyActivatedException("Email is already confirmed or Token is outdated."));
+        ConfirmationToken confirmationToken = confirmationTokenService.getToken(token)
+                .orElseThrow(() -> new UserAlreadyActivatedException("Email is already confirmed or Token is invalid or outdated."));
 
         User user = confirmationToken.getUser();
 
         if (user.isEnabled()) {
-            throw new UserAlreadyActivatedException("Email is already confirmed. You can log in now.");
+            throw new UserAlreadyActivatedException(EMAIL_CONFIRMED_LOG_IN);
         }
 
         if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
@@ -95,7 +98,27 @@ public class AuthenticationService {
 
         user.setEnabled(true);
         confirmationTokenService.deleteTokenFromDatabase(confirmationToken);
+
         return new ApiResponseWrapper("Account is successfully activated.");
+    }
+
+    @Transactional
+    public ApiResponseWrapper resendConfirmationEmail(String email) {
+        User user = userService.getUserByEmail(email);
+
+        if (user.isEnabled()) {
+            throw new UserAlreadyActivatedException(EMAIL_CONFIRMED_LOG_IN);
+        }
+
+        String newToken = userService.generateNewConfirmationToken(user);
+        sendActivationEmail(user, newToken);
+
+        return new ApiResponseWrapper("A new confirmation email has been sent. Please check your inbox.");
+    }
+
+    private void sendActivationEmail(User user, String token) {
+        String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, token);
+        emailSenderService.sendConfirmationEmail(user.getEmail(), user.getFirstName(), activationLink);
     }
 
 }

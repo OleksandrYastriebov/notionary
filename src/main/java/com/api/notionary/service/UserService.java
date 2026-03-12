@@ -9,6 +9,7 @@ import com.api.notionary.exception.UserNotFoundException;
 import com.api.notionary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserService {
 
@@ -41,14 +43,15 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userRepository.save(user);
-        String token = UUID.randomUUID().toString();
+        return generateNewConfirmationToken(user);
+    }
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(
-                token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(tokenExpirationDays),
-                user
-        );
+    @Transactional
+    public String generateNewConfirmationToken(User user) {
+        confirmationTokenService.deleteTokensByUserIds(List.of(user.getId()));
+
+        String token = UUID.randomUUID().toString();
+        ConfirmationToken confirmationToken = buildConfirmationToken(user, token);
 
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         return token;
@@ -70,7 +73,6 @@ public class UserService {
         userToDelete.setDeleted(true);
 
         refreshTokenService.deleteByUserId(userToDelete.getId());
-        log.info("User with email {} was anonymized and soft-deleted.", currentUser.getEmail());
     }
 
     @Transactional
@@ -92,9 +94,24 @@ public class UserService {
         return new UserProfileDto(user);
     }
 
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found.", email)));
+    }
+
     private User getUserEntityById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", id)));
+    }
+
+    private @NonNull ConfirmationToken buildConfirmationToken(User user, String token) {
+        return new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusDays(tokenExpirationDays),
+                user
+        );
     }
 
 }

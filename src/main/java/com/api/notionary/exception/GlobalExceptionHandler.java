@@ -14,6 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -61,8 +62,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, WebRequest webRequest) {
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(),
-                "Invalid or missing request body: " + ex.getLocalizedMessage(), webRequest);
+        log.warn("Malformed or missing request body: {}", ex.getMessage());
+
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON Request",
+                "The request body is missing or cannot be parsed. Please check the JSON format.", webRequest);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -137,6 +140,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RateLimitExceededException.class)
     public ResponseEntity<ErrorResponse> handleRateLimitExceededException(RateLimitExceededException ex, WebRequest request) {
         return buildErrorResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), "Rate limit exceeded", request);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(MissingServletRequestParameterException ex, WebRequest webRequest) {
+        String parameterName = ex.getParameterName();
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Missing Parameter",
+                String.format("Required request parameter '%s' is not present.", parameterName), webRequest);
     }
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String exceptionMessage, WebRequest request) {

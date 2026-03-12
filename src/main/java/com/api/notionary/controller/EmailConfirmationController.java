@@ -1,13 +1,17 @@
 package com.api.notionary.controller;
 
 import com.api.notionary.dto.ApiResponseWrapper;
+import com.api.notionary.dto.payload.request.user.ResendConfirmationTokenRequest;
 import com.api.notionary.security.interceptor.RateLimitPlan;
 import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
-@RateLimited(action = RateLimitPlan.DEFAULT)
+@RateLimited(action = RateLimitPlan.EMAIL)
 public class EmailConfirmationController {
 
     private final AuthenticationService authenticationService;
@@ -24,5 +28,10 @@ public class EmailConfirmationController {
     @GetMapping(path = "/confirm-email")
     public ResponseEntity<ApiResponseWrapper> confirmEmail(@RequestParam("token") String token) {
         return ResponseEntity.ok(authenticationService.confirmToken(token));
+    }
+
+    @PostMapping(path = "/resend-confirmation-email")
+    public ResponseEntity<ApiResponseWrapper> resendConfirmationEmail(@Valid @RequestBody ResendConfirmationTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.resendConfirmationEmail(request.getEmail()));
     }
 }

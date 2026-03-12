@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class ConfirmationTokenService {
-    
+
     private final ConfirmationTokenRepository confirmationTokenRepository;
 
+    @Transactional
     public void saveConfirmationToken(ConfirmationToken confirmationToken) {
         confirmationTokenRepository.save(confirmationToken);
     }
@@ -23,6 +25,7 @@ public class ConfirmationTokenService {
         return confirmationTokenRepository.findByToken(token);
     }
 
+    @Transactional
     public void deleteTokensByUserIds(List<Long> userIds) {
         confirmationTokenRepository.deleteByUserIds(userIds);
     }

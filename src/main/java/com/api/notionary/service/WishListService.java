@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class WishListService {
 
@@ -24,17 +25,6 @@ public class WishListService {
     private int maxWishlistsPerAccount;
 
     private final WishListRepository wishListRepository;
-
-    public WishListDto findWishlistById(String wishlistId, User user) {
-        WishList wishlist = getWishlistById(wishlistId);
-        if (Boolean.TRUE.equals(wishlist.getIsPublic())) {
-            return wishlist.toDto();
-        }
-        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
-            throw new AccessDeniedException("This is a private wishlist. You don't have permissions to see it.");
-        }
-        return wishlist.toDto();
-    }
 
     @Transactional
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
@@ -45,13 +35,6 @@ public class WishListService {
 
         WishList wishlist = createWishlistRequest.toEntity(user);
         return wishListRepository.save(wishlist).toDto();
-    }
-
-    public WishListContainerDto getWishlistsForUser(User user) {
-        List<WishListDto> wisLists = wishListRepository.findByUser(user).stream()
-                .map(WishList::toDto)
-                .toList();
-        return new WishListContainerDto(wisLists);
     }
 
     @Transactional
@@ -67,6 +50,23 @@ public class WishListService {
         return wishList.toDto();
     }
 
+    public WishListDto findWishlistById(String wishlistId, User user) {
+        WishList wishlist = getWishlistById(wishlistId);
+        if (Boolean.TRUE.equals(wishlist.getIsPublic())) {
+            return wishlist.toDto();
+        }
+        checkOwnership(user, wishlistId, "This is a private wishlist. You don't have permissions to see it.");
+        return wishlist.toDto();
+    }
+
+
+    public WishListContainerDto getWishlistsForUser(User user) {
+        List<WishListDto> wisLists = wishListRepository.findByUser(user).stream()
+                .map(WishList::toDto)
+                .toList();
+        return new WishListContainerDto(wisLists);
+    }
+
     public boolean isWishlistOwner(String wishlistId, String userEmail) {
         return !userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
     }
@@ -78,10 +78,13 @@ public class WishListService {
 
     public WishList getWishlistEntityForOwner(String wishlistId, User user) {
         WishList wishList = getWishlistById(wishlistId);
-
-        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
-            throw new AccessDeniedException("You need to be owner to modify this wishlist.");
-        }
+        checkOwnership(user, wishlistId, "You need to be owner to modify this wishlist.");
         return wishList;
+    }
+
+    private void checkOwnership(User user, String wishlistId, String msg) {
+        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
+            throw new AccessDeniedException(msg);
+        }
     }
 }

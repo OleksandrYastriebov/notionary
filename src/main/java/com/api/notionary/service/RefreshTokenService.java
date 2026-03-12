@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class RefreshTokenService {
     @Value("${token.refresh.expiration.sec}")
@@ -31,6 +32,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token);
     }
 
+    @Transactional
     public RefreshToken createRefreshToken(Long userId) {
         List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(userId);
 
@@ -47,6 +49,7 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public void verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
