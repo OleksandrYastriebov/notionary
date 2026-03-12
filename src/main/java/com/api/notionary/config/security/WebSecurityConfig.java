@@ -41,6 +41,7 @@ public class WebSecurityConfig {
                                 "/api/v1/sign-up/**",
                                 "/api/v1/sign-in/**",
                                 "/api/v1/confirm-email/**",
+                                "/api/v1/health",
                                 "/api/v1/refresh-token/**",
                                 "/css/**",
                                 "/js/**",
