@@ -1,0 +1,76 @@
+package com.api.notionary.service;
+
+import com.api.notionary.dto.ApiResponseWrapper;
+import com.api.notionary.dto.access.AccessesContainerDto;
+import com.api.notionary.dto.payload.request.wishlist.RevokeAccessRequest;
+import com.api.notionary.dto.payload.request.wishlist.ShareWishListRequest;
+import com.api.notionary.entity.User;
+import com.api.notionary.entity.WishList;
+import com.api.notionary.entity.WishlistAccess;
+import com.api.notionary.exception.EntityNotFoundException;
+import com.api.notionary.repository.WishListAccessRepository;
+import com.api.notionary.repository.WishListRepository;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
+public class WishListAccessService {
+
+    private final WishListAccessRepository wishlistAccessRepository;
+    private final WishListRepository wishListRepository;
+
+    public AccessesContainerDto getAllGrantedEmailsForWishlist(String wishlistId, User user) {
+        getWishlistAndVerifyOwner(wishlistId, user);
+        return new AccessesContainerDto(wishlistAccessRepository.findEmailsByWishlistId(wishlistId));
+    }
+
+    @Transactional
+    public ApiResponseWrapper grantAccess(String wishlistId, ShareWishListRequest request, User user) {
+        WishList wishlist = getWishlistAndVerifyOwner(wishlistId, user);
+        String targetEmail = request.email().toLowerCase().trim();
+
+        if (user.getEmail().equalsIgnoreCase(targetEmail)) {
+            throw new IllegalStateException("You cannot share a wishlist with yourself");
+        }
+
+        if (wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishlist, targetEmail)) {
+            throw new IllegalStateException("User already has access to this wishlist");
+        }
+
+        WishlistAccess access = new WishlistAccess(wishlist, targetEmail);
+        wishlistAccessRepository.save(access);
+
+        return new ApiResponseWrapper("Access granted successfully to " + targetEmail);
+    }
+
+    @Transactional
+    public ApiResponseWrapper revokeAccess(String wishlistId, RevokeAccessRequest request, User user) {
+        WishList wishlist = getWishlistAndVerifyOwner(wishlistId, user);
+
+        WishlistAccess access = wishlistAccessRepository.findByWishListAndGrantedUserEmail(wishlist, request.email())
+                .orElseThrow(() -> new EntityNotFoundException("Access record not found for this email"));
+
+        wishlistAccessRepository.delete(access);
+
+        return new ApiResponseWrapper("Access revoked successfully for " + request.email());
+    }
+
+    private WishList getWishlistAndVerifyOwner(String wishlistId, User owner) {
+        if (owner == null) {
+            throw new AccessDeniedException("Authentication is required to perform this action");
+        }
+
+        WishList wishlist = wishListRepository.findById(wishlistId)
+                .orElseThrow(() -> new EntityNotFoundException("Wishlist not found"));
+
+        if (!wishlist.getUser().getId().equals(owner.getId())) {
+            throw new AccessDeniedException("Only the owner can manage access to this wishlist");
+        }
+        return wishlist;
+    }
+
+}

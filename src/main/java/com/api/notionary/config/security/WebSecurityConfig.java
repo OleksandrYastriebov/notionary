@@ -47,6 +47,7 @@ public class WebSecurityConfig {
                                 "/api/v1/health",
                                 "/css/**",
                                 "/js/**").permitAll()
+                        .requestMatchers("/api/v1/wishlists/*/access", "/api/v1/wishlists/*/access/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists", "/api/v1/wishlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()

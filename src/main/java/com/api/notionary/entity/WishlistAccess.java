@@ -50,6 +50,11 @@ public class WishlistAccess {
         this.createdAt = LocalDateTime.now();
     }
 
+    public WishlistAccess(WishList wishList, String grantedUserEmail) {
+        this.wishList = wishList;
+        this.grantedUserEmail = grantedUserEmail;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

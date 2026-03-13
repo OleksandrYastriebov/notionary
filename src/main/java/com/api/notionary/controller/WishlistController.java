@@ -71,7 +71,7 @@ public class WishlistController {
     @DeleteMapping("/{wishlistId}")
     public ResponseEntity<ApiResponseWrapper> deleteWishList(@PathVariable String wishlistId, @AuthenticationPrincipal User user) {
         wishlistService.deleteWishList(wishlistId, user);
-        return ResponseEntity.ok(new ApiResponseWrapper(String.format("Wishlist with id %s was successfully removed from database", wishlistId)));
+        return ResponseEntity.ok(new ApiResponseWrapper(String.format("Wishlist with id %s was successfully deleted.", wishlistId)));
     }
 
     @Operation(summary = "Update a wishlist", description = "Updates the title, visibility, or image of an existing wishlist.")

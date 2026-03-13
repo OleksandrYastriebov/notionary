@@ -7,6 +7,7 @@ import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.exception.WishlistNotFoundException;
+import com.api.notionary.repository.WishListAccessRepository;
 import com.api.notionary.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,10 +26,10 @@ public class WishListService {
     private int maxWishlistsPerAccount;
 
     private final WishListRepository wishListRepository;
+    private final WishListAccessRepository wishlistAccessRepository;
 
     @Transactional
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
-
         if (wishListRepository.countByUser(user) >= maxWishlistsPerAccount) {
             throw new IllegalStateException("Maximum limit WishLists per account reached.");
         }
@@ -55,20 +56,26 @@ public class WishListService {
         if (Boolean.TRUE.equals(wishlist.getIsPublic())) {
             return wishlist.toDto();
         }
-        checkOwnership(user, wishlistId, "This is a private wishlist. You don't have permissions to see it.");
-        return wishlist.toDto();
-    }
 
+        if (user == null) {
+            throw new AccessDeniedException("This is a private wishlist. Please, log in.");
+        }
+
+        if (isWishlistOwner(wishlistId, user.getEmail())) {
+            return wishlist.toDto();
+        }
+
+        if (wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishlist, user.getEmail())) {
+            return wishlist.toDto();
+        }
+        throw new AccessDeniedException("This is a private wishlist. You don't have permissions to see it.");
+    }
 
     public WishListContainerDto getWishlistsForUser(User user) {
         List<WishListDto> wisLists = wishListRepository.findByUser(user).stream()
                 .map(WishList::toDto)
                 .toList();
         return new WishListContainerDto(wisLists);
-    }
-
-    public boolean isWishlistOwner(String wishlistId, String userEmail) {
-        return !userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
     }
 
     private WishList getWishlistById(String wishlistId) {
@@ -78,13 +85,17 @@ public class WishListService {
 
     public WishList getWishlistEntityForOwner(String wishlistId, User user) {
         WishList wishList = getWishlistById(wishlistId);
-        checkOwnership(user, wishlistId, "You need to be owner to modify this wishlist.");
+        checkOwnership(user, wishlistId);
         return wishList;
     }
 
-    private void checkOwnership(User user, String wishlistId, String msg) {
-        if (user == null || isWishlistOwner(wishlistId, user.getEmail())) {
-            throw new AccessDeniedException(msg);
+    private void checkOwnership(User user, String wishlistId) {
+        if (user == null || !isWishlistOwner(wishlistId, user.getEmail())) {
+            throw new AccessDeniedException("You need to be owner to modify this wishlist.");
         }
+    }
+
+    private boolean isWishlistOwner(String wishlistId, String userEmail) {
+        return userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
     }
 }
