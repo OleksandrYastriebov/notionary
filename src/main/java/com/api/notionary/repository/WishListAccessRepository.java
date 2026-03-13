@@ -20,6 +20,4 @@ public interface WishListAccessRepository extends JpaRepository<WishlistAccess, 
     @Query("SELECT wa.grantedUserEmail FROM WishlistAccess wa WHERE wa.wishList.id = :wishlistId")
     List<String> findEmailsByWishlistId(@Param("wishlistId") String wishlistId);
 
-    void deleteByWishList(WishList wishList);
-
 }
