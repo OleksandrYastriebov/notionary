@@ -64,16 +64,14 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public TokenRefreshDto refreshToken(TokenRefreshRequest request) {
-        String requestToken = request.refreshToken();
-
-        RefreshToken refreshToken = refreshTokenService.findByToken(requestToken)
-                .orElseThrow(() -> new TokenRefreshException(requestToken, "Refresh token is not in database!"));
+    public TokenRefreshDto refreshToken(String refreshRequestToken) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshRequestToken)
+                .orElseThrow(() -> new TokenRefreshException(refreshRequestToken, "Refresh token is not in database!"));
 
         refreshTokenService.verifyExpiration(refreshToken);
         User user = refreshToken.getUser();
 
-        refreshTokenService.deleteByToken(requestToken);
+        refreshTokenService.deleteByToken(refreshRequestToken);
 
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
         String jwt = jwtService.generateToken(user);
