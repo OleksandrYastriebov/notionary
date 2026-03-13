@@ -61,11 +61,12 @@ public class WishListService {
             throw new AccessDeniedException("This is a private wishlist. Please, log in.");
         }
 
-        if (isWishlistOwner(wishlistId, user.getEmail())) {
+        String userEmail = user.getEmail().toLowerCase().trim();
+        if (isWishlistOwner(wishlistId, userEmail)) {
             return wishlist.toDto();
         }
 
-        if (wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishlist, user.getEmail())) {
+        if (wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishlist, userEmail)) {
             return wishlist.toDto();
         }
         throw new AccessDeniedException("This is a private wishlist. You don't have permissions to see it.");
@@ -96,6 +97,6 @@ public class WishListService {
     }
 
     private boolean isWishlistOwner(String wishlistId, String userEmail) {
-        return userEmail.equals(getWishlistById(wishlistId).getUser().getEmail());
+        return userEmail.equalsIgnoreCase(getWishlistById(wishlistId).getUser().getEmail().toLowerCase().trim());
     }
 }

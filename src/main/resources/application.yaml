@@ -5,6 +5,7 @@ app:
   limits:
     max-wishlists: 100
     max-items-per-list: 50
+    max-shares-per-wishlist: 30
 
 token:
   signing:

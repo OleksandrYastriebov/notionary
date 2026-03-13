@@ -36,7 +36,7 @@ public record SignUpRequest(
         return new User(
                 this.firstName,
                 this.lastName,
-                this.email,
+                this.email.toLowerCase().trim(),
                 this.password,
                 LocalDateTime.now(),
                 UserRole.ROLE_USER);

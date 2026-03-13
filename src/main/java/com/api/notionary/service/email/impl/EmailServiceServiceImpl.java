@@ -28,11 +28,11 @@ public class EmailServiceServiceImpl implements EmailSenderService {
 
     @Override
     @Async
-    public void send(String to, String email) {
+    public void send(String to, String emailText) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setText(email, true);
+            helper.setText(emailText, true);
             helper.setTo(to);
             helper.setSubject("Confirm your email address.");
             helper.setFrom(emailFromValue);
@@ -45,14 +45,15 @@ public class EmailServiceServiceImpl implements EmailSenderService {
     @Override
     @Async
     public void sendConfirmationEmail(String emailTo, String name, String link) {
-        if (!emailValidator.test(emailTo)) {
-            throw new IllegalStateException(String.format("Email %s is invalid.", emailTo));
+        String normalizedEmail = emailTo.toLowerCase().trim();
+        if (!emailValidator.test(normalizedEmail)) {
+            throw new IllegalStateException(String.format("Email %s is invalid.", normalizedEmail));
         }
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("link", link);
         String htmlContent = templateEngine.process("email-confirmation", context);
 
-        send(emailTo, htmlContent);
+        send(normalizedEmail, htmlContent);
     }
 }

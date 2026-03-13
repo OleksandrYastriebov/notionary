@@ -36,7 +36,7 @@ public class UserService {
 
     @Transactional
     public String signUpUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (userRepository.existsByEmail(user.getEmail().toLowerCase().trim())) {
             throw new UserAlreadyExistsException("Email already taken.");
         }
 
@@ -96,7 +96,7 @@ public class UserService {
 
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmail(email.toLowerCase().trim())
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found.", email)));
     }
 

@@ -33,13 +33,13 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("id", customUserDetails.getId());
-            claims.put("email", customUserDetails.getEmail());
+            claims.put("email", customUserDetails.getEmail().toLowerCase().trim());
         }
         return generateToken(claims, userDetails);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
+        final String email = extractEmail(token).toLowerCase().trim();
         return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 

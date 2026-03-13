@@ -54,17 +54,18 @@ public class AuthenticationService {
 
     @Transactional
     public AuthResultDto signIn(SignInRequest request) {
+        String userEmail = request.email().toLowerCase().trim();
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                new UsernamePasswordAuthenticationToken(userEmail, request.password())
         );
 
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("User with email: %s not found", request.email())));
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with email: %s not found", userEmail)));
 
         String jwt = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return new AuthResultDto(jwt, refreshToken.getToken(), user.getId(), user.getEmail());
+        return new AuthResultDto(jwt, refreshToken.getToken(), user.getId(), userEmail);
     }
 
     @Transactional
@@ -80,7 +81,7 @@ public class AuthenticationService {
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
         String newJwt = jwtService.generateToken(user);
 
-        return new AuthResultDto(newJwt, newRefreshToken.getToken(), user.getId(), user.getEmail());
+        return new AuthResultDto(newJwt, newRefreshToken.getToken(), user.getId(), user.getEmail().toLowerCase().trim());
     }
 
     @Transactional
@@ -106,7 +107,7 @@ public class AuthenticationService {
 
     @Transactional
     public ApiResponseWrapper resendConfirmationEmail(String email) {
-        User user = userService.getUserByEmail(email);
+        User user = userService.getUserByEmail(email.toLowerCase().trim());
 
         if (user.isEnabled()) {
             throw new UserAlreadyActivatedException(EMAIL_CONFIRMED_LOG_IN);
@@ -127,7 +128,7 @@ public class AuthenticationService {
 
     private void sendActivationEmail(User user, String token) {
         String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, token);
-        emailSenderService.sendConfirmationEmail(user.getEmail(), user.getFirstName(), activationLink);
+        emailSenderService.sendConfirmationEmail(user.getEmail().toLowerCase().trim(), user.getFirstName(), activationLink);
     }
 
 }

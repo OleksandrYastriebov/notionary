@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface WishListAccessRepository extends JpaRepository<WishlistAccess, Long> {
 
+    int countByWishListId(String wishListId);
+
     boolean existsByWishListAndGrantedUserEmail(WishList wishList, String email);
 
     Optional<WishlistAccess> findByWishListAndGrantedUserEmail(WishList wishList, String email);
