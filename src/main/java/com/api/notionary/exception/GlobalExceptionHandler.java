@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenRefreshException.class)
     public ResponseEntity<ErrorResponse> handleTokenRefreshException(TokenRefreshException ex, WebRequest webRequest) {
-        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), webRequest);
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), webRequest);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

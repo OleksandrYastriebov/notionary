@@ -14,6 +14,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true)
   const [isEditing, setIsEditing] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [avatarError, setAvatarError] = useState(false)
 
   useEffect(() => {
     fetchProfile()
@@ -55,15 +56,19 @@ const UserProfile = () => {
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center space-x-4">
-              {profile.avatarUrl ? (
+              {/* Avatar with fallback */}
+              {profile.avatarUrl && !avatarError ? (
                 <img 
                   src={profile.avatarUrl} 
                   alt={profile.firstName}
-                  className="w-20 h-20 rounded-full object-cover"
+                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                  onError={() => setAvatarError(true)}
                 />
               ) : (
-                <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="w-10 h-10 text-primary-600" />
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center border-2 border-primary-200">
+                  <span className="text-white font-bold text-2xl">
+                    {profile.firstName[0]}{profile.lastName[0]}
+                  </span>
                 </div>
               )}
               <div>

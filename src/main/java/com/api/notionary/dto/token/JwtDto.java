@@ -10,16 +10,13 @@ public record JwtDto(
         @Schema(description = "Token type", example = "Bearer", defaultValue = "Bearer")
         String type,
 
-        @Schema(description = "Refresh token string", example = "550e8400-e29b-41d4-a716-446655440000")
-        String refreshToken,
-
         @Schema(description = "Unique user identifier", example = "10")
         Long id,
 
         @Schema(description = "User email address", example = "john.doe@notionary.app")
         String email
 ) {
-    public JwtDto(String jwtToken, String refreshToken, Long id, String email) {
-        this(jwtToken, "Bearer", refreshToken, id, email);
+    public JwtDto(String jwtToken, Long id, String email) {
+        this(jwtToken, "Bearer", id, email);
     }
 }

@@ -2,16 +2,18 @@ package com.api.notionary.service;
 
 import com.api.notionary.dto.payload.request.user.SignInRequest;
 import com.api.notionary.dto.payload.request.user.SignUpRequest;
-import com.api.notionary.dto.payload.request.token.TokenRefreshRequest;
+import com.api.notionary.dto.token.AuthResultDto;
 import com.api.notionary.dto.token.JwtDto;
 import com.api.notionary.dto.ApiResponseWrapper;
 import com.api.notionary.dto.token.TokenRefreshDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.RefreshToken;
 import com.api.notionary.entity.User;
+import com.api.notionary.exception.EntityNotFoundException;
 import com.api.notionary.exception.TokenExpiredException;
 import com.api.notionary.exception.TokenRefreshException;
 import com.api.notionary.exception.UserAlreadyActivatedException;
+import com.api.notionary.repository.UserRepository;
 import com.api.notionary.service.email.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -38,6 +40,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
+    private final UserRepository userRepository;
 
     @Transactional
     public ApiResponseWrapper signUp(SignUpRequest request) {
@@ -50,33 +53,34 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public JwtDto signIn(SignInRequest signInRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(signInRequest.email(), signInRequest.password())
+    public AuthResultDto signIn(SignInRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
 
-        User user = (User) authentication.getPrincipal();
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new EntityNotFoundException(String.format("User with email: %s not found", request.email())));
 
-        String jwtToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+        String jwt = jwtService.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return new JwtDto(jwtToken, refreshToken, user.getId(), user.getEmail());
+        return new AuthResultDto(jwt, refreshToken.getToken(), user.getId(), user.getEmail());
     }
 
     @Transactional
-    public TokenRefreshDto refreshToken(String refreshRequestToken) {
-        RefreshToken refreshToken = refreshTokenService.findByToken(refreshRequestToken)
-                .orElseThrow(() -> new TokenRefreshException(refreshRequestToken, "Refresh token is not in database!"));
+    public AuthResultDto refreshToken(String requestRefreshToken) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
+                .orElseThrow(() -> new TokenRefreshException("Refresh token is not in database!"));
 
         refreshTokenService.verifyExpiration(refreshToken);
         User user = refreshToken.getUser();
 
-        refreshTokenService.deleteByToken(refreshRequestToken);
+        refreshTokenService.deleteByToken(requestRefreshToken);
 
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
-        String jwt = jwtService.generateToken(user);
+        String newJwt = jwtService.generateToken(user);
 
-        return new TokenRefreshDto(jwt, newRefreshToken.getToken());
+        return new AuthResultDto(newJwt, newRefreshToken.getToken(), user.getId(), user.getEmail());
     }
 
     @Transactional
@@ -115,11 +119,10 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public ApiResponseWrapper logout(String refreshToken, User user) {
-        if (user != null) {
+    public void logout(String refreshToken) {
+        if (refreshToken != null && !refreshToken.isBlank()) {
             refreshTokenService.deleteByToken(refreshToken);
         }
-        return new ApiResponseWrapper("Log out successful!");
     }
 
     private void sendActivationEmail(User user, String token) {

@@ -5,9 +5,9 @@ export const authApi = {
 
   signIn: (credentials) => axiosInstance.post("/sign-in", credentials),
 
-  signOut: (data) => axiosInstance.post("/sign-out", data),
+  signOut: () => axiosInstance.post("/sign-out"), // cookie sent automatically
 
-  refreshToken: (data) => axiosInstance.post("/refresh-token", data),
+  refreshToken: () => axiosInstance.post("/refresh-token"), // cookie sent automatically
 
   confirmEmail: (token) => axiosInstance.get(`/confirm-email?token=${token}`),
 };

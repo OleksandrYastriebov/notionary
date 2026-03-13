@@ -53,7 +53,7 @@ public class RefreshTokenService {
     public void verifyExpiration(RefreshToken token) {
         if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
-            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
+            throw new TokenRefreshException("Refresh token was expired. Please make a new signin request");
         }
     }
 

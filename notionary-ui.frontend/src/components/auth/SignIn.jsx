@@ -10,17 +10,28 @@ const SignIn = () => {
   const { signIn } = useAuth()
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   
   const { register, handleSubmit, formState: { errors } } = useForm()
 
   const onSubmit = async (data) => {
     setIsLoading(true)
+    setErrorMessage('') // Clear previous errors
+    
     try {
       await signIn(data)
       toast.success('Successfully signed in!')
       navigate('/wishlists')
     } catch (error) {
-      // Error is already handled by axios interceptor
+      // Handle 401 Unauthorized (wrong credentials)
+      if (error.response?.status === 401) {
+        const message = error.response.data?.message || 
+                       error.response.data?.exceptionMessage || 
+                       'Invalid email or password'
+        setErrorMessage(message)
+        toast.error(message)
+      }
+      // Other errors already handled by axios interceptor
     } finally {
       setIsLoading(false)
     }
@@ -40,6 +51,17 @@ const SignIn = () => {
         </div>
 
         <form className="mt-8 space-y-6 card" onSubmit={handleSubmit(onSubmit)}>
+          {/* Error Banner */}
+          {errorMessage && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-medium text-red-800">Authentication Failed</p>
+                <p className="text-sm text-red-700 mt-1">{errorMessage}</p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
             {/* Email */}
             <div>
@@ -53,6 +75,7 @@ const SignIn = () => {
                 <input
                   {...register('email', { validate: validators.email })}
                   type="email"
+                  autoComplete="email"
                   className={`input-field pl-10 ${errors.email ? 'border-red-500' : ''}`}
                   placeholder="you@example.com"
                 />
@@ -77,6 +100,7 @@ const SignIn = () => {
                 <input
                   {...register('password', { validate: validators.password })}
                   type="password"
+                  autoComplete="current-password"
                   className={`input-field pl-10 ${errors.password ? 'border-red-500' : ''}`}
                   placeholder="••••••••"
                 />

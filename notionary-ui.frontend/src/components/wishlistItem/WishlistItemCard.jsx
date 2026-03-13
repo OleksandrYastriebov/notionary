@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MoreVertical, Edit2, Trash2, ExternalLink, Check, X } from 'lucide-react'
+import { MoreVertical, Edit2, Trash2, ExternalLink, Check, Package } from 'lucide-react'
 import { wishlistItemApi } from '../../api/wishlistItemApi'
 import { getResponsiveImageUrl } from '../../utils/cloudinary'
 import EditWishlistItem from './EditWishlistItem'
@@ -12,6 +12,7 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
   const [deleting, setDeleting] = useState(false)
   const [isChecked, setIsChecked] = useState(item.isChecked)
   const [updating, setUpdating] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const handleToggleCheck = async () => {
     if (updating) return
@@ -25,8 +26,7 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
       })
       setIsChecked(newCheckedState)
     } catch (error) {
-      // Error handled by interceptor
-      setIsChecked(!newCheckedState) // Revert on error
+      setIsChecked(!newCheckedState)
     } finally {
       setUpdating(false)
     }
@@ -49,30 +49,30 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
   return (
     <>
       <div className={`card hover:shadow-lg transition-all duration-200 relative ${isChecked ? 'opacity-60' : ''}`}>
-        {/* Checkmark & Menu */}
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
+        {/* Checkmark & Menu - MORE VISIBLE */}
+        <div className="absolute top-3 right-3 z-10 flex gap-2">
           {/* Check Button */}
           <button
             onClick={handleToggleCheck}
             disabled={updating}
-            className={`p-2 rounded-full transition-all ${
+            className={`p-2.5 rounded-full transition-all shadow-md ${
               isChecked 
                 ? 'bg-green-500 text-white hover:bg-green-600' 
-                : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                : 'bg-white text-gray-400 hover:bg-gray-100 border border-gray-300'
             }`}
             title={isChecked ? 'Mark as needed' : 'Mark as purchased'}
           >
             <Check className="w-5 h-5" />
           </button>
 
-          {/* Menu (Owner Only) */}
+          {/* Menu (Owner Only) - MORE VISIBLE */}
           {isOwner && (
             <div className="relative">
               <button
                 onClick={() => setShowMenu(!showMenu)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2.5 bg-white hover:bg-gray-100 rounded-full transition-colors shadow-md border border-gray-300"
               >
-                <MoreVertical className="w-5 h-5 text-gray-600" />
+                <MoreVertical className="w-5 h-5 text-gray-700" />
               </button>
 
               {showMenu && (
@@ -81,7 +81,7 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
                     className="fixed inset-0" 
                     onClick={() => setShowMenu(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
                     <button
                       onClick={() => {
                         setShowEdit(true)
@@ -109,18 +109,20 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
           )}
         </div>
 
-        {/* Image */}
-        {item.imageUrl ? (
+        {/* Image with fallback */}
+        {item.imageUrl && !imageError ? (
           <div className="aspect-square rounded-lg overflow-hidden mb-4 bg-gray-100">
             <img
               src={getResponsiveImageUrl(item.imageUrl, 'medium')}
               alt={item.title}
               className="w-full h-full object-cover"
+              onError={() => setImageError(true)}
             />
           </div>
         ) : (
-          <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-4">
-            <span className="text-4xl font-bold text-gray-300">
+          <div className="aspect-square rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center mb-4">
+            <Package className="w-16 h-16 text-gray-400 mb-2" />
+            <span className="text-3xl font-bold text-gray-500">
               {item.title[0].toUpperCase()}
             </span>
           </div>
@@ -149,7 +151,7 @@ const WishlistItemCard = ({ item, wishlistId, isOwner, onDelete, onUpdate }) => 
               href={item.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
+              className="inline-flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
               <span>View Product</span>

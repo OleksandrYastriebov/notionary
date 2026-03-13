@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { MoreVertical, Edit2, Trash2, Lock, Globe } from 'lucide-react'
+import { MoreVertical, Edit2, Trash2, Lock, Globe, Gift } from 'lucide-react'
 import { useState } from 'react'
 import { wishlistApi } from '../../api/wishlistApi'
 import { getDeviceSpecificImage } from '../../utils/cloudinary'
@@ -10,6 +10,7 @@ const WishlistCard = ({ wishlist, onDelete }) => {
   const [showEdit, setShowEdit] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   const handleDelete = async () => {
     setDeleting(true)
@@ -36,7 +37,7 @@ const WishlistCard = ({ wishlist, onDelete }) => {
               e.preventDefault()
               setShowMenu(!showMenu)
             }}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 bg-white hover:bg-gray-100 rounded-full transition-colors shadow-md"
           >
             <MoreVertical className="w-5 h-5 text-gray-600" />
           </button>
@@ -76,18 +77,20 @@ const WishlistCard = ({ wishlist, onDelete }) => {
         </div>
 
         <Link to={`/wishlists/${wishlist.id}`} className="block">
-          {/* Image */}
-          {wishlist.imageUrl ? (
+          {/* Image with fallback */}
+          {wishlist.imageUrl && !imageError ? (
             <div className="aspect-video rounded-lg overflow-hidden mb-4 bg-gray-100">
               <img
                 src={getDeviceSpecificImage(wishlist.imageUrl)}
                 alt={wishlist.title}
                 className="w-full h-full object-cover"
+                onError={() => setImageError(true)}
               />
             </div>
           ) : (
-            <div className="aspect-video rounded-lg bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center mb-4">
-              <span className="text-4xl font-bold text-primary-600">
+            <div className="aspect-video rounded-lg bg-gradient-to-br from-primary-100 to-primary-200 flex flex-col items-center justify-center mb-4">
+              <Gift className="w-12 h-12 text-primary-600 mb-2" />
+              <span className="text-2xl font-bold text-primary-700">
                 {wishlist.title[0].toUpperCase()}
               </span>
             </div>
@@ -126,7 +129,7 @@ const WishlistCard = ({ wishlist, onDelete }) => {
           onClose={() => setShowEdit(false)}
           onUpdated={() => {
             setShowEdit(false)
-            window.location.reload() // Refresh to show updates
+            window.location.reload()
           }}
         />
       )}

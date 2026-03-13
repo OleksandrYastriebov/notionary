@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { authApi } from '../api/authApi'
 import { tokenManager } from '../utils/tokenManager'
+import { userApi } from '../api/userApi'
 
 const AuthContext = createContext(null)
 
@@ -9,26 +10,49 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Check for existing session on mount
-    const initAuth = async () => {
-      const accessToken = tokenManager.getAccessToken()
-      const refreshToken = tokenManager.getRefreshToken()
-      
-      if (accessToken && refreshToken) {
-        const userData = tokenManager.getUserData()
-        setUser(userData)
-      }
+    initAuth()
+    
+    // Listen for auto-refresh events
+    window.addEventListener('token-refresh-needed', handleAutoRefresh)
+    
+    return () => {
+      window.removeEventListener('token-refresh-needed', handleAutoRefresh)
+    }
+  }, [])
+
+  const initAuth = async () => {
+    // Try to get current user (cookie will be sent automatically)
+    try {
+      const response = await userApi.getCurrentUser()
+      setUser({
+        id: response.data.id,
+        email: response.data.email,
+        firstName: response.data.firstName,
+        lastName: response.data.lastName,
+      })
+    } catch (error) {
+      // No valid session
+      tokenManager.clearTokens()
+    } finally {
       setLoading(false)
     }
+  }
 
-    initAuth()
-  }, [])
+  const handleAutoRefresh = async () => {
+    try {
+      const response = await authApi.refreshToken()
+      tokenManager.setAccessToken(response.data.accessToken)
+    } catch (error) {
+      console.error('Auto-refresh failed:', error)
+      signOut()
+    }
+  }
 
   const signIn = async (credentials) => {
     const response = await authApi.signIn(credentials)
-    const { jwtToken, refreshToken, id, email } = response.data
+    const { jwtToken, id, email } = response.data
     
-    tokenManager.setTokens(jwtToken, refreshToken, { id, email })
+    tokenManager.setAccessToken(jwtToken)
     setUser({ id, email })
     
     return response.data
@@ -39,30 +63,15 @@ export const AuthProvider = ({ children }) => {
   }
 
   const signOut = async () => {
-    const refreshToken = tokenManager.getRefreshToken()
-    if (refreshToken) {
-      try {
-        await authApi.signOut({ refreshToken })
-      } catch (error) {
-        console.error('Sign out error:', error)
-      }
+    try {
+      await authApi.signOut()
+    } catch (error) {
+      // Ignore errors during sign out (token might be expired)
+      console.log('Sign out error (ignored):', error)
+    } finally {
+      tokenManager.clearTokens()
+      setUser(null)
     }
-    
-    tokenManager.clearTokens()
-    setUser(null)
-  }
-
-  const refreshAccessToken = async () => {
-    const refreshToken = tokenManager.getRefreshToken()
-    if (!refreshToken) {
-      throw new Error('No refresh token available')
-    }
-
-    const response = await authApi.refreshToken({ refreshToken })
-    const { accessToken, refreshToken: newRefreshToken } = response.data
-    
-    tokenManager.setTokens(accessToken, newRefreshToken)
-    return accessToken
   }
 
   return (
@@ -72,7 +81,6 @@ export const AuthProvider = ({ children }) => {
       signIn,
       signUp,
       signOut,
-      refreshAccessToken
     }}>
       {children}
     </AuthContext.Provider>
