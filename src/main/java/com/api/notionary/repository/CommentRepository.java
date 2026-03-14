@@ -15,6 +15,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByWishListItemOrderByCreatedAtAsc(WishListItem wishListItem);
 
     List<Comment> findByAuthorId(String authorId);
-
-    void deleteByWishListItem(WishListItem wishListItem);
 }

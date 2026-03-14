@@ -44,6 +44,12 @@ public class Comment {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    public Comment(String text, WishListItem wishListItem, User author) {
+        this.text = text;
+        this.wishListItem = wishListItem;
+        this.author = author;
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
