@@ -42,12 +42,7 @@ class UserAuthenticationControllerTest {
 
     @Test
     void signUp_shouldReturnOkWithServiceResponse() {
-        SignUpRequest request = new SignUpRequest(
-                "John",
-                "Doe",
-                "user@notionary.app",
-                "password123"
-        );
+        SignUpRequest request = new SignUpRequest("John", "Doe", "user@notionary.app", "password123");
         ApiResponseWrapper serviceResponse = new ApiResponseWrapper("User registered successfully");
 
         when(authenticationService.signUp(any(SignUpRequest.class))).thenReturn(serviceResponse);
@@ -63,12 +58,8 @@ class UserAuthenticationControllerTest {
     @Test
     void signIn_shouldReturnJwtDtoAndSetRefreshCookie() {
         SignInRequest request = new SignInRequest("user@notionary.app", "password123");
-        AuthResultDto authResult = new AuthResultDto(
-                "access-token-value",
-                "refresh-token-value",
-                42L,
-                "user@notionary.app"
-        );
+        AuthResultDto authResult = new AuthResultDto("access-token-value", "refresh-token-value", 42L,
+                "user@notionary.app");
 
         when(authenticationService.signIn(any(SignInRequest.class))).thenReturn(authResult);
 
@@ -91,12 +82,8 @@ class UserAuthenticationControllerTest {
     @Test
     void refreshToken_shouldExchangeCookieForNewTokens() {
         String refreshTokenCookie = "existing-refresh-token";
-        AuthResultDto authResult = new AuthResultDto(
-                "new-access-token",
-                "new-refresh-token",
-                42L,
-                "user@notionary.app"
-        );
+        AuthResultDto authResult = new AuthResultDto("new-access-token", "new-refresh-token", 42L,
+                "user@notionary.app");
 
         when(authenticationService.refreshToken(refreshTokenCookie)).thenReturn(authResult);
 
@@ -116,12 +103,10 @@ class UserAuthenticationControllerTest {
 
     @Test
     void refreshToken_shouldThrowExceptionWhenCookieMissing() {
-        assertThatThrownBy(() -> controller.refreshToken(null))
-                .isInstanceOf(TokenRefreshException.class)
+        assertThatThrownBy(() -> controller.refreshToken(null)).isInstanceOf(TokenRefreshException.class)
                 .hasMessage("Refresh Token is missing in cookies");
 
-        assertThatThrownBy(() -> controller.refreshToken("  "))
-                .isInstanceOf(TokenRefreshException.class)
+        assertThatThrownBy(() -> controller.refreshToken("  ")).isInstanceOf(TokenRefreshException.class)
                 .hasMessage("Refresh Token is missing in cookies");
     }
 
@@ -161,4 +146,3 @@ class UserAuthenticationControllerTest {
         assertThat(setCookieHeader).contains("Max-Age=0");
     }
 }
-

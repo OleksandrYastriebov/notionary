@@ -4,6 +4,7 @@ import com.api.notionary.controller.docs.ApiForbiddenErrorDoc;
 import com.api.notionary.controller.docs.ApiNotFoundErrorDoc;
 import com.api.notionary.controller.docs.ApiUnauthorizedErrorDoc;
 import com.api.notionary.dto.ApiResponseWrapper;
+import com.api.notionary.dto.payload.request.user.ChangePasswordRequest;
 import com.api.notionary.dto.payload.request.user.UpdateUserRequest;
 import com.api.notionary.dto.user.UserProfileDto;
 import com.api.notionary.entity.User;
@@ -69,5 +70,15 @@ public class UserController {
     public ResponseEntity<UserProfileDto> updateUserProfile(@AuthenticationPrincipal User user,
                                                             @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(user, request));
+    }
+
+    @Operation(summary = "Change user password", description = "Updates the authenticated user's password after verifying the current password.")
+    @ApiUnauthorizedErrorDoc
+    @PatchMapping("/me/password")
+    @RateLimited(action = RateLimitPlan.MUTATION)
+    public ResponseEntity<ApiResponseWrapper> changePassword(@AuthenticationPrincipal User user,
+                                                             @Valid @RequestBody ChangePasswordRequest request) {
+        userService.changePassword(user, request);
+        return ResponseEntity.ok(new ApiResponseWrapper("Password updated successfully."));
     }
 }

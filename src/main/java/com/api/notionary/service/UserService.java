@@ -1,5 +1,6 @@
 package com.api.notionary.service;
 
+import com.api.notionary.dto.payload.request.user.ChangePasswordRequest;
 import com.api.notionary.dto.payload.request.user.UpdateUserRequest;
 import com.api.notionary.dto.user.UserProfileDto;
 import com.api.notionary.entity.ConfirmationToken;
@@ -94,6 +95,16 @@ public class UserService {
         return new UserProfileDto(user);
     }
 
+    @Transactional
+    public void changePassword(User currentUser, ChangePasswordRequest request) {
+        User user = getUserEntityById(currentUser.getId());
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Incorrect current password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+    }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email.toLowerCase().trim())
