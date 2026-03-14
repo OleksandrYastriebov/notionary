@@ -32,7 +32,7 @@ public class EmailNotificationListener {
         log.info("Handling UserRegisteredEvent for user: {}", event.getUser().getEmail());
         String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, event.getConfirmationToken());
         emailSenderService.sendConfirmationEmail(
-                event.getUser().getEmail().toLowerCase().trim(),
+                event.getUser().getEmail(),
                 event.getUser().getFirstName(),
                 activationLink
         );

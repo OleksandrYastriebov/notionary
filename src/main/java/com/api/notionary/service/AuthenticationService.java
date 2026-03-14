@@ -16,7 +16,6 @@ import com.api.notionary.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -27,10 +26,7 @@ import java.time.LocalDateTime;
 @Service
 public class AuthenticationService {
 
-    private static final String EMAIL_CONFIRMED_LOG_IN = "Email is already confirmed. You can log in now.";
-
-    @Value("${app.url.backend}")
-    private String appUrl;
+    private static final String EMAIL_CONFIRMED_LOG_IN = "Email is already confirmed. You can Log In now.";
 
     private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;

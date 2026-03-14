@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Confirmation - Notionary</title>
+    <style>
+        @media screen and (max-width: 600px) {
+            .main-container { width: 100% !important; margin: auto !important; border-radius: 0 !important; }
+        }
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+    </style>
+</head>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 40px 20px;">
+    <tr>
+        <td align="center" valign="top">
+
+            <table role="presentation" class="main-container" width="500" border="0" cellpadding="0" cellspacing="0"
+                   style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+
+                <tr>
+                    <td th:bgcolor="${success ? '#10b981' : '#ef4444'}" align="center" style="padding: 30px;">
+                        <span style="color: #ffffff; font-size: 24px; font-weight: bold; letter-spacing: 1px;"
+                              th:text="${success ? 'Email Confirmed!' : 'Confirmation Failed'}">
+                            Status
+                        </span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center" style="padding: 40px 30px; color: #333333; font-size: 16px; line-height: 24px;">
+
+                        <p style="margin: 0 0 35px 0; font-size: 18px; color: #4b5563;" th:text="${message}">
+                            Your email has been successfully confirmed.
+                        </p>
+
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0;">
+                            <tr>
+                                <td align="center" bgcolor="#1D70B8" style="border-radius: 4px;">
+                                    <a th:href="${frontendUrl + '/sign-in'}"
+                                       style="display: inline-block; padding: 14px 32px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 4px;">
+                                        Go to Login
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td align="center" style="padding: 20px; background-color: #f9f9f9; color: #999999; font-size: 13px;">
+                        <p style="margin: 0;">The Notionary Team</p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
