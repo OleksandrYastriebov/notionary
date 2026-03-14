@@ -62,7 +62,8 @@ public class WishListService {
         }
 
         String userEmail = user.getEmail().toLowerCase().trim();
-        if (isWishlistOwner(wishlistId, userEmail)) {
+
+        if (wishlist.getUser().getEmail().equalsIgnoreCase(user.getEmail())) {
             return wishlist.toDto();
         }
 
