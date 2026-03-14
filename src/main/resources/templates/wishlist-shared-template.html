@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
+  <title>Wishlist Shared With You</title>
+  <style>
+    @media screen and (max-width: 600px) {
+        .email-container {
+            width: 100% !important;
+            margin: auto !important;
+        }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+
+<div style="display: none; max-height: 0px; overflow: hidden; color: #fff; font-size: 1px; line-height: 1px;">
+  Someone shared a wishlist with you on Notionary. Check it out!
+</div>
+
+<table role="presentation" width="100%" border="0" cellpadding="0" cellspacing="0"
+       style="background-color: #f4f4f4; padding-top: 20px; padding-bottom: 20px;">
+  <tr>
+    <td align="center" valign="top">
+
+      <table role="presentation" class="email-container" width="600" border="0" cellpadding="0" cellspacing="0"
+             style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+
+        <tr>
+          <td bgcolor="#0b0c0c" align="left" style="padding: 20px 30px;">
+            <span style="color: #ffffff; font-size: 24px; font-weight: bold; letter-spacing: 1px;">Wishlist Shared With You</span>
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#1D70B8" height="4" style="line-height: 4px; font-size: 4px;">&nbsp;</td>
+        </tr>
+
+        <tr>
+          <td align="left" style="padding: 40px 30px; color: #333333; font-size: 16px; line-height: 24px;">
+            <p style="margin: 0 0 20px 0;">
+              Hi there,
+            </p>
+            <p style="margin: 0 0 20px 0;">
+              Great news! <strong th:text="${ownerName}">User Name</strong> has shared their wishlist "<strong><span th:text="${wishlistTitle}">Title</span></strong>" with you.
+            </p>
+
+            <div th:if="${isTargetRegistered}">
+              <p style="margin: 0 0 30px 0;">
+                You can view their list, see what they want, and mark items as purchased directly in the app.
+              </p>
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 0 30px 0;">
+                <tr>
+                  <td align="center" bgcolor="#1D70B8" style="border-radius: 4px;">
+                    <a th:href="${wishlistLink}" target="_blank"
+                       style="display: inline-block; padding: 14px 24px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 4px;">
+                      View Wishlist
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+
+            <div th:unless="${isTargetRegistered}">
+              <p style="margin: 0 0 30px 0;">
+                To view the list and coordinate gifts, you'll need a Notionary account. It's completely free and only takes a minute to set up!
+              </p>
+
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 0 30px 0;">
+                <tr>
+                  <td align="center" bgcolor="#1D70B8" style="border-radius: 4px; padding-right: 10px;">
+                    <a th:href="${registerLink}" target="_blank"
+                       style="display: inline-block; padding: 14px 24px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: bold; border-radius: 4px;">
+                      Create Account
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #777777;">
+                *Once registered, you can access the wishlist directly using the same email address this message was sent to.
+              </p>
+            </div>
+
+            <p style="margin: 0;">
+              Happy gifting,<br>
+              <strong>The Notionary Team</strong>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center"
+              style="padding: 20px; background-color: #f9f9f9; color: #999999; font-size: 12px;">
+            <p style="margin: 0;">If you don't know this person or don't wish to receive these emails, please ignore this message.</p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>

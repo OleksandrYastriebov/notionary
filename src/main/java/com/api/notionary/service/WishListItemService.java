@@ -42,7 +42,6 @@ public class WishListItemService {
         return new WishListItemContainerDto(wishList.wishListItems());
     }
 
-
     @Transactional
     public WishListItemDto createWishListItem(String wishListId, CreateWishListItemRequest createWishListItemRequest, User user) {
         WishListDto wishListDto = wishListService.findWishlistById(wishListId, user);

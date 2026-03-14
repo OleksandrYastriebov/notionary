@@ -3,20 +3,18 @@ package com.api.notionary.service;
 import com.api.notionary.dto.payload.request.user.SignInRequest;
 import com.api.notionary.dto.payload.request.user.SignUpRequest;
 import com.api.notionary.dto.token.AuthResultDto;
-import com.api.notionary.dto.token.JwtDto;
 import com.api.notionary.dto.ApiResponseWrapper;
-import com.api.notionary.dto.token.TokenRefreshDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.RefreshToken;
 import com.api.notionary.entity.User;
+import com.api.notionary.event.UserRegisteredEvent;
 import com.api.notionary.exception.EntityNotFoundException;
 import com.api.notionary.exception.TokenExpiredException;
 import com.api.notionary.exception.TokenRefreshException;
 import com.api.notionary.exception.UserAlreadyActivatedException;
 import com.api.notionary.repository.UserRepository;
-import com.api.notionary.service.email.EmailSenderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,7 +32,7 @@ public class AuthenticationService {
     @Value("${app.url.backend}")
     private String appUrl;
 
-    private final EmailSenderService emailSenderService;
+    private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final JwtService jwtService;
@@ -47,7 +45,7 @@ public class AuthenticationService {
         User user = request.toEntity();
         String confirmationToken = userService.signUpUser(user);
 
-        sendActivationEmail(user, confirmationToken);
+        eventPublisher.publishEvent(new UserRegisteredEvent(this, user, confirmationToken));
 
         return new ApiResponseWrapper("User registered successfully. Please check your email to activate your account.");
     }
@@ -114,7 +112,7 @@ public class AuthenticationService {
         }
 
         String newToken = userService.generateNewConfirmationToken(user);
-        sendActivationEmail(user, newToken);
+        eventPublisher.publishEvent(new UserRegisteredEvent(this, user, newToken));
 
         return new ApiResponseWrapper("A new confirmation email has been sent. Please check your inbox.");
     }
@@ -124,11 +122,6 @@ public class AuthenticationService {
         if (refreshToken != null && !refreshToken.isBlank()) {
             refreshTokenService.deleteByToken(refreshToken);
         }
-    }
-
-    private void sendActivationEmail(User user, String token) {
-        String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, token);
-        emailSenderService.sendConfirmationEmail(user.getEmail().toLowerCase().trim(), user.getFirstName(), activationLink);
     }
 
 }

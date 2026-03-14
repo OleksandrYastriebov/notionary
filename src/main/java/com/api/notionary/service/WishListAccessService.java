@@ -7,10 +7,13 @@ import com.api.notionary.dto.payload.request.wishlist.ShareWishListRequest;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.entity.WishlistAccess;
+import com.api.notionary.event.WishlistSharedEvent;
 import com.api.notionary.exception.EntityNotFoundException;
+import com.api.notionary.repository.UserRepository;
 import com.api.notionary.repository.WishListAccessRepository;
 import com.api.notionary.repository.WishListRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,8 +27,10 @@ public class WishListAccessService {
     @Value("${app.limits.max-shares-per-wishlist}")
     private int maxShares;
 
+    private final ApplicationEventPublisher eventPublisher;
     private final WishListAccessRepository wishlistAccessRepository;
     private final WishListRepository wishListRepository;
+    private final UserRepository userRepository;
 
     public AccessesContainerDto getAllGrantedEmailsForWishlist(String wishlistId, User user) {
         getWishlistAndVerifyOwner(wishlistId, user);
@@ -46,6 +51,7 @@ public class WishListAccessService {
         }
         verifyMaxShareCount(wishlistId);
 
+        sendEmailNotification(user, wishlist, targetEmail);
         wishlistAccessRepository.save(new WishlistAccess(wishlist, targetEmail));
 
         return new ApiResponseWrapper("Access granted successfully to " + targetEmail);
@@ -85,4 +91,8 @@ public class WishListAccessService {
         }
     }
 
+    private void sendEmailNotification(User user, WishList wishlist, String targetEmail) {
+        eventPublisher.publishEvent(
+                new WishlistSharedEvent(this, wishlist, targetEmail, user, userRepository.existsByEmail(targetEmail)));
+    }
 }

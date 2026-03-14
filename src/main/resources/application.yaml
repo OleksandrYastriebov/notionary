@@ -1,9 +1,9 @@
 app:
   url:
-    frontend: ${FRONTEND_URL}
-    backend: ${BACKEND_URL}
+    frontend: ${FRONTEND_URL:localhost:3000}
+    backend: ${BACKEND_URL:localhost:8080}
   limits:
-    max-wishlists: 100
+    max-wishlists: 50
     max-items-per-list: 50
     max-shares-per-wishlist: 30
 

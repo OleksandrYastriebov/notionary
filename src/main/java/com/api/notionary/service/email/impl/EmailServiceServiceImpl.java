@@ -1,5 +1,6 @@
 package com.api.notionary.service.email.impl;
 
+import com.api.notionary.entity.User;
 import com.api.notionary.service.email.EmailSenderService;
 import com.api.notionary.service.email.EmailValidator;
 import jakarta.mail.MessagingException;
@@ -27,7 +28,6 @@ public class EmailServiceServiceImpl implements EmailSenderService {
     private final EmailValidator emailValidator;
 
     @Override
-    @Async
     public void send(String to, String emailText) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
@@ -43,7 +43,6 @@ public class EmailServiceServiceImpl implements EmailSenderService {
     }
 
     @Override
-    @Async
     public void sendConfirmationEmail(String emailTo, String name, String link) {
         String normalizedEmail = emailTo.toLowerCase().trim();
         if (!emailValidator.test(normalizedEmail)) {
@@ -53,6 +52,24 @@ public class EmailServiceServiceImpl implements EmailSenderService {
         context.setVariable("name", name);
         context.setVariable("link", link);
         String htmlContent = templateEngine.process("email-confirmation", context);
+
+        send(normalizedEmail, htmlContent);
+    }
+
+    @Override
+    public void sendWishListSharedEmail(User wlOwner, String emailTo, boolean isTargetRegistered, String wlTitle,
+                                        String wishlistLink, String registrationLink) {
+        String normalizedEmail = emailTo.toLowerCase().trim();
+        if (!emailValidator.test(normalizedEmail)) {
+            throw new IllegalStateException(String.format("Email %s is invalid.", normalizedEmail));
+        }
+        Context context = new Context();
+        context.setVariable("ownerName", wlOwner.getFirstName() + wlOwner.getLastName());
+        context.setVariable("wishlistTitle", wlTitle);
+        context.setVariable("isTargetRegistered", isTargetRegistered);
+        context.setVariable("wishlistLink", wishlistLink);
+        context.setVariable("registerLink", registrationLink);
+        String htmlContent = templateEngine.process("wishlist-shared-template", context);
 
         send(normalizedEmail, htmlContent);
     }

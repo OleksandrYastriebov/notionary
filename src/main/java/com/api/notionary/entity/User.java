@@ -35,19 +35,6 @@ import java.util.Objects;
 @Table(name = "users")
 @SQLRestriction("is_deleted = false")
 public class User implements UserDetails {
-    public User(String firstName,
-                String lastName,
-                String email,
-                String password,
-                LocalDateTime createdAt,
-                UserRole userRole) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.createdAt = createdAt;
-        this.userRole = userRole;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -96,6 +83,20 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<RefreshToken> refreshTokens = new ArrayList<>();
+
+    public User(String firstName,
+                String lastName,
+                String email,
+                String password,
+                LocalDateTime createdAt,
+                UserRole userRole) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.createdAt = createdAt;
+        this.userRole = userRole;
+    }
 
     @Override
     @Nonnull
