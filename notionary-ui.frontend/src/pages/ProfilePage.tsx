@@ -153,7 +153,6 @@ export default function ProfilePage() {
           transition={{ duration: 0.3, delay: 0.05 }}
           className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
         >
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Avatar</h2>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Avatar

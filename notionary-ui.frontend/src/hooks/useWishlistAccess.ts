@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import type { AxiosError } from 'axios';
 import { getWishlistAccess, grantAccess, revokeAccess } from '../api/endpoints';
+
+interface ApiError {
+  errorMessage?: string;
+  message?: string;
+}
 
 const accessKey = (id: string) => ['wishlist-access', id] as const;
 
@@ -14,14 +20,11 @@ export function useWishlistAccess(wishlistId: string) {
 
 export function useGrantAccess(wishlistId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<void, AxiosError<ApiError>, string>({
     mutationFn: (email: string) => grantAccess(wishlistId, { email }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: accessKey(wishlistId) });
       toast.success('Access granted. An email notification was sent.');
-    },
-    onError: () => {
-      toast.error('Failed to grant access.');
     },
   });
 }

@@ -23,14 +23,14 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
         {/* Logo */}
         <Link
           to={user ? '/wishlists' : '/'}
-          className="flex items-center gap-2 font-bold text-gray-900 hover:text-violet-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
+          className="flex items-center gap-2.5 font-bold text-gray-900 hover:text-violet-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
         >
-          <Gift size={20} className="text-violet-600" />
-          <span className="text-base">Notionary</span>
+          <Gift size={24} className="text-violet-600" />
+          <span className="text-lg">Notionary</span>
         </Link>
 
         {/* Right side */}
@@ -38,16 +38,16 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen((p) => !p)}
-              className="flex items-center gap-2 p-1 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
               aria-label="Open user menu"
             >
               <Avatar
                 src={user.avatarUrl}
                 firstName={user.firstName}
                 lastName={user.lastName}
-                size="sm"
+                size="md"
               />
-              <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[120px] truncate">
+              <span className="hidden sm:block text-base font-medium text-gray-700 max-w-[140px] truncate">
                 {user.firstName}
               </span>
             </button>

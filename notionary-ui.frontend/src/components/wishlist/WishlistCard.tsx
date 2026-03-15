@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Globe, Lock, Pencil, Trash2, ChevronRight } from 'lucide-react';
+import { Globe, Lock, Pencil, Trash2, ChevronRight, UserPlus } from 'lucide-react';
 import type { WishListDto } from '../../types';
 import { ImageFallback } from '../ui/ImageFallback';
 import { ConfirmModal } from '../ui/ConfirmModal';
@@ -11,9 +11,10 @@ interface WishlistCardProps {
   wishlist: WishListDto;
   isOwner: boolean;
   onEdit: (wishlist: WishListDto) => void;
+  onShare: (wishlist: WishListDto) => void;
 }
 
-export function WishlistCard({ wishlist, isOwner, onEdit }: WishlistCardProps) {
+export function WishlistCard({ wishlist, isOwner, onEdit, onShare }: WishlistCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteMutation = useDeleteWishlist();
 
@@ -60,6 +61,15 @@ export function WishlistCard({ wishlist, isOwner, onEdit }: WishlistCardProps) {
 
             {isOwner && (
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {!wishlist.isPublic && (
+                  <button
+                    onClick={() => onShare(wishlist)}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-violet-600 hover:bg-violet-50 active:bg-violet-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+                    aria-label="Share wishlist"
+                  >
+                    <UserPlus size={14} />
+                  </button>
+                )}
                 <button
                   onClick={() => onEdit(wishlist)}
                   className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"

@@ -61,6 +61,7 @@ export interface WishListItemDto {
   description: string | null;
   imageUrl: string | null;
   isChecked: boolean;
+  createdAt: string;
 }
 
 export interface WishListDto {

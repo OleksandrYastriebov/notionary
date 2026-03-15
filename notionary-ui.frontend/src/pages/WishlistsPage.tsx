@@ -6,6 +6,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Layout } from '../components/layout/Layout';
 import { WishlistCard } from '../components/wishlist/WishlistCard';
 import { WishlistModal } from '../components/wishlist/WishlistModal';
+import { ShareModal } from '../components/wishlist/ShareModal';
 import { WishlistCardSkeleton } from '../components/ui/SkeletonLoader';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
@@ -18,6 +19,7 @@ export default function WishlistsPage() {
   const { data, isLoading, isError } = useWishlists();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editWishlist, setEditWishlist] = useState<WishListDto | null>(null);
+  const [shareWishlist, setShareWishlist] = useState<WishListDto | null>(null);
 
   const wishlists = data?.wishLists ?? [];
   const atLimit = wishlists.length >= MAX_WISHLISTS;
@@ -81,6 +83,7 @@ export default function WishlistsPage() {
                 wishlist={wl}
                 isOwner={wl.userId === user?.id}
                 onEdit={(w) => setEditWishlist(w)}
+                onShare={(w) => setShareWishlist(w)}
               />
             ))}
           </AnimatePresence>
@@ -109,6 +112,14 @@ export default function WishlistsPage() {
         onClose={() => setEditWishlist(null)}
         editWishlist={editWishlist}
       />
+      {shareWishlist && (
+        <ShareModal
+          isOpen={!!shareWishlist}
+          onClose={() => setShareWishlist(null)}
+          wishlistId={shareWishlist.id}
+          wishlistTitle={shareWishlist.title}
+        />
+      )}
     </Layout>
   );
 }

@@ -3,10 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
-import { Gift } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Navbar } from '../components/layout/Navbar';
 import { useAuth } from '../hooks/useAuth';
 
 const schema = z.object({
@@ -39,24 +39,15 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex items-center justify-center px-4 py-12">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <Link
-            to="/"
-            className="flex items-center gap-2 font-bold text-gray-900 hover:text-violet-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
-          >
-            <Gift size={22} className="text-violet-600" />
-            <span className="text-lg">Notionary</span>
-          </Link>
-        </div>
-
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-1">Welcome back</h1>
           <p className="text-sm text-gray-500 mb-6">Sign in to your account</p>
@@ -104,6 +95,7 @@ export default function SignInPage() {
           </p>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }

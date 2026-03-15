@@ -49,7 +49,9 @@ export default function WishlistDetailPage() {
   }
 
   const isOwner = wishlist?.userId === user?.id;
-  const items = wishlist?.wishListItems ?? [];
+  const items = (wishlist?.wishListItems ?? []).slice().sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
   const atLimit = items.length >= MAX_ITEMS;
 
   return (
