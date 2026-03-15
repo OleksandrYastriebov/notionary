@@ -3,6 +3,7 @@ package com.api.notionary.dto.wishlistitem;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Schema(description = "Details of a single wishlist item")
 public record WishListItemDto(
@@ -28,6 +29,9 @@ public record WishListItemDto(
         String imageUrl,
 
         @Schema(description = "Whether the item is fulfilled or purchased", example = "false")
-        Boolean isChecked
+        Boolean isChecked,
+
+        @Schema(description = "Creation timestamp")
+        LocalDateTime createdAt
 ) {
 }

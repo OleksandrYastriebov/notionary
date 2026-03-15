@@ -18,6 +18,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -56,6 +57,9 @@ public class WishListItem {
     @Column(name = "image_url", length = 2048)
     private String imageUrl;
 
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked = false;
 
@@ -79,6 +83,7 @@ public class WishListItem {
         this.id = UUID.randomUUID()
                 .toString()
                 .replace("-", "");
+        this.createdAt = LocalDateTime.now();
     }
 
     @Override
@@ -104,7 +109,8 @@ public class WishListItem {
                 price,
                 description,
                 imageUrl,
-                isChecked
+                isChecked,
+                createdAt
         );
     }
 }
