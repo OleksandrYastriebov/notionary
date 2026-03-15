@@ -48,7 +48,6 @@ class RateLimitServiceTest {
     @Test
     void resolveBucket_shouldRespectPlanCapacity() {
         Bucket bucket = rateLimitService.resolveBucket("ip", RateLimitPlan.EMAIL);
-        // EMAIL has capacity 5
         assertThat(bucket.tryConsume(5)).isTrue();
         assertThat(bucket.tryConsume(1)).isFalse();
     }

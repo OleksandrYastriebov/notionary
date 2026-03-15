@@ -1,16 +1,22 @@
 package com.api.notionary.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class HealthCheckControllerTest {
@@ -18,31 +24,30 @@ class HealthCheckControllerTest {
     @InjectMocks
     private HealthCheckController healthCheckController;
 
-    @Test
-    void check_shouldReturnOkWithUpStatusAndMessage() {
-        ResponseEntity<Map<String, String>> responseEntity = healthCheckController.check();
+    private MockMvc mockMvc;
 
-        assertNotNull(responseEntity);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertNotNull(responseEntity.getBody());
-
-        Map<String, String> body = responseEntity.getBody();
-        assertNotNull(body);
-        assertEquals("UP", body.get("status"));
-        assertEquals("Notionary is running and feeling good!", body.get("message"));
-        assertEquals(2, body.size());
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(healthCheckController).build();
     }
 
     @Test
-    void check_shouldReturnExpectedMap() {
-        ResponseEntity<Map<String, String>> responseEntity = healthCheckController.check();
+    void check_shouldReturnOkWithUpStatusAndMessage() throws Exception {
+        mockMvc.perform(get("/api/v1/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.message").value("Notionary is running and feeling good!"));
+    }
 
-        Map<String, String> expectedBody = Map.of(
-                "status", "UP",
-                "message", "Notionary is running and feeling good!"
-        );
+    @Test
+    void check_directInvocation_shouldReturnExpectedMap() {
+        ResponseEntity<Map<String, String>> response = healthCheckController.check();
 
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(expectedBody, responseEntity.getBody());
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("UP", response.getBody().get("status"));
+        assertEquals("Notionary is running and feeling good!", response.getBody().get("message"));
+        assertEquals(2, response.getBody().size());
     }
 }

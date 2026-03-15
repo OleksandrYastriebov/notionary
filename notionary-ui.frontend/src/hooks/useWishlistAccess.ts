@@ -20,7 +20,7 @@ export function useWishlistAccess(wishlistId: string) {
 
 export function useGrantAccess(wishlistId: string) {
   const qc = useQueryClient();
-  return useMutation<void, AxiosError<ApiError>, string>({
+  return useMutation({
     mutationFn: (email: string) => grantAccess(wishlistId, { email }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: accessKey(wishlistId) });
