@@ -13,6 +13,9 @@ notionary-ui.frontend/node_modules
 .settings
 .springBeans
 .sts4-cache
+CLAUDE.md
+.claude
+.cursor
 
 ### IntelliJ IDEA ###
 .idea
