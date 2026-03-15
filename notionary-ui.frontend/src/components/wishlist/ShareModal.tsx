@@ -7,7 +7,7 @@ import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Skeleton } from '../ui/SkeletonLoader';
-import type { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 import { useWishlistAccess, useGrantAccess, useRevokeAccess } from '../../hooks/useWishlistAccess';
 
 const schema = z.object({
@@ -40,8 +40,10 @@ export function ShareModal({ isOpen, onClose, wishlistId, wishlistTitle }: Share
   const onSubmit = (data: FormData) => {
     grantMutation.mutate(data.email, {
       onSuccess: () => reset(),
-      onError: (err: AxiosError<{ errorMessage?: string }>) => {
-        const message = err.response?.data?.errorMessage ?? 'Failed to grant access.';
+      onError: (err) => {
+        const message = isAxiosError<{ errorMessage?: string }>(err)
+          ? (err.response?.data?.errorMessage ?? 'Failed to grant access.')
+          : 'Failed to grant access.';
         setError('email', { message });
       },
     });

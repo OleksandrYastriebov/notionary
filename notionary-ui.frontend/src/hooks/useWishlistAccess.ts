@@ -1,12 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import type { AxiosError } from 'axios';
 import { getWishlistAccess, grantAccess, revokeAccess } from '../api/endpoints';
-
-interface ApiError {
-  errorMessage?: string;
-  message?: string;
-}
 
 const accessKey = (id: string) => ['wishlist-access', id] as const;
 
