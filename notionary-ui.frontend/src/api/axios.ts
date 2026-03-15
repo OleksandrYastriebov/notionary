@@ -27,8 +27,10 @@ export const setAuthFailureHandler = (handler: () => void): void => {
 };
 
 // ─── Axios instance ───────────────────────────────────────────────────────────
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL as string | undefined ?? '') + '/api/v1';
+
 const api: AxiosInstance = axios.create({
-  baseURL: 'https://notionary-8oyd.onrender.com/api/v1',
+  baseURL: BASE_URL,
   withCredentials: true,
 });
 
@@ -83,7 +85,7 @@ api.interceptors.response.use(
 
       try {
         const { data } = await axios.post<RefreshTokenResponse>(
-          'https://notionary-8oyd.onrender.com/api/v1/refresh-token',
+          `${BASE_URL}/refresh-token`,
           {},
           { withCredentials: true }
         );
