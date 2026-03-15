@@ -5,6 +5,7 @@ import type { WishListItemDto } from '../../types';
 import { ImageFallback } from '../ui/ImageFallback';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { useDeleteItem, useToggleChecked } from '../../hooks/useWishlistItems';
+import { useIsOverflowing } from '../../hooks/useIsOverflowing';
 import type { AxiosError } from 'axios';
 
 interface ItemCardProps {
@@ -27,6 +28,7 @@ export function ItemCard({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteMutation = useDeleteItem(wishlistId);
   const toggleMutation = useToggleChecked(wishlistId);
+  const { ref: titleRef, isOverflowing: titleOverflowing } = useIsOverflowing<HTMLDivElement>();
 
   const handleToggle = () => {
     toggleMutation.mutate(
@@ -56,66 +58,77 @@ export function ItemCard({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.2 }}
-        className={`group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden ${
-          item.isChecked ? 'opacity-70' : ''
+        className={`group rounded-2xl border transition-all duration-200 overflow-hidden ${
+          item.isChecked
+            ? 'bg-gray-100 border-gray-200 shadow-none opacity-75 saturate-50'
+            : 'bg-white border-gray-100 shadow-sm hover:shadow-md'
         }`}
       >
         <div className="flex gap-0">
           {/* Image */}
-          <div className="flex-shrink-0 w-28 sm:w-36">
+          <div className="flex-shrink-0 w-28 sm:w-36 h-[130px]">
             <ImageFallback
               src={item.imageUrl}
               alt={item.title}
               initials={item.title[0]?.toUpperCase()}
-              className="w-full h-full min-h-[100px]"
+              className="w-full h-full"
             />
           </div>
 
           {/* Content */}
-          <div className="flex-1 min-w-0 p-4">
-            <div className="flex items-start justify-between gap-2">
-              <h3
-                className={`font-semibold text-gray-900 text-sm sm:text-base ${
-                  item.isChecked ? 'line-through text-gray-500' : ''
-                }`}
-              >
-                {item.title}
-              </h3>
-
-              {/* Actions */}
-              {isOwner && (
-                <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={() => onEdit(item)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-                    aria-label="Edit item"
+          <div className="flex-1 min-w-0 p-4 flex flex-col justify-between">
+            <div>
+              <div className="flex items-start justify-between gap-2 min-w-0">
+                <div ref={titleRef} className="relative min-w-0 overflow-hidden" title={titleOverflowing ? item.title : undefined}>
+                  <h3
+                    className={`font-semibold text-sm sm:text-base whitespace-nowrap ${
+                      item.isChecked ? 'line-through text-gray-400' : 'text-gray-900'
+                    }`}
                   >
-                    <Pencil size={13} />
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(true)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
-                    aria-label="Delete item"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                    {item.title}
+                  </h3>
+                  {titleOverflowing && (
+                    <div className={`absolute inset-y-0 right-0 w-10 bg-gradient-to-l to-transparent pointer-events-none ${
+                      item.isChecked ? 'from-gray-100' : 'from-white'
+                    }`} />
+                  )}
                 </div>
+
+                {/* Actions */}
+                {isOwner && (
+                  <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => onEdit(item)}
+                      className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+                      aria-label="Edit item"
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <button
+                      onClick={() => setConfirmDelete(true)}
+                      className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                      aria-label="Delete item"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {item.price !== null && (
+                <div className="flex items-center gap-1 text-sm font-semibold text-violet-600 mt-1">
+                  <DollarSign size={13} />
+                  {item.price.toFixed(2)}
+                </div>
+              )}
+
+              {item.description && (
+                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
               )}
             </div>
 
-            {item.price !== null && (
-              <div className="flex items-center gap-1 text-sm font-semibold text-violet-600 mt-1">
-                <DollarSign size={13} />
-                {item.price.toFixed(2)}
-              </div>
-            )}
-
-            {item.description && (
-              <p className="text-xs text-gray-500 mt-1 line-clamp-2">{item.description}</p>
-            )}
-
             {/* Footer actions */}
-            <div className="flex items-center gap-3 mt-3">
+            <div className="flex items-center gap-3">
               <button
                 onClick={handleToggle}
                 disabled={toggleMutation.isPending}

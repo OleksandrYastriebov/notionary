@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Globe, Lock, ArrowLeft, UserPlus, Package, LogIn, UserPlus as UserPlusIcon } from 'lucide-react';
 import { useWishlistDetail } from '../hooks/useWishlistDetail';
+import { useIsOverflowing } from '../hooks/useIsOverflowing';
 import { useAuth } from '../hooks/useAuth';
 import { Layout } from '../components/layout/Layout';
 import { ItemCard } from '../components/item/ItemCard';
@@ -25,6 +26,7 @@ export default function WishlistDetailPage() {
   const navigate = useNavigate();
 
   const { data: wishlist, isLoading, isError } = useWishlistDetail(wishlistId ?? '');
+  const { ref: titleRef, isOverflowing: titleOverflowing } = useIsOverflowing<HTMLDivElement>();
 
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
   const [editItem, setEditItem] = useState<WishListItemDto | null>(null);
@@ -93,23 +95,12 @@ export default function WishlistDetailPage() {
               className="w-full h-40 sm:h-52"
             />
             <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold text-gray-900">{wishlist.title}</h1>
-                  <span
-                    className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
-                      wishlist.isPublic
-                        ? 'bg-emerald-50 text-emerald-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {wishlist.isPublic ? (
-                      <Globe size={10} />
-                    ) : (
-                      <Lock size={10} />
-                    )}
-                    {wishlist.isPublic ? 'Public' : 'Private'}
-                  </span>
+              <div className="min-w-0">
+                <div ref={titleRef} className="relative min-w-0 overflow-hidden" title={titleOverflowing ? wishlist.title : undefined}>
+                  <h1 className="text-xl font-bold text-gray-900 whitespace-nowrap">{wishlist.title}</h1>
+                  {titleOverflowing && (
+                    <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+                  )}
                 </div>
                 <p className="text-sm text-gray-500 mt-0.5">
                   {items.length} {items.length === 1 ? 'item' : 'items'}
@@ -118,35 +109,47 @@ export default function WishlistDetailPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                {isOwner && !wishlist.isPublic && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setIsShareOpen(true)}
-                    leftIcon={<UserPlus size={14} />}
-                  >
-                    Share
-                  </Button>
-                )}
-                {isOwner && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setIsEditWishlistOpen(true)}
-                  >
-                    Edit
-                  </Button>
-                )}
-                {isOwner && !atLimit && (
-                  <Button
-                    size="sm"
-                    onClick={() => setIsAddItemOpen(true)}
-                    leftIcon={<Plus size={14} />}
-                  >
-                    Add item
-                  </Button>
-                )}
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <span
+                  className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
+                    wishlist.isPublic
+                      ? 'bg-emerald-50 text-emerald-700'
+                      : 'bg-red-50 text-red-600'
+                  }`}
+                >
+                  {wishlist.isPublic ? <Globe size={10} /> : <Lock size={10} />}
+                  {wishlist.isPublic ? 'Public' : 'Private'}
+                </span>
+                <div className="flex items-center gap-2">
+                  {isOwner && !wishlist.isPublic && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setIsShareOpen(true)}
+                      leftIcon={<UserPlus size={14} />}
+                    >
+                      Share
+                    </Button>
+                  )}
+                  {isOwner && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setIsEditWishlistOpen(true)}
+                    >
+                      Edit
+                    </Button>
+                  )}
+                  {isOwner && !atLimit && (
+                    <Button
+                      size="sm"
+                      onClick={() => setIsAddItemOpen(true)}
+                      leftIcon={<Plus size={14} />}
+                    >
+                      Add item
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>

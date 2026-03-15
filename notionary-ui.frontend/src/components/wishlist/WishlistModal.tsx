@@ -8,6 +8,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { useCreateWishlist, useUpdateWishlist } from '../../hooks/useWishlists';
 import { useUploadImage } from '../../hooks/useUploadImage';
+import { useClipboardPaste } from '../../hooks/useClipboardPaste';
 import type { WishListDto } from '../../types';
 
 const schema = z.object({
@@ -43,6 +44,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', isPublic: true, imageUrl: '' },
+    mode: 'onChange',
   });
 
   const imageUrlValue = watch('imageUrl');
@@ -64,14 +66,20 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
     }
   }, [isOpen, editWishlist, reset]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFile = async (file: File) => {
     const result = await uploadMutation.mutateAsync(file);
     setValue('imageUrl', result.url);
     setPreviewUrl(result.url);
     setImageRemoved(false);
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    void handleFile(file);
+  };
+
+  useClipboardPaste((file) => void handleFile(file), isOpen);
 
   const onSubmit = async (data: FormData) => {
     const payload = {
@@ -129,6 +137,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
               >
                 <ImageIcon size={20} />
                 <span className="text-xs">Upload cover image</span>
+                <span className="text-[11px] text-gray-400">or paste (Ctrl+V)</span>
               </button>
             )}
             <input

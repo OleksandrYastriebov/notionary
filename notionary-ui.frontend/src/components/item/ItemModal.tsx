@@ -9,16 +9,25 @@ import { Textarea } from '../ui/Textarea';
 import { Button } from '../ui/Button';
 import { useCreateItem, useUpdateItem } from '../../hooks/useWishlistItems';
 import { useUploadImage } from '../../hooks/useUploadImage';
+import { useClipboardPaste } from '../../hooks/useClipboardPaste';
 import type { WishListItemDto } from '../../types';
 
 const schema = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
-  url: z.string().url('Must be a valid URL').or(z.literal('')).optional(),
+  title: z.string().min(1, 'Title is required').max(100, 'Max 100 characters'),
+  url: z.union([z.literal(''), z.string().url('Must be a valid URL').max(2048, 'Max 2048 characters')]).optional(),
   price: z
     .string()
     .optional()
-    .refine((v) => !v || !isNaN(parseFloat(v)), { message: 'Must be a number' }),
-  description: z.string().max(500).optional(),
+    .refine((v) => !v || !isNaN(parseFloat(v)), { message: 'Must be a number' })
+    .refine((v) => !v || parseFloat(v) >= 0, { message: 'Price must be positive' })
+    .refine((v) => {
+      if (!v) return true;
+      const parts = v.split('.');
+      const intPart = parts[0].replace('-', '');
+      const fracPart = parts[1] ?? '';
+      return intPart.length <= 8 && fracPart.length <= 2;
+    }, { message: 'Price format is invalid (e.g. 12345678.99)' }),
+  description: z.string().max(1000, 'Max 1000 characters').optional(),
   imageUrl: z.string().url().or(z.literal('')).optional(),
 });
 
@@ -50,6 +59,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { title: '', url: '', price: '', description: '', imageUrl: '' },
+    mode: 'onChange',
   });
 
   const imageUrlValue = watch('imageUrl');
@@ -73,14 +83,20 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
     }
   }, [isOpen, editItem, reset]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFile = async (file: File) => {
     const result = await uploadMutation.mutateAsync(file);
     setValue('imageUrl', result.url);
     setPreviewUrl(result.url);
     setImageRemoved(false);
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    void handleFile(file);
+  };
+
+  useClipboardPaste((file) => void handleFile(file), isOpen);
 
   const onSubmit = (data: FormData) => {
     const payload = {
@@ -139,6 +155,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
             >
               <ImageIcon size={18} />
               <span className="text-xs">Upload image</span>
+              <span className="text-[11px] text-gray-400">or paste (Ctrl+V)</span>
             </button>
           )}
           {(previewUrl ?? imageUrlValue) && (

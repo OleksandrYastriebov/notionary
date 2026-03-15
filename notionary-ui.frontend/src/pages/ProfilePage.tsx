@@ -14,6 +14,7 @@ import { Modal } from '../components/ui/Modal';
 import { useAuth } from '../hooks/useAuth';
 import { updateMe, changePassword, deleteAccount } from '../api/endpoints';
 import { useUploadImage } from '../hooks/useUploadImage';
+import { useClipboardPaste } from '../hooks/useClipboardPaste';
 import type { ChangePasswordRequest } from '../types';
 
 // ─── Profile form schema ──────────────────────────────────────────────────────
@@ -80,9 +81,8 @@ export default function ProfilePage() {
     }
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
+  const handleAvatarFile = async (file: File) => {
+    if (!user) return;
     try {
       const { url } = await uploadMutation.mutateAsync(file);
       const updated = await updateMe({ avatarUrl: url });
@@ -92,6 +92,14 @@ export default function ProfilePage() {
       toast.error('Failed to upload avatar.');
     }
   };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    void handleAvatarFile(file);
+  };
+
+  useClipboardPaste((file) => void handleAvatarFile(file));
 
   const onPasswordChange = async (data: PasswordFormData) => {
     const payload: ChangePasswordRequest = {

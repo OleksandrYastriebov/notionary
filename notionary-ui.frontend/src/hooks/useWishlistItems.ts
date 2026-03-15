@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { createItem, updateItem, deleteItem, toggleItemChecked } from '../api/endpoints';
-import type { CreateItemRequest, UpdateItemRequest } from '../types';
+import type { CreateItemRequest, UpdateItemRequest, WishListDto } from '../types';
 
 const wishlistKey = (id: string) => ['wishlist', id] as const;
 
@@ -53,8 +53,24 @@ export function useToggleChecked(wishlistId: string) {
   return useMutation({
     mutationFn: ({ itemId, isChecked }: { itemId: string; isChecked: boolean }) =>
       toggleItemChecked(wishlistId, itemId, { isChecked }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: wishlistKey(wishlistId) });
+    onMutate: async ({ itemId, isChecked }) => {
+      await qc.cancelQueries({ queryKey: wishlistKey(wishlistId) });
+      const previous = qc.getQueryData<WishListDto>(wishlistKey(wishlistId));
+      qc.setQueryData<WishListDto>(wishlistKey(wishlistId), (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          wishListItems: old.wishListItems.map((item) =>
+            item.id === itemId ? { ...item, isChecked } : item
+          ),
+        };
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        qc.setQueryData(wishlistKey(wishlistId), context.previous);
+      }
     },
   });
 }
