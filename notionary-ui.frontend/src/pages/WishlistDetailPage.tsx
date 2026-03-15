@@ -22,10 +22,11 @@ const MAX_ITEMS = 50;
 
 export default function WishlistDetailPage() {
   const { wishlistId } = useParams<{ wishlistId: string }>();
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
 
-  const { data: wishlist, isLoading, isError } = useWishlistDetail(wishlistId ?? '');
+  const { data: wishlist, isLoading: isWishlistLoading, isError } = useWishlistDetail(wishlistId ?? '', !isAuthLoading);
+  const isLoading = isAuthLoading || isWishlistLoading;
   const { ref: titleRef, isOverflowing: titleOverflowing } = useIsOverflowing<HTMLDivElement>();
 
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
