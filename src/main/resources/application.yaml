@@ -1,4 +1,9 @@
 app:
+  email:
+    from: "s1t1a1w1r1@gmail.com"
+  brevo:
+    api-key: ${BREVO_API_KEY}
+    api-url: "https://api.brevo.com/v3/smtp/email"
   url:
     frontend: ${FRONTEND_URL:localhost:3000}
     backend: ${BACKEND_URL:localhost:8080}

@@ -3,41 +3,60 @@ package com.api.notionary.service.email.impl;
 import com.api.notionary.entity.User;
 import com.api.notionary.service.email.EmailSenderService;
 import com.api.notionary.service.email.EmailValidator;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailServiceServiceImpl implements EmailSenderService {
+public class EmailSenderServiceImpl implements EmailSenderService {
 
-    @Value("${email.from.value}")
-    private String emailFromValue;
+    @Value("${app.brevo.api-key}")
+    private String brevoApiKey;
 
-    private final JavaMailSender javaMailSender;
+    @Value("${app.brevo.api-url}")
+    private String brevoApiUrl;
+
+    @Value("${app.email.from}")
+    private String fromEmail;
+
     private final TemplateEngine templateEngine;
     private final EmailValidator emailValidator;
 
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Async
     @Override
-    public void send(String to, String emailText) {
+    public void send(String to, String emailHtml, String subject) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api-key", brevoApiKey);
+        headers.set("Content-Type", "application/json");
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("sender", Map.of("name", "Notionary", "email", fromEmail));
+        body.put("to", List.of(Map.of("email", to)));
+        body.put("subject", subject);
+        body.put("htmlContent", emailHtml);
+
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+
         try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
-            helper.setText(emailText, true);
-            helper.setTo(to);
-            helper.setSubject("Confirm your email address.");
-            helper.setFrom(emailFromValue);
-            javaMailSender.send(mimeMessage);
-        } catch (MessagingException ex) {
-            log.error("Failed to send email.", ex);
+            restTemplate.postForEntity(brevoApiUrl, request, String.class);
+        } catch (Exception e) {
+            log.error("Failed to send email to {}", to, e);
         }
     }
 
@@ -52,7 +71,7 @@ public class EmailServiceServiceImpl implements EmailSenderService {
         context.setVariable("link", link);
         String htmlContent = templateEngine.process("email-confirmation", context);
 
-        send(normalizedEmail, htmlContent);
+        send(normalizedEmail, htmlContent, "Confirm your email address.");
     }
 
     @Override
@@ -70,6 +89,6 @@ public class EmailServiceServiceImpl implements EmailSenderService {
         context.setVariable("registerLink", registrationLink);
         String htmlContent = templateEngine.process("wishlist-shared-template", context);
 
-        send(normalizedEmail, htmlContent);
+        send(normalizedEmail, htmlContent, "Someone shared a Wishlist with you.");
     }
 }
