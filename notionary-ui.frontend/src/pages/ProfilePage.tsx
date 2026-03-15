@@ -174,6 +174,7 @@ export default function ProfilePage() {
               >
                 {uploadMutation.isPending ? 'Uploading...' : 'Change photo'}
               </button>
+              <p className="text-xs text-gray-400 mt-0.5">Max file size: 5 MB</p>
             </div>
           </div>
           <input

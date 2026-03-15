@@ -149,6 +149,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
               Replace image
             </button>
           )}
+          <p className="text-xs text-gray-400 mt-1.5">Max file size: 5 MB</p>
         </div>
 
         <Input

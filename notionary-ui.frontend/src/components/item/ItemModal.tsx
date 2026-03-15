@@ -151,6 +151,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
               Replace
             </button>
           )}
+          <p className="text-xs text-gray-400 mt-1.5">Max file size: 5 MB</p>
           <input
             ref={fileInputRef}
             type="file"
