@@ -38,6 +38,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
   const uploadMutation = useUploadImage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
 
   const {
     register,
@@ -68,6 +69,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
         reset({ title: '', url: '', price: '', description: '', imageUrl: '' });
         setPreviewUrl(null);
       }
+      setImageRemoved(false);
     }
   }, [isOpen, editItem, reset]);
 
@@ -77,6 +79,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
     const result = await uploadMutation.mutateAsync(file);
     setValue('imageUrl', result.url);
     setPreviewUrl(result.url);
+    setImageRemoved(false);
   };
 
   const onSubmit = (data: FormData) => {
@@ -85,7 +88,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
       url: data.url || undefined,
       price: data.price ? parseFloat(data.price) : undefined,
       description: data.description || undefined,
-      imageUrl: data.imageUrl || undefined,
+      imageUrl: data.imageUrl ? data.imageUrl : (imageRemoved ? '' : undefined),
     };
 
     if (isEdit && editItem) {
@@ -121,6 +124,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
                 onClick={() => {
                   setPreviewUrl(null);
                   setValue('imageUrl', '');
+                  setImageRemoved(true);
                 }}
                 className="absolute top-2 right-2 p-1 rounded-lg bg-black/40 text-white hover:bg-black/60 transition-colors text-xs px-2"
               >

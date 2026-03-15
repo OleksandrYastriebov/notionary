@@ -31,6 +31,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
   const uploadMutation = useUploadImage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
 
   const {
     register,
@@ -59,6 +60,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
         reset({ title: '', isPublic: true, imageUrl: '' });
         setPreviewUrl(null);
       }
+      setImageRemoved(false);
     }
   }, [isOpen, editWishlist, reset]);
 
@@ -68,13 +70,14 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
     const result = await uploadMutation.mutateAsync(file);
     setValue('imageUrl', result.url);
     setPreviewUrl(result.url);
+    setImageRemoved(false);
   };
 
   const onSubmit = async (data: FormData) => {
     const payload = {
       title: data.title,
       isPublic: data.isPublic,
-      imageUrl: data.imageUrl || undefined,
+      imageUrl: data.imageUrl ? data.imageUrl : (imageRemoved ? '' : undefined),
     };
 
     if (isEdit && editWishlist) {
@@ -111,6 +114,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
                   onClick={() => {
                     setPreviewUrl(null);
                     setValue('imageUrl', '');
+                    setImageRemoved(true);
                   }}
                   className="absolute top-2 right-2 p-1 rounded-lg bg-black/40 text-white hover:bg-black/60 transition-colors text-xs px-2"
                 >

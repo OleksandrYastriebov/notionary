@@ -49,7 +49,7 @@ export default function WishlistsPage() {
 
       {/* Content */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <WishlistCardSkeleton key={i} />
           ))}
@@ -72,7 +72,7 @@ export default function WishlistsPage() {
       ) : (
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
         >
           <AnimatePresence>
             {wishlists.map((wl) => (
@@ -84,6 +84,15 @@ export default function WishlistsPage() {
               />
             ))}
           </AnimatePresence>
+          {!atLimit && (
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="rounded-2xl border-2 border-dashed border-gray-200 hover:border-violet-400 hover:bg-violet-50 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:text-violet-500 min-h-[248px]"
+            >
+              <Plus size={28} strokeWidth={1.5} />
+              <span className="text-sm font-medium">Add wishlist</span>
+            </button>
+          )}
         </motion.div>
       )}
 

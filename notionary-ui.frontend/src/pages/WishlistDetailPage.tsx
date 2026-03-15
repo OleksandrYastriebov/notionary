@@ -187,6 +187,15 @@ export default function WishlistDetailPage() {
                   />
                 ))}
               </AnimatePresence>
+              {isOwner && !atLimit && (
+                <button
+                  onClick={() => setIsAddItemOpen(true)}
+                  className="w-full rounded-2xl border-2 border-dashed border-gray-200 hover:border-violet-400 hover:bg-violet-50 transition-all duration-200 flex items-center justify-center gap-2 text-gray-400 hover:text-violet-500 py-5"
+                >
+                  <Plus size={20} strokeWidth={1.5} />
+                  <span className="text-sm font-medium">Add item</span>
+                </button>
+              )}
             </div>
           )}
 
