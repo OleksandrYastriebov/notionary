@@ -96,9 +96,8 @@ class JwtServiceTest {
         User user = new User("John", "Doe", "user@test.com", "pass",
                 LocalDateTime.now(), UserRole.ROLE_USER);
         user.setId(1L);
-        UserDetails details = user;
 
-        String token = jwtService.generateToken(details);
+        String token = jwtService.generateToken(user);
 
         assertThat(token).isNotBlank();
         assertThat(jwtService.extractEmail(token)).isEqualTo("user@test.com");

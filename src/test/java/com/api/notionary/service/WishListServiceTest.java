@@ -190,7 +190,7 @@ class WishListServiceTest {
         WishListContainerDto result = wishListService.getWishlistsForUser(user);
 
         assertThat(result.wishLists()).hasSize(1);
-        assertThat(result.wishLists().get(0).title()).isEqualTo("My List");
+        assertThat(result.wishLists().getFirst().title()).isEqualTo("My List");
     }
 
     @Test

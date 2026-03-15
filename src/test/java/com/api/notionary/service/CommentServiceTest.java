@@ -91,7 +91,7 @@ class CommentServiceTest {
         CommentContainerDto result = commentService.getCommentsForItem("wl-1", "item-1", commenter);
 
         assertThat(result.comments()).hasSize(1);
-        assertThat(result.comments().get(0).text()).isEqualTo("Hello");
+        assertThat(result.comments().getFirst().text()).isEqualTo("Hello");
     }
 
     @Test

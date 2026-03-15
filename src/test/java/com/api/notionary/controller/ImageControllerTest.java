@@ -63,9 +63,7 @@ class ImageControllerTest {
                 new byte[0]
         );
 
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            imageController.uploadImage(emptyFile);
-        });
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> imageController.uploadImage(emptyFile));
 
         assertEquals("Cannot upload empty file", thrown.getMessage());
         verify(imageService, never()).uploadImage(any(MultipartFile.class));

@@ -17,7 +17,6 @@ import org.thymeleaf.context.IContext;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,7 +50,7 @@ class EmailServiceServiceImplTest {
     }
 
     @Test
-    void send_shouldSetContentAndSend() throws MessagingException {
+    void send_shouldSetContentAndSend() {
         MimeMessage mimeMessage = org.mockito.Mockito.mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
@@ -62,7 +61,7 @@ class EmailServiceServiceImplTest {
     }
 
     @Test
-    void sendConfirmationEmail_shouldProcessTemplateAndSend() throws MessagingException {
+    void sendConfirmationEmail_shouldProcessTemplateAndSend() {
         when(emailValidator.test("user@example.com")).thenReturn(true);
         when(templateEngine.process(eq("email-confirmation"), any(IContext.class))).thenReturn("<html>Confirm</html>");
         MimeMessage mimeMessage = org.mockito.Mockito.mock(MimeMessage.class);
@@ -97,7 +96,7 @@ class EmailServiceServiceImplTest {
     }
 
     @Test
-    void sendWishListSharedEmail_shouldProcessTemplateAndSend() throws MessagingException {
+    void sendWishListSharedEmail_shouldProcessTemplateAndSend() {
         when(emailValidator.test("friend@example.com")).thenReturn(true);
         when(templateEngine.process(eq("wishlist-shared-template"), any(IContext.class))).thenReturn("<html>Shared</html>");
         MimeMessage mimeMessage = org.mockito.Mockito.mock(MimeMessage.class);
