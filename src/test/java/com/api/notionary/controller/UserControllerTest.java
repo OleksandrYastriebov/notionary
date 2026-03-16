@@ -9,6 +9,7 @@ import com.api.notionary.exception.EntityNotFoundException;
 import com.api.notionary.exception.GlobalExceptionHandler;
 import com.api.notionary.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -50,18 +50,17 @@ class UserControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
-    private User authenticatedUser;
 
     @BeforeEach
     void setUp() {
-        objectMapper = Jackson2ObjectMapperBuilder.json().build();
+        objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         mockMvc = MockMvcBuilders.standaloneSetup(userController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
 
-        authenticatedUser = new User("John", "Doe", "john@notionary.app", "hashed",
+        User authenticatedUser = new User("John", "Doe", "john@notionary.app", "hashed",
                 LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
         authenticatedUser.setId(10L);
         authenticatedUser.setEnabled(true);

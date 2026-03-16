@@ -57,7 +57,6 @@ class WishListItemControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
-    private User authenticatedUser;
     private WishListItemDto sampleItemDto;
 
     @BeforeEach
@@ -70,7 +69,7 @@ class WishListItemControllerTest {
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
 
-        authenticatedUser = new User("Jane", "Doe", "jane@notionary.app", "hashed",
+        User authenticatedUser = new User("Jane", "Doe", "jane@notionary.app", "hashed",
                 LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
         authenticatedUser.setId(2L);
         authenticatedUser.setEnabled(true);

@@ -28,7 +28,6 @@ public class WishListService {
 
     private final WishListRepository wishListRepository;
     private final WishListAccessRepository wishlistAccessRepository;
-    private final UserRepository userRepository;
 
     @Transactional
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {

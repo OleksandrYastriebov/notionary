@@ -50,7 +50,6 @@ class WishListAccessControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
-    private User authenticatedUser;
 
     private static final String BASE_URL = "/api/v1/wishlists/wl-id-1/access";
 
@@ -62,7 +61,7 @@ class WishListAccessControllerTest {
                 .build();
         objectMapper = new ObjectMapper();
 
-        authenticatedUser = new User("Owner", "User", "owner@notionary.app", "hashed",
+        User authenticatedUser = new User("Owner", "User", "owner@notionary.app", "hashed",
                 LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
         authenticatedUser.setId(1L);
         authenticatedUser.setEnabled(true);

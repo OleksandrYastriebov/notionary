@@ -51,7 +51,6 @@ class CommentControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
-    private User authenticatedUser;
     private CommentDto sampleCommentDto;
 
     private static final String BASE_URL = "/api/v1/wishlists/wl-id-1/wishes/item-id-1/comments";
@@ -64,7 +63,7 @@ class CommentControllerTest {
                 .build();
         objectMapper = new ObjectMapper();
 
-        authenticatedUser = new User("Alice", "Smith", "alice@notionary.app", "hashed",
+        User authenticatedUser = new User("Alice", "Smith", "alice@notionary.app", "hashed",
                 LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
         authenticatedUser.setId(5L);
         authenticatedUser.setEnabled(true);
