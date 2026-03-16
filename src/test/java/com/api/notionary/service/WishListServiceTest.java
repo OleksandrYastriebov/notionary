@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ class WishListServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(wishListService, "maxWishlistsPerAccount", MAX_WISHLISTS);
         user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         wishList = new WishList(user, "My List", false, null);
         wishList.setId("wl-123");
@@ -97,7 +97,7 @@ class WishListServiceTest {
     @Test
     void deleteWishList_shouldThrow_whenNotOwner() {
         User otherUser = new User("Jane", "Doe", "jane@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         otherUser.setId(2L);
         when(wishListRepository.findById("wl-123")).thenReturn(Optional.of(wishList));
 
@@ -159,7 +159,7 @@ class WishListServiceTest {
         when(wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishList, "friend@example.com"))
                 .thenReturn(true);
         User friend = new User("Friend", "User", "friend@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         friend.setId(2L);
 
         WishListDto result = wishListService.findWishlistById("wl-123", friend);
@@ -175,7 +175,7 @@ class WishListServiceTest {
         when(wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishList, "stranger@example.com"))
                 .thenReturn(false);
         User stranger = new User("Stranger", "User", "stranger@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         stranger.setId(3L);
 
         assertThatThrownBy(() -> wishListService.findWishlistById("wl-123", stranger))

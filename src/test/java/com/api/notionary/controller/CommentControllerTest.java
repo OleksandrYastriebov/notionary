@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -65,7 +64,7 @@ class CommentControllerTest {
         objectMapper = new ObjectMapper();
 
         User authenticatedUser = new User("Alice", "Smith", "alice@notionary.app", "hashed",
-                LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         authenticatedUser.setId(5L);
         authenticatedUser.setEnabled(true);
 

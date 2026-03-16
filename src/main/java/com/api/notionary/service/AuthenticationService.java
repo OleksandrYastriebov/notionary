@@ -20,7 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @RequiredArgsConstructor
 @Service
@@ -89,7 +89,7 @@ public class AuthenticationService {
             throw new UserAlreadyActivatedException(EMAIL_CONFIRMED_LOG_IN);
         }
 
-        if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (confirmationToken.getExpiresAt().isBefore(Instant.now())) {
             throw new TokenExpiredException("Confirmation token expired. Please request a new one.");
         }
 

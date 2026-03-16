@@ -10,7 +10,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,9 +31,9 @@ class ConfirmationTokenServiceTest {
     @Test
     void saveConfirmationToken_shouldDelegateToRepository() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         ConfirmationToken token = new ConfirmationToken("token-value",
-                LocalDateTime.now(), LocalDateTime.now().plusDays(7), user);
+                Instant.now(), Instant.now().plus(7, ChronoUnit.DAYS), user);
 
         confirmationTokenService.saveConfirmationToken(token);
 
@@ -52,9 +53,9 @@ class ConfirmationTokenServiceTest {
     @Test
     void getToken_shouldReturnPresentOptional_whenTokenExists() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         ConfirmationToken token = new ConfirmationToken("token-123",
-                LocalDateTime.now(), LocalDateTime.now().plusDays(7), user);
+                Instant.now(), Instant.now().plus(7, ChronoUnit.DAYS), user);
         when(confirmationTokenRepository.findByToken("token-123")).thenReturn(Optional.of(token));
 
         var result = confirmationTokenService.getToken("token-123");
@@ -75,9 +76,9 @@ class ConfirmationTokenServiceTest {
     @Test
     void deleteTokenFromDatabase_shouldCallRepository() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
-        ConfirmationToken token = new ConfirmationToken("t", LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7), user);
+                Instant.now(), UserRole.ROLE_USER);
+        ConfirmationToken token = new ConfirmationToken("t", Instant.now(),
+                Instant.now().plus(7, ChronoUnit.DAYS), user);
 
         confirmationTokenService.deleteTokenFromDatabase(token);
 

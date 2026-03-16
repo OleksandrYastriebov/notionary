@@ -15,7 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +48,7 @@ class RefreshTokenServiceTest {
         ReflectionTestUtils.setField(refreshTokenService, "refreshTokenDurationSec", DURATION_SEC);
         ReflectionTestUtils.setField(refreshTokenService, "maxSessions", MAX_SESSIONS);
         user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
     }
 
@@ -78,7 +79,7 @@ class RefreshTokenServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getUser()).isSameAs(user);
         assertThat(result.getToken()).isNotNull();
-        assertThat(result.getExpiresAt()).isAfter(LocalDateTime.now());
+        assertThat(result.getExpiresAt()).isAfter(Instant.now());
         verify(refreshTokenRepository).save(result);
     }
 
@@ -109,7 +110,7 @@ class RefreshTokenServiceTest {
     @Test
     void verifyExpiration_shouldThrowAndDelete_whenTokenExpired() {
         RefreshToken token = new RefreshToken();
-        token.setExpiresAt(LocalDateTime.now().minusSeconds(1));
+        token.setExpiresAt(Instant.now().minus(1, ChronoUnit.SECONDS));
 
         assertThatThrownBy(() -> refreshTokenService.verifyExpiration(token))
                 .isInstanceOf(TokenRefreshException.class)
@@ -120,7 +121,7 @@ class RefreshTokenServiceTest {
     @Test
     void verifyExpiration_shouldDoNothing_whenTokenNotExpired() {
         RefreshToken token = new RefreshToken();
-        token.setExpiresAt(LocalDateTime.now().plusDays(1));
+        token.setExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS));
 
         refreshTokenService.verifyExpiration(token);
 

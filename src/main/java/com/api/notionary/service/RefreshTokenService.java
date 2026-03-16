@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,7 +44,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("No User found with the following ID: %s", userId))));
-        refreshToken.setExpiresAt(LocalDateTime.now().plusSeconds(refreshTokenDurationSec));
+        refreshToken.setExpiresAt(Instant.now().plus(Duration.ofSeconds(refreshTokenDurationSec)));
         refreshToken.setToken(UUID.randomUUID().toString());
 
         return refreshTokenRepository.save(refreshToken);
@@ -51,7 +52,7 @@ public class RefreshTokenService {
 
     @Transactional
     public void verifyExpiration(RefreshToken token) {
-        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (token.getExpiresAt().isBefore(Instant.now())) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException("Refresh token was expired. Please make a new signin request");
         }

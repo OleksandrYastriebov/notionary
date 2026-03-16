@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +53,7 @@ class UserServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(userService, "tokenExpirationDays", TOKEN_EXPIRATION_DAYS);
         user = new User("John", "Doe", "john@example.com", "rawPassword",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         user.setEnabled(true);
     }

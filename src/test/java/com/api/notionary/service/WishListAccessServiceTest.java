@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +58,7 @@ class WishListAccessServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(wishListAccessService, "maxShares", MAX_SHARES);
         owner = new User("Owner", "User", "owner@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         owner.setId(1L);
         wishList = new WishList(owner, "My List", false, null);
         wishList.setId("wl-1");
@@ -77,7 +77,7 @@ class WishListAccessServiceTest {
     @Test
     void getAllGrantedEmailsForWishlist_shouldThrow_whenNotOwner() {
         User other = new User("Other", "User", "other@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         other.setId(2L);
         when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
 

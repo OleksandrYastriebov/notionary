@@ -19,7 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -146,8 +147,8 @@ public class UserService {
     private @NonNull ConfirmationToken buildConfirmationToken(User user, String token) {
         return new ConfirmationToken(
                 token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(tokenExpirationDays),
+                Instant.now(),
+                Instant.now().plus(Duration.ofDays(tokenExpirationDays)),
                 user
         );
     }

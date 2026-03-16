@@ -6,10 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +31,7 @@ class JwtServiceTest {
     @Test
     void extractEmail_shouldReturnSubjectFromToken() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         String token = jwtService.generateToken(user);
 
@@ -44,7 +43,7 @@ class JwtServiceTest {
     @Test
     void generateToken_shouldProduceValidToken_forUser() {
         User user = new User("Jane", "Doe", "jane@example.com", "secret",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(2L);
 
         String token = jwtService.generateToken(user);
@@ -56,7 +55,7 @@ class JwtServiceTest {
     @Test
     void generateToken_shouldIncludeEmailInClaims_forUser() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
 
         String token = jwtService.generateToken(user);
@@ -67,7 +66,7 @@ class JwtServiceTest {
     @Test
     void isTokenValid_shouldReturnTrue_whenEmailMatchesAndNotExpired() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         String token = jwtService.generateToken(user);
 
@@ -79,10 +78,10 @@ class JwtServiceTest {
     @Test
     void isTokenValid_shouldReturnFalse_whenEmailDoesNotMatch() {
         User user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         User otherUser = new User("Jane", "Doe", "jane@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         otherUser.setId(2L);
         String token = jwtService.generateToken(user);
 
@@ -94,7 +93,7 @@ class JwtServiceTest {
     @Test
     void generateToken_shouldWorkWithPlainUserDetails() {
         User user = new User("John", "Doe", "user@test.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
 
         String token = jwtService.generateToken(user);

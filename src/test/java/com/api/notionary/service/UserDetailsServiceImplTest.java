@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +31,7 @@ class UserDetailsServiceImplTest {
     @Test
     void loadUserByUsername_shouldReturnUserDetails_whenUserExists() {
         User user = new User("John", "Doe", "john@example.com", "encoded",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
 
@@ -48,7 +48,7 @@ class UserDetailsServiceImplTest {
     @Test
     void loadUserByUsername_shouldNormalizeEmail() {
         User user = new User("John", "Doe", "john@example.com", "encoded",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(user));
 
         userDetailsService.loadUserByUsername("  JOHN@Example.COM  ");

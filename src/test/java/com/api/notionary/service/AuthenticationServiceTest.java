@@ -24,7 +24,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,13 +62,13 @@ class AuthenticationServiceTest {
     @BeforeEach
     void setUp() {
         user = new User("John", "Doe", "john@example.com", "encoded",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         user.setEnabled(true);
         refreshToken = new RefreshToken();
         refreshToken.setToken("refresh-123");
         refreshToken.setUser(user);
-        refreshToken.setExpiresAt(LocalDateTime.now().plusDays(1));
+        refreshToken.setExpiresAt(Instant.now().plus(1, ChronoUnit.DAYS));
     }
 
     @Test
@@ -159,8 +160,8 @@ class AuthenticationServiceTest {
     @Test
     void confirmToken_shouldActivateUserAndReturnMessage() {
         user.setEnabled(false);
-        ConfirmationToken confToken = new ConfirmationToken("token", LocalDateTime.now(),
-                LocalDateTime.now().plusDays(1), user);
+        ConfirmationToken confToken = new ConfirmationToken("token", Instant.now(),
+                Instant.now().plus(1, ChronoUnit.DAYS), user);
         when(confirmationTokenService.getToken("token")).thenReturn(Optional.of(confToken));
 
         ApiResponseWrapper result = authenticationService.confirmToken("token");
@@ -172,8 +173,8 @@ class AuthenticationServiceTest {
 
     @Test
     void confirmToken_shouldThrow_whenUserAlreadyEnabled() {
-        ConfirmationToken confToken = new ConfirmationToken("token", LocalDateTime.now(),
-                LocalDateTime.now().plusDays(1), user);
+        ConfirmationToken confToken = new ConfirmationToken("token", Instant.now(),
+                Instant.now().plus(1, ChronoUnit.DAYS), user);
         when(confirmationTokenService.getToken("token")).thenReturn(Optional.of(confToken));
 
         assertThatThrownBy(() -> authenticationService.confirmToken("token"))
@@ -184,8 +185,8 @@ class AuthenticationServiceTest {
     @Test
     void confirmToken_shouldThrow_whenTokenExpired() {
         user.setEnabled(false);
-        ConfirmationToken confToken = new ConfirmationToken("token", LocalDateTime.now().minusDays(2),
-                LocalDateTime.now().minusDays(1), user);
+        ConfirmationToken confToken = new ConfirmationToken("token", Instant.now().minus(2, ChronoUnit.DAYS),
+                Instant.now().minus(1, ChronoUnit.DAYS), user);
         when(confirmationTokenService.getToken("token")).thenReturn(Optional.of(confToken));
 
         assertThatThrownBy(() -> authenticationService.confirmToken("token"))

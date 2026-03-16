@@ -22,7 +22,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,13 +54,13 @@ class WishListItemServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(wishListItemService, "maxWishlistsPerWishlist", MAX_ITEMS);
         user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         wishList = new WishList(user, "My List", false, null);
         wishList.setId("wl-1");
         wishListItem = new WishListItem(wishList, "Item", "https://u.url", "desc", BigDecimal.TEN, null);
         wishListItem.setId("item-1");
-        wishListDto = new WishListDto("wl-1", 1L, List.of(wishListItem.toDto()), "My List", false, null, LocalDateTime.now());
+        wishListDto = new WishListDto("wl-1", 1L, List.of(wishListItem.toDto()), "My List", false, null, Instant.now());
     }
 
     @Test
@@ -108,7 +108,7 @@ class WishListItemServiceTest {
     void createWishListItem_shouldThrow_whenMaxItemsReached() {
         WishListDto fullList = new WishListDto("wl-1", 1L,
                 List.of(wishListItem.toDto(), wishListItem.toDto() /* 50 items in real scenario */),
-                "My List", false, null, LocalDateTime.now());
+                "My List", false, null, Instant.now());
         when(wishListService.findWishlistById("wl-1", user)).thenReturn(fullList);
         ReflectionTestUtils.setField(wishListItemService, "maxWishlistsPerWishlist", 2);
         CreateWishListItemRequest request = new CreateWishListItemRequest("New", null, null, null, null);
@@ -158,7 +158,7 @@ class WishListItemServiceTest {
     @Test
     void toggleIsChecked_reserverCanUnreserveOwnItem() {
         User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         reserver.setId(2L);
         wishListItem.setChecked(true);
         wishListItem.setCheckedBy(reserver);
@@ -176,10 +176,10 @@ class WishListItemServiceTest {
     @Test
     void toggleIsChecked_shouldThrow_whenAnotherUserTriesToUnreserve() {
         User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         reserver.setId(2L);
         User otherUser = new User("Bob", "Smith", "bob@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         otherUser.setId(3L);
         wishListItem.setChecked(true);
         wishListItem.setCheckedBy(reserver);
@@ -196,7 +196,7 @@ class WishListItemServiceTest {
     @Test
     void toggleIsChecked_wishlistOwnerCanUnreserveAnyItem() {
         User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         reserver.setId(2L);
         wishListItem.setChecked(true);
         wishListItem.setCheckedBy(reserver);

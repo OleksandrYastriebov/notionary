@@ -26,7 +26,7 @@ import org.springframework.security.web.method.annotation.AuthenticationPrincipa
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -68,7 +68,7 @@ class WishlistControllerTest {
                 .build();
 
         User authenticatedUser = new User("John", "Doe", "john@notionary.app", "hashed",
-                LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         authenticatedUser.setId(1L);
         authenticatedUser.setEnabled(true);
 
@@ -77,7 +77,7 @@ class WishlistControllerTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         sampleWishListDto = new WishListDto("wl-id-1", 1L, List.of(), "Birthday Wishes",
-                false, null, LocalDateTime.of(2024, 6, 1, 12, 0));
+                false, null, Instant.now());
     }
 
     @AfterEach
@@ -222,7 +222,7 @@ class WishlistControllerTest {
     void updateWishlist_whenValidRequest_shouldReturnOkWithMessage() throws Exception {
         UpdateWishlistRequest request = new UpdateWishlistRequest("Updated Title", true, null);
         WishListDto updatedDto = new WishListDto("wl-id-1", 1L, List.of(), "Updated Title",
-                true, null, LocalDateTime.of(2024, 6, 1, 12, 0));
+                true, null, Instant.now());
         when(wishlistService.updateWishlist(eq("wl-id-1"), any(UpdateWishlistRequest.class), any(User.class)))
                 .thenReturn(updatedDto);
 

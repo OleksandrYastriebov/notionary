@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "Request payload for creating a new user account")
 public record SignUpRequest(
@@ -38,7 +38,7 @@ public record SignUpRequest(
                 this.lastName,
                 this.email.toLowerCase().trim(),
                 this.password,
-                LocalDateTime.now(),
+                Instant.now(),
                 UserRole.ROLE_USER);
     }
 }

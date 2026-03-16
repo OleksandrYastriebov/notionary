@@ -25,7 +25,7 @@ import org.springframework.security.web.method.annotation.AuthenticationPrincipa
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,7 +61,7 @@ class UserControllerTest {
                 .build();
 
         User authenticatedUser = new User("John", "Doe", "john@notionary.app", "hashed",
-                LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         authenticatedUser.setId(10L);
         authenticatedUser.setEnabled(true);
 
@@ -119,7 +119,7 @@ class UserControllerTest {
         UpdateUserRequest request = new UpdateUserRequest("Johnny", "Smith", null);
         UserProfileDto updatedProfile = new UserProfileDto(
                 10L, "Johnny", "Smith", "john@notionary.app", null,
-                LocalDateTime.of(2024, 1, 1, 0, 0));
+                Instant.now());
         when(userService.updateUser(any(User.class), any(UpdateUserRequest.class))).thenReturn(updatedProfile);
 
         mockMvc.perform(patch("/api/v1/users/me")

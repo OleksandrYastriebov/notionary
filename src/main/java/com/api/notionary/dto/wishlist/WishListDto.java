@@ -3,7 +3,7 @@ package com.api.notionary.dto.wishlist;
 import com.api.notionary.dto.wishlistitem.WishListItemDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Schema(description = "Details of a wishlist including its items")
@@ -27,6 +27,6 @@ public record WishListDto(
         String imageUrl,
 
         @Schema(description = "Creation timestamp")
-        LocalDateTime createdAt
+        Instant createdAt
 ) {
 }

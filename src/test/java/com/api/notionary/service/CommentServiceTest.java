@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,10 +56,10 @@ class CommentServiceTest {
     @BeforeEach
     void setUp() {
         owner = new User("Owner", "User", "owner@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         owner.setId(1L);
         commenter = new User("Commenter", "User", "commenter@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         commenter.setId(2L);
         wishList = new WishList(owner, "List", false, null);
         wishList.setId("wl-1");
@@ -157,7 +157,7 @@ class CommentServiceTest {
     @Test
     void deleteComment_shouldThrow_whenCommentNotOwned() {
         User otherUser = new User("Other", "User", "other@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         otherUser.setId(99L);
         when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
         when(wishListService.findWishlistById("wl-1", otherUser)).thenReturn(null);

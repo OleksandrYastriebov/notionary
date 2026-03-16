@@ -3,7 +3,7 @@ package com.api.notionary.dto.user;
 import com.api.notionary.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "User profile information")
 public record UserProfileDto(
@@ -23,7 +23,7 @@ public record UserProfileDto(
         String avatarUrl,
 
         @Schema(description = "Timestamp when the account was created", example = "2023-10-01T12:00:00Z")
-        LocalDateTime createdAt
+        Instant createdAt
 ) {
     public UserProfileDto(User user) {
         this(

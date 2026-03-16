@@ -20,7 +20,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,7 +57,7 @@ public class User implements UserDetails {
     private String avatarUrl;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
@@ -88,7 +88,7 @@ public class User implements UserDetails {
                 String lastName,
                 String email,
                 String password,
-                LocalDateTime createdAt,
+                Instant createdAt,
                 UserRole userRole) {
         this.firstName = firstName;
         this.lastName = lastName;

@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +51,7 @@ public class WishList {
     private String imageUrl;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @OneToMany(mappedBy = "wishList", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
@@ -73,7 +73,7 @@ public class WishList {
         this.id = UUID.randomUUID()
                 .toString()
                 .replace("-", "");
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = Instant.now();
     }
 
     @Override

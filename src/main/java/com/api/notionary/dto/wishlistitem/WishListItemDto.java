@@ -3,7 +3,7 @@ package com.api.notionary.dto.wishlistitem;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "Details of a single wishlist item")
 public record WishListItemDto(
@@ -35,6 +35,6 @@ public record WishListItemDto(
         Long checkedByUserId,
 
         @Schema(description = "Creation timestamp")
-        LocalDateTime createdAt
+        Instant createdAt
 ) {
 }

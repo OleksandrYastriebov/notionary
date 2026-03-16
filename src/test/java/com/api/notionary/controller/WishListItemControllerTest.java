@@ -28,7 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -70,7 +70,7 @@ class WishListItemControllerTest {
                 .build();
 
         User authenticatedUser = new User("Jane", "Doe", "jane@notionary.app", "hashed",
-                LocalDateTime.of(2024, 1, 1, 0, 0), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         authenticatedUser.setId(2L);
         authenticatedUser.setEnabled(true);
 
@@ -81,7 +81,7 @@ class WishListItemControllerTest {
         sampleItemDto = new WishListItemDto("item-id-1", "wl-id-1", "PlayStation 5",
                 "https://store.sony.com/ps5", new BigDecimal("499.99"),
                 "Disc edition", "https://example.com/ps5.jpg", false, null,
-                LocalDateTime.of(2024, 6, 1, 10, 0));
+                Instant.now());
     }
 
     @AfterEach
@@ -244,7 +244,7 @@ class WishListItemControllerTest {
         UpdateWishListItemRequest request = new UpdateWishListItemRequest(
                 "PS5 Slim", null, null, null, null, null);
         WishListItemDto updatedItem = new WishListItemDto("item-id-1", "wl-id-1", "PS5 Slim",
-                null, null, null, null, false, null, LocalDateTime.now());
+                null, null, null, null, false, null, Instant.now());
         when(wishListItemService.updateWishlistItem(any(UpdateWishListItemRequest.class),
                 eq("wl-id-1"), eq("item-id-1"), any(User.class))).thenReturn(updatedItem);
 

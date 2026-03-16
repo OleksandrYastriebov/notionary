@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IContext;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +50,7 @@ class EmailSenderServiceImplTest {
         ReflectionTestUtils.setField(emailService, "brevoApiKey", BREVO_API_KEY);
         ReflectionTestUtils.setField(emailService, "restTemplate", restTemplate);
         user = new User("John", "Doe", "john@example.com", "pass",
-                LocalDateTime.now(), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
     }
 

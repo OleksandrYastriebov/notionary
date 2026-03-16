@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.security.access.AccessDeniedException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -47,7 +47,7 @@ class AiAssistantServiceTest {
         aiAssistantService = new AiAssistantService(chatClientBuilder, wishListService);
 
         user = new User("Jane", "Doe", "jane@notionary.app", "hashed",
-                LocalDateTime.of(2024, 6, 1, 10, 0), UserRole.ROLE_USER);
+                Instant.now(), UserRole.ROLE_USER);
         user.setId(1L);
         user.setEnabled(true);
     }
