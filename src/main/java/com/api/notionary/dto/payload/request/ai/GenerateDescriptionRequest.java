@@ -13,7 +13,7 @@ public record GenerateDescriptionRequest(
                 minLength = 2,
                 maxLength = 150
         )
-        @Size(min = 2, max = 150, message = "Wish title must be between 2 and 150 characters")
+        @Size(max = 100, message = "Wish title must be 100 characters max")
         String title,
 
         @Schema(

@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ImageIcon, Upload } from 'lucide-react';
+import { ImageIcon, Loader2, Sparkles, Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
@@ -10,6 +11,8 @@ import { Button } from '../ui/Button';
 import { useCreateItem, useUpdateItem } from '../../hooks/useWishlistItems';
 import { useUploadImage } from '../../hooks/useUploadImage';
 import { useClipboardPaste } from '../../hooks/useClipboardPaste';
+import { useGenerateDescription } from '../../hooks/useGenerateDescription';
+import { fileToBase64DataUri } from '../../utils/imageUpload';
 import type { WishListItemDto } from '../../types';
 
 const schema = z.object({
@@ -45,9 +48,12 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
   const createMutation = useCreateItem(wishlistId);
   const updateMutation = useUpdateItem(wishlistId);
   const uploadMutation = useUploadImage();
+  const generateMutation = useGenerateDescription(wishlistId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [imageRemoved, setImageRemoved] = useState(false);
+  // Tracks the raw File object so it can be sent to the AI endpoint as Base64
+  const pendingFileRef = useRef<File | null>(null);
 
   const {
     register,
@@ -63,6 +69,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
   });
 
   const imageUrlValue = watch('imageUrl');
+  const titleValue = watch('title');
 
   useEffect(() => {
     if (isOpen) {
@@ -80,10 +87,12 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
         setPreviewUrl(null);
       }
       setImageRemoved(false);
+      pendingFileRef.current = null;
     }
   }, [isOpen, editItem, reset]);
 
   const handleFile = async (file: File) => {
+    pendingFileRef.current = file;
     const result = await uploadMutation.mutateAsync(file);
     setValue('imageUrl', result.url);
     setPreviewUrl(result.url);
@@ -97,6 +106,32 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
   };
 
   useClipboardPaste((file) => void handleFile(file), isOpen);
+
+  const handleGenerateDescription = async () => {
+    const title = titleValue?.trim();
+    const hasImage = !!(pendingFileRef.current ?? previewUrl ?? imageUrlValue);
+    if (!title && !hasImage) {
+      toast.error('Please enter a title first.');
+      return;
+    }
+
+    let base64Image: string | undefined;
+    let mimeType: string | undefined;
+
+    if (pendingFileRef.current) {
+      const file = pendingFileRef.current;
+      base64Image = await fileToBase64DataUri(file);
+      mimeType = file.type;
+    }
+
+    const result = await generateMutation.mutateAsync({
+      title,
+      base64Image: base64Image ?? '',
+      mimeType: mimeType,
+    });
+
+    setValue('description', result.description, { shouldValidate: true });
+  };
 
   const onSubmit = (data: FormData) => {
     const payload = {
@@ -119,7 +154,9 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
     }
   };
 
+  const isGenerating = generateMutation.isPending;
   const isLoading = createMutation.isPending || updateMutation.isPending || uploadMutation.isPending;
+  const canGenerateDescription = !!(titleValue?.trim()) || !!(previewUrl ?? imageUrlValue);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEdit ? 'Edit Item' : 'Add Item'} size="md">
@@ -141,6 +178,7 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
                   setPreviewUrl(null);
                   setValue('imageUrl', '');
                   setImageRemoved(true);
+                  pendingFileRef.current = null;
                 }}
                 className="absolute top-2 right-2 p-1 rounded-lg bg-black/40 text-white hover:bg-black/60 transition-colors text-xs px-2"
               >
@@ -203,13 +241,44 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
           />
         </div>
 
-        <Textarea
-          label="Description (optional)"
-          placeholder="Any color, just not white"
-          rows={2}
-          error={errors.description?.message}
-          {...register('description')}
-        />
+        {/* Description with AI Generate button */}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-gray-700">
+              Description (optional)
+            </label>
+            {canGenerateDescription && (
+              <button
+                type="button"
+                onClick={() => void handleGenerateDescription()}
+                disabled={isGenerating || isLoading}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600 active:from-violet-700 active:to-purple-700 shadow-sm hover:shadow-violet-200 hover:shadow-md"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" />
+                    Thinking...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles size={12} />
+                    AI Generate
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+          <textarea
+            placeholder="Any color, just not white"
+            rows={2}
+            disabled={isGenerating}
+            className="w-full px-3.5 py-2.5 rounded-xl border text-sm text-gray-900 placeholder-gray-400 transition-colors resize-none focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent border-gray-200 bg-white hover:border-gray-300 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
+            {...register('description')}
+          />
+          {errors.description && (
+            <p className="text-xs text-red-500">{errors.description.message}</p>
+          )}
+        </div>
 
         <div className="flex gap-3 pt-1">
           <Button
@@ -217,11 +286,11 @@ export function ItemModal({ isOpen, onClose, wishlistId, editItem }: ItemModalPr
             variant="secondary"
             onClick={() => { onClose(); reset(); }}
             className="flex-1"
-            disabled={isLoading}
+            disabled={isLoading || isGenerating}
           >
             Cancel
           </Button>
-          <Button type="submit" className="flex-1" isLoading={isLoading}>
+          <Button type="submit" className="flex-1" isLoading={isLoading} disabled={isGenerating}>
             {isEdit ? 'Save' : 'Add item'}
           </Button>
         </div>

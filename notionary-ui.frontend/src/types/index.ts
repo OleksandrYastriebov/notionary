@@ -152,3 +152,15 @@ export interface CreateCommentRequest {
 export interface ImageUploadResponse {
   url: string;
 }
+
+// ─── AI ───────────────────────────────────────────────────────────────────────
+
+export interface GenerateDescriptionRequest {
+  title: string;
+  base64Image?: string;
+  mimeType?: string;
+}
+
+export interface GenerateDescriptionResponse {
+  description: string;
+}

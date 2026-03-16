@@ -21,6 +21,8 @@ import type {
   CommentDto,
   CreateCommentRequest,
   ImageUploadResponse,
+  GenerateDescriptionRequest,
+  GenerateDescriptionResponse,
 } from '../types';
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -124,6 +126,19 @@ export const createComment = (
 export const deleteComment = (wishlistId: string, itemId: string, commentId: number) =>
   api
     .delete<MessageResponse>(`/wishlists/${wishlistId}/wishes/${itemId}/comments/${commentId}`)
+    .then((r) => r.data);
+
+// ─── AI ───────────────────────────────────────────────────────────────────────
+
+export const generateItemDescription = (
+  wishlistId: string,
+  data: GenerateDescriptionRequest
+) =>
+  api
+    .post<GenerateDescriptionResponse>(
+      `/ai/wishlists/${wishlistId}/generate-description`,
+      data
+    )
     .then((r) => r.data);
 
 // ─── Images ───────────────────────────────────────────────────────────────────
