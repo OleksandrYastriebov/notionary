@@ -33,6 +33,7 @@ email:
 
 server:
   port: ${PORT:8080}
+  address: ${SERVER_ADDRESS:0.0.0.0}
   error:
     path: /error
     include-message: never
@@ -41,8 +42,9 @@ server:
       enabled: false
 
 spring:
+  main:
+    lazy-initialization: ${SPRING_MAIN_LAZY_INITIALIZATION:false}
   datasource:
-#    url: ${DATABASE_URL}
     url: jdbc:postgresql://ep-divine-mouse-alb0as1v-pooler.c-3.eu-central-1.aws.neon.tech:5432/${DATABASE_NAME}?sslmode=require
     username: ${DATABASE_LOGIN}
     password: ${DATABASE_PASSWORD}
