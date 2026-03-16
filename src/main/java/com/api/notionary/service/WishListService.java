@@ -87,17 +87,20 @@ public class WishListService {
 
     public WishList getWishlistEntityForOwner(String wishlistId, User user) {
         WishList wishList = getWishlistById(wishlistId);
-        checkOwnership(user, wishlistId);
+        checkOwnership(user, wishList);
         return wishList;
     }
 
-    private void checkOwnership(User user, String wishlistId) {
-        if (user == null || !isWishlistOwner(wishlistId, user.getEmail())) {
-            throw new AccessDeniedException("You need to be owner to modify this wishlist.");
+    private void checkOwnership(User user, WishList wishlist) {
+        if (user == null) {
+            throw new AccessDeniedException("You need to be logged in to modify this wishlist.");
+        }
+        if (!isWishlistOwner(wishlist, user.getEmail())) {
+            throw new AccessDeniedException("You need to be the owner to modify this wishlist.");
         }
     }
 
-    private boolean isWishlistOwner(String wishlistId, String userEmail) {
-        return userEmail.equalsIgnoreCase(getWishlistById(wishlistId).getUser().getEmail().toLowerCase().trim());
+    private boolean isWishlistOwner(WishList wishList, String userEmail) {
+        return userEmail.trim().equalsIgnoreCase(wishList.getUser().getEmail().trim());
     }
 }

@@ -48,12 +48,12 @@ public class WebSecurityConfig {
                                 "/css/**",
                                 "/js/**").permitAll()
                         .requestMatchers("/api/v1/wishlists/*/access", "/api/v1/wishlists/*/access/**").authenticated()
+                        .requestMatchers("/api/v1/ai/wishlists/*/generate-description", "/api/v1/ai/wishlists/(*)/generate-description/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists", "/api/v1/wishlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()
                         .requestMatchers(
-                                "/api/v1/wishlists/**",
-                                "/api/v1/user/**",
+                                "/api/v1/wishlists/**", "/api/v1/user/**",
                                 "/api/v1/sign-out/**").authenticated()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_DEVELOPER")
                         .anyRequest().authenticated()

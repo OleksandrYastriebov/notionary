@@ -11,7 +11,6 @@ app:
     max-wishlists: 50
     max-items-per-list: 50
     max-shares-per-wishlist: 30
-
 token:
   signing:
     key: ${TOKEN_SIGNING_KEY}
@@ -75,27 +74,19 @@ spring:
     async:
       request-timeout: 30000
 
-  mail:
-    host: ${SMTP_MAIL_HOST}
-    port: ${SMTP_MAIL_PORT}
-    username: ${SMTP_LOGIN}
-    password: ${SMTP_PASSWORD}
-    protocol: smtp
-    properties:
-      mail:
-        debug: false
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-          starttls:
-            enable: false
-          connectiontimeout: 10000
-          timeout: 10000
-          writetimeout: 10000
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-2.5-flash
+            temperature: 0.7
+
 logging:
   level:
     org.springframework.core.events.SpringDocAppInitializer: ERROR
+
 cloudinary:
   cloud-name: ${CLOUDINARY_CLOUD_NAME}
   api-key: ${CLOUDINARY_API_KEY}
