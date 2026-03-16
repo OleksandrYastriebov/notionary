@@ -3,7 +3,7 @@ package com.api.notionary.dto.comment;
 import com.api.notionary.entity.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Schema(description = "Data Transfer Object for a Comment")
 public record CommentDto(
@@ -25,8 +25,8 @@ public record CommentDto(
         @Schema(description = "Avatar URL of the author", example = "https://res.cloudinary.com/...")
         String authorAvatarUrl,
 
-        @Schema(description = "Creation timestamp", example = "2026-03-14T23:24:00")
-        LocalDateTime createdAt
+        @Schema(description = "Creation timestamp", example = "2026-03-14T23:24:00Z")
+        Instant createdAt
 ) {
     public static CommentDto fromEntity(Comment comment) {
         return new CommentDto(

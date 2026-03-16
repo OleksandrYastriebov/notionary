@@ -24,6 +24,7 @@ import org.springframework.security.web.method.annotation.AuthenticationPrincipa
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -73,7 +74,7 @@ class CommentControllerTest {
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         sampleCommentDto = new CommentDto(1L, "Let's chip in!", 5L, "Alice", "Smith",
-                null, LocalDateTime.of(2024, 6, 1, 10, 0));
+                null, Instant.parse("2024-06-01T10:00:00Z"));
     }
 
     @AfterEach

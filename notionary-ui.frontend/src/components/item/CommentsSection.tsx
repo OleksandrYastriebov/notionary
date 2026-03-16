@@ -32,7 +32,7 @@ function CommentItem({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className={`group flex items-end gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}
+      className={`group flex items-center gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}
     >
       {!isOwn && (
         <Avatar
@@ -170,7 +170,7 @@ export function CommentsSection({ wishlistId, itemId }: CommentsSectionProps) {
             <button
               type="submit"
               disabled={!text.trim() || createMutation.isPending}
-              className="absolute right-2 bottom-2 p-1 rounded-lg text-violet-500 hover:text-violet-700 hover:bg-violet-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-lg text-violet-500 hover:text-violet-700 hover:bg-violet-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
               aria-label="Send comment"
             >
               <Send size={14} />
