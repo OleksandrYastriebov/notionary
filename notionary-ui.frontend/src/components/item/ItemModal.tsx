@@ -6,7 +6,6 @@ import { ImageIcon, Loader2, Sparkles, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
-import { Textarea } from '../ui/Textarea';
 import { Button } from '../ui/Button';
 import { useCreateItem, useUpdateItem } from '../../hooks/useWishlistItems';
 import { useUploadImage } from '../../hooks/useUploadImage';
