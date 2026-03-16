@@ -3,6 +3,8 @@ package com.api.notionary.controller;
 import com.api.notionary.dto.ai.AiDescriptionDto;
 import com.api.notionary.dto.payload.request.ai.GenerateDescriptionRequest;
 import com.api.notionary.entity.User;
+import com.api.notionary.security.interceptor.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.ai.AiAssistantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "AI Assistant", description = "API for interacting with Artificial Intelligence (content generation)")
+@RateLimited(action = RateLimitPlan.DEFAULT)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/ai")

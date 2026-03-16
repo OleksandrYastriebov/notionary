@@ -4,6 +4,8 @@ import com.api.notionary.dto.user.PublicUserDto;
 import com.api.notionary.dto.user.UserProfileResponseDto;
 import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.entity.User;
+import com.api.notionary.security.interceptor.RateLimitPlan;
+import com.api.notionary.security.interceptor.RateLimited;
 import com.api.notionary.service.UserService;
 import com.api.notionary.service.WishListService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Tag(name = "Social Profile", description = "Users search anv public profiles views")
+@RateLimited(action = RateLimitPlan.DEFAULT)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/profiles")

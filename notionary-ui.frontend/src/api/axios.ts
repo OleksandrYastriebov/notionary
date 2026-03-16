@@ -113,4 +113,9 @@ api.interceptors.response.use(
   }
 );
 
+export const refreshAccessToken = (): Promise<RefreshTokenResponse> =>
+  axios
+    .post<RefreshTokenResponse>(`${BASE_URL}/refresh-token`, {}, { withCredentials: true })
+    .then((r) => r.data);
+
 export default api;

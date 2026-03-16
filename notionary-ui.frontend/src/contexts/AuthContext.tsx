@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { getMe, signIn as apiSignIn, signOut as apiSignOut } from '../api/endpoints';
-import { setAccessToken, setAuthFailureHandler } from '../api/axios';
+import { setAccessToken, setAuthFailureHandler, refreshAccessToken } from '../api/axios';
 import type { SignInRequest, UserProfileDto } from '../types';
 
 interface AuthContextValue {
@@ -34,14 +34,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthFailureHandler(clearAuth);
   }, [clearAuth]);
 
-  // On mount: try to get current user (uses refresh cookie if access token expired)
+  // On mount: refresh access token first, then fetch the user — avoids spurious 401 on /me
   useEffect(() => {
     const bootstrap = async () => {
       try {
+        const { accessToken: token } = await refreshAccessToken();
+        setAccessToken(token);
         const me = await getMe();
         setUser(me);
       } catch {
-        // Not authenticated — that's fine
+        // No valid refresh cookie — user is not authenticated, that's fine
         clearAuth();
       } finally {
         setIsLoading(false);

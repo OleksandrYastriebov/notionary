@@ -120,14 +120,17 @@ public class UserService {
         );
 
         return users.stream()
-                .map(u -> new PublicUserDto(u.getId(), u.getFirstName(), u.getLastName(), null))
+                .map(user -> new PublicUserDto(user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getAvatarUrl()))
                 .toList();
     }
 
     public PublicUserDto getPublicUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), null);
+        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
     }
 
     public User getUserByEmail(String email) {

@@ -8,12 +8,14 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MimeTypeUtils;
 
 import java.util.Base64;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class AiAssistantService {
 
     private final ChatClient chatClient;
