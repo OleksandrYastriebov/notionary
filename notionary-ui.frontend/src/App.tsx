@@ -9,6 +9,7 @@ import SignUpPage from './pages/SignUpPage';
 import WishlistsPage from './pages/WishlistsPage';
 import WishlistDetailPage from './pages/WishlistDetailPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicProfilePage from './pages/PublicProfilePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -100,6 +101,15 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      {/* Public profile — requires auth (search is auth-gated) */}
+      <Route
+        path="/profile/:userId"
+        element={
+          <ProtectedRoute>
+            <PublicProfilePage />
           </ProtectedRoute>
         }
       />

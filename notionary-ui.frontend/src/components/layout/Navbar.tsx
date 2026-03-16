@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Gift, LogOut, User, List } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Avatar } from '../ui/Avatar';
+import { UserSearchDropdown } from '../search/UserSearchDropdown';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,6 +33,13 @@ export function Navbar() {
           <Gift size={24} className="text-violet-600" />
           <span className="text-lg">Notionary</span>
         </Link>
+
+        {/* Search — only when authenticated */}
+        {user && (
+          <div className="flex-1 flex justify-center px-4 sm:px-8 max-w-xs sm:max-w-sm mx-auto">
+            <UserSearchDropdown />
+          </div>
+        )}
 
         {/* Right side */}
         {user ? (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Globe, Lock, ArrowLeft, UserPlus, Package, LogIn, UserPlus as UserPlusIcon } from 'lucide-react';
 import { useWishlistDetail } from '../hooks/useWishlistDetail';
@@ -24,6 +24,8 @@ export default function WishlistDetailPage() {
   const { wishlistId } = useParams<{ wishlistId: string }>();
   const { user, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromProfileId = (location.state as { fromProfileId?: number } | null)?.fromProfileId;
 
   const { data: wishlist, isLoading: isWishlistLoading, isError } = useWishlistDetail(wishlistId ?? '', !isAuthLoading);
   const isLoading = isAuthLoading || isWishlistLoading;
@@ -59,11 +61,15 @@ export default function WishlistDetailPage() {
     <Layout>
       {/* Back button */}
       <button
-        onClick={() => navigate(-1)}
+        onClick={() =>
+          fromProfileId !== undefined
+            ? navigate(`/profile/${fromProfileId}`)
+            : navigate(-1)
+        }
         className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
       >
         <ArrowLeft size={15} />
-        Back
+        {fromProfileId !== undefined ? 'Back to profile' : 'Back'}
       </button>
 
       {isLoading ? (

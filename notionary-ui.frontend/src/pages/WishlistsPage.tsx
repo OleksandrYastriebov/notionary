@@ -21,7 +21,9 @@ export default function WishlistsPage() {
   const [editWishlist, setEditWishlist] = useState<WishListDto | null>(null);
   const [shareWishlist, setShareWishlist] = useState<WishListDto | null>(null);
 
-  const wishlists = data?.wishLists ?? [];
+  const wishlists = [...(data?.wishLists ?? [])].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  );
   const atLimit = wishlists.length >= MAX_WISHLISTS;
 
   return (

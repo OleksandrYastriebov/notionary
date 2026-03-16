@@ -153,6 +153,20 @@ export interface ImageUploadResponse {
   url: string;
 }
 
+// ─── Public Profiles ──────────────────────────────────────────────────────────
+
+export interface PublicUserDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+}
+
+export interface UserProfileResponseDto {
+  user: PublicUserDto;
+  publicWishlists: WishListDto[];
+}
+
 // ─── AI ───────────────────────────────────────────────────────────────────────
 
 export interface GenerateDescriptionRequest {

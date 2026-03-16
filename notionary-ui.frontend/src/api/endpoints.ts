@@ -23,6 +23,8 @@ import type {
   ImageUploadResponse,
   GenerateDescriptionRequest,
   GenerateDescriptionResponse,
+  PublicUserDto,
+  UserProfileResponseDto,
 } from '../types';
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -140,6 +142,14 @@ export const generateItemDescription = (
       data
     )
     .then((r) => r.data);
+
+// ─── Profiles ─────────────────────────────────────────────────────────────────
+
+export const searchUsers = (query: string) =>
+  api.get<PublicUserDto[]>('/profiles/search', { params: { q: query } }).then((r) => r.data);
+
+export const getUserProfile = (userId: number) =>
+  api.get<UserProfileResponseDto>(`/profiles/${userId}`).then((r) => r.data);
 
 // ─── Images ───────────────────────────────────────────────────────────────────
 

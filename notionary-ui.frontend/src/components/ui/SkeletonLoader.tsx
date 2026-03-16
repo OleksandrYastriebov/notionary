@@ -40,6 +40,18 @@ export function ItemCardSkeleton() {
   );
 }
 
+export function PublicProfileHeaderSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
+      <Skeleton className="w-20 h-20 rounded-full flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-4 w-24" />
+      </div>
+    </div>
+  );
+}
+
 export function CommentSkeleton() {
   return (
     <div className="flex gap-3">
