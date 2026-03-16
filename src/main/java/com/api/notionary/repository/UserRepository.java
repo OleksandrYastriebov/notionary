@@ -44,9 +44,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     @Query("""
-            SELECT u FROM User u WHERE u.id != :currentUserId AND (
-                        LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) OR
-                        LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR
-                        LOWER(u.lastName) LIKE LOWER(CONCAT('%', :query, '%')))""")
+            SELECT u FROM User u
+            WHERE u.id != :currentUserId
+              AND u.enabled = true
+              AND u.locked = false
+              AND (
+                LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(u.lastName)  LIKE LOWER(CONCAT('%', :query, '%')) OR
+                LOWER(u.email)     LIKE LOWER(CONCAT('%', :query, '%'))
+              )""")
     List<User> searchUsersByQuery(@Param("query") String query, @Param("currentUserId") Long currentUserId, Pageable pageable);
 }
