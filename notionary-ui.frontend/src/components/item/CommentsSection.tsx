@@ -30,27 +30,37 @@ function CommentItem({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, x: -10 }}
+      exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
-      className="group flex gap-2.5"
+      className={`group flex items-end gap-2 ${isOwn ? 'flex-row-reverse' : 'flex-row'}`}
     >
-      <Avatar
-        src={comment.authorAvatarUrl}
-        firstName={comment.authorFirstName}
-        lastName={comment.authorLastName}
-        size="xs"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-2">
-          <span className="text-xs font-semibold text-gray-900">
+      {!isOwn && (
+        <Avatar
+          src={comment.authorAvatarUrl}
+          firstName={comment.authorFirstName}
+          lastName={comment.authorLastName}
+          size="xs"
+        />
+      )}
+
+      <div className={`flex flex-col max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
+        {!isOwn && (
+          <span className="text-xs font-semibold text-gray-700 mb-0.5 px-1">
             {comment.authorFirstName} {comment.authorLastName}
           </span>
-          <span className="text-xs text-gray-400">
-            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-          </span>
+        )}
+        <div className={`relative px-3 py-2 rounded-2xl text-sm break-words ${
+          isOwn
+            ? 'bg-violet-600 text-white rounded-br-sm'
+            : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+        }`}>
+          {comment.text}
         </div>
-        <p className="text-sm text-gray-700 mt-0.5 break-words">{comment.text}</p>
+        <span className="text-[11px] text-gray-400 mt-0.5 px-1">
+          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+        </span>
       </div>
+
       {isOwn && (
         <button
           onClick={() => onDelete(comment.id)}
