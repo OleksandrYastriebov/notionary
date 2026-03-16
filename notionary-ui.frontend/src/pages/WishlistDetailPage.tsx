@@ -193,6 +193,7 @@ export default function WishlistDetailPage() {
                     item={item}
                     wishlistId={wishlist.id}
                     isOwner={isOwner}
+                    currentUserId={user?.id ?? null}
                     onEdit={(i) => setEditItem(i)}
                     onOpenComments={(i) => setCommentsItem(i)}
                     onRequireAuth={() => setRequireAuthOpen(true)}

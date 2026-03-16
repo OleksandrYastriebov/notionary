@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { isAxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
@@ -34,6 +35,7 @@ export default function SignUpPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
@@ -50,8 +52,12 @@ export default function SignUpPage() {
       setRegisteredEmail(data.email);
       setSuccess(true);
       setCountdown(RESEND_COOLDOWN);
-    } catch {
-      toast.error('Sign up failed. The email may already be in use.');
+    } catch (err) {
+      if (isAxiosError(err) && err.response?.status === 400) {
+        setError('email', { message: 'This email is already registered' });
+      } else {
+        toast.error('Sign up failed. Please try again.');
+      }
     }
   };
 

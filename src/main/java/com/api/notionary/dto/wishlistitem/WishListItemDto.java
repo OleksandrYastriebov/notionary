@@ -31,6 +31,9 @@ public record WishListItemDto(
         @Schema(description = "Whether the item is fulfilled or purchased", example = "false")
         Boolean isChecked,
 
+        @Schema(description = "ID of the user who reserved the item, null if not reserved")
+        Long checkedByUserId,
+
         @Schema(description = "Creation timestamp")
         LocalDateTime createdAt
 ) {

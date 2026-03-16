@@ -73,11 +73,34 @@ public class WishListItemService {
     @Transactional
     public void toggleIsChecked(String wishlistId, String itemId, WishlistItemIsCheckedRequest request, User user) {
         if (user == null) {
-            throw new AccessDeniedException("You must be logged in to mark items.");
+            throw new AccessDeniedException("You must be logged in to reserve items.");
         }
         wishListService.findWishlistById(wishlistId, user);
-        WishListItem wishlistItem = getWishlistItem(wishlistId, itemId);
-        wishlistItem.setChecked(request.isChecked());
+        WishListItem item = getWishlistItem(wishlistId, itemId);
+
+        if (request.isChecked()) {
+            reserve(item, user);
+        } else {
+            unreserve(item, user);
+        }
+
+    }
+
+    private void reserve(WishListItem item, User user) {
+        item.setChecked(true);
+        item.setCheckedBy(user);
+    }
+
+    private void unreserve(WishListItem item, User user) {
+        User reserver = item.getCheckedBy();
+        boolean reservedByAnotherUser = reserver != null && !reserver.getId().equals(user.getId());
+        boolean callerIsWishlistOwner = item.getWishList().getUser().getId().equals(user.getId());
+
+        if (reservedByAnotherUser && !callerIsWishlistOwner) {
+            throw new AccessDeniedException("You cannot unreserve an item reserved by another user.");
+        }
+        item.setChecked(false);
+        item.setCheckedBy(null);
     }
 
     private @NonNull WishListItem getWishlistItem(String wishListId, String itemId) {

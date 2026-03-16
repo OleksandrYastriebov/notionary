@@ -152,6 +152,64 @@ class WishListItemServiceTest {
         wishListItemService.toggleIsChecked("wl-1", "item-1", request, user);
 
         assertThat(wishListItem.isChecked()).isTrue();
+        assertThat(wishListItem.getCheckedBy()).isEqualTo(user);
+    }
+
+    @Test
+    void toggleIsChecked_reserverCanUnreserveOwnItem() {
+        User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
+                LocalDateTime.now(), UserRole.ROLE_USER);
+        reserver.setId(2L);
+        wishListItem.setChecked(true);
+        wishListItem.setCheckedBy(reserver);
+        when(wishListService.findWishlistById("wl-1", reserver)).thenReturn(wishListDto);
+        when(wishListItemRepository.findByIdAndWishListId("item-1", "wl-1"))
+                .thenReturn(Optional.of(wishListItem));
+        WishlistItemIsCheckedRequest request = new WishlistItemIsCheckedRequest(false);
+
+        wishListItemService.toggleIsChecked("wl-1", "item-1", request, reserver);
+
+        assertThat(wishListItem.isChecked()).isFalse();
+        assertThat(wishListItem.getCheckedBy()).isNull();
+    }
+
+    @Test
+    void toggleIsChecked_shouldThrow_whenAnotherUserTriesToUnreserve() {
+        User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
+                LocalDateTime.now(), UserRole.ROLE_USER);
+        reserver.setId(2L);
+        User otherUser = new User("Bob", "Smith", "bob@example.com", "pass",
+                LocalDateTime.now(), UserRole.ROLE_USER);
+        otherUser.setId(3L);
+        wishListItem.setChecked(true);
+        wishListItem.setCheckedBy(reserver);
+        when(wishListService.findWishlistById("wl-1", otherUser)).thenReturn(wishListDto);
+        when(wishListItemRepository.findByIdAndWishListId("item-1", "wl-1"))
+                .thenReturn(Optional.of(wishListItem));
+        WishlistItemIsCheckedRequest request = new WishlistItemIsCheckedRequest(false);
+
+        assertThatThrownBy(() -> wishListItemService.toggleIsChecked("wl-1", "item-1", request, otherUser))
+                .isInstanceOf(AccessDeniedException.class)
+                .hasMessageContaining("cannot unreserve");
+    }
+
+    @Test
+    void toggleIsChecked_wishlistOwnerCanUnreserveAnyItem() {
+        User reserver = new User("Jane", "Doe", "jane@example.com", "pass",
+                LocalDateTime.now(), UserRole.ROLE_USER);
+        reserver.setId(2L);
+        wishListItem.setChecked(true);
+        wishListItem.setCheckedBy(reserver);
+
+        when(wishListService.findWishlistById("wl-1", user)).thenReturn(wishListDto);
+        when(wishListItemRepository.findByIdAndWishListId("item-1", "wl-1"))
+                .thenReturn(Optional.of(wishListItem));
+        WishlistItemIsCheckedRequest request = new WishlistItemIsCheckedRequest(false);
+
+        wishListItemService.toggleIsChecked("wl-1", "item-1", request, user);
+
+        assertThat(wishListItem.isChecked()).isFalse();
+        assertThat(wishListItem.getCheckedBy()).isNull();
     }
 
     @Test

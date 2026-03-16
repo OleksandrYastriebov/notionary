@@ -63,6 +63,11 @@ public class WishListItem {
     @Column(name = "is_checked", nullable = false)
     private boolean isChecked = false;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "checked_by_user_id")
+    @ToString.Exclude
+    private User checkedBy;
+
     @OneToMany(mappedBy = "wishListItem", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<Comment> comments = new ArrayList<>();
@@ -110,6 +115,7 @@ public class WishListItem {
                 description,
                 imageUrl,
                 isChecked,
+                checkedBy == null ? null : checkedBy.getId(),
                 createdAt
         );
     }

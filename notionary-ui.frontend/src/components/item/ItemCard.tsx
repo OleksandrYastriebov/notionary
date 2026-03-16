@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ExternalLink, MessageCircle, Pencil, Trash2, CheckCircle2, Circle, DollarSign } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { ExternalLink, MessageCircle, Pencil, Trash2, CheckCircle2, Circle, DollarSign, Lock } from 'lucide-react';
 import type { WishListItemDto } from '../../types';
 import { ImageFallback } from '../ui/ImageFallback';
 import { ConfirmModal } from '../ui/ConfirmModal';
@@ -12,6 +13,7 @@ interface ItemCardProps {
   item: WishListItemDto;
   wishlistId: string;
   isOwner: boolean;
+  currentUserId: number | null;
   onEdit: (item: WishListItemDto) => void;
   onOpenComments: (item: WishListItemDto) => void;
   onRequireAuth: () => void;
@@ -21,6 +23,7 @@ export function ItemCard({
   item,
   wishlistId,
   isOwner,
+  currentUserId,
   onEdit,
   onOpenComments,
   onRequireAuth,
@@ -30,14 +33,25 @@ export function ItemCard({
   const toggleMutation = useToggleChecked(wishlistId);
   const { ref: titleRef, isOverflowing: titleOverflowing } = useIsOverflowing<HTMLDivElement>();
 
+  const isReservedByOther =
+    !isOwner &&
+    item.isChecked &&
+    item.checkedByUserId !== null &&
+    item.checkedByUserId !== currentUserId;
+
   const handleToggle = () => {
+    if (isReservedByOther) return;
     toggleMutation.mutate(
-      { itemId: item.id, isChecked: !item.isChecked },
+      { itemId: item.id, isChecked: !item.isChecked, currentUserId },
       {
         onError: (err) => {
           const axiosErr = err as AxiosError;
           if (axiosErr.response?.status === 403) {
-            onRequireAuth();
+            if (item.isChecked) {
+              toast.error('This item is already reserved by someone else.');
+            } else {
+              onRequireAuth();
+            }
           }
         },
       }
@@ -131,14 +145,18 @@ export function ItemCard({
             <div className="flex items-center gap-3">
               <button
                 onClick={handleToggle}
-                disabled={toggleMutation.isPending}
+                disabled={isReservedByOther || toggleMutation.isPending}
                 className={`flex items-center gap-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 rounded focus-visible:ring-violet-400 disabled:opacity-50 ${
-                  item.isChecked
+                  isReservedByOther
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : item.isChecked
                     ? 'text-emerald-600 hover:text-emerald-700'
                     : 'text-gray-500 hover:text-emerald-600'
                 }`}
               >
-                {item.isChecked ? (
+                {isReservedByOther ? (
+                  <Lock size={14} className="text-gray-400" />
+                ) : item.isChecked ? (
                   <CheckCircle2 size={14} className="text-emerald-500" />
                 ) : (
                   <Circle size={14} />

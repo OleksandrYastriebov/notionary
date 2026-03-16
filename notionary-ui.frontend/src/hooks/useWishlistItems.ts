@@ -51,9 +51,9 @@ export function useDeleteItem(wishlistId: string) {
 export function useToggleChecked(wishlistId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, isChecked }: { itemId: string; isChecked: boolean }) =>
+    mutationFn: ({ itemId, isChecked }: { itemId: string; isChecked: boolean; currentUserId: number | null }) =>
       toggleItemChecked(wishlistId, itemId, { isChecked }),
-    onMutate: async ({ itemId, isChecked }) => {
+    onMutate: async ({ itemId, isChecked, currentUserId }) => {
       await qc.cancelQueries({ queryKey: wishlistKey(wishlistId) });
       const previous = qc.getQueryData<WishListDto>(wishlistKey(wishlistId));
       qc.setQueryData<WishListDto>(wishlistKey(wishlistId), (old) => {
@@ -61,7 +61,9 @@ export function useToggleChecked(wishlistId: string) {
         return {
           ...old,
           wishListItems: old.wishListItems.map((item) =>
-            item.id === itemId ? { ...item, isChecked } : item
+            item.id === itemId
+              ? { ...item, isChecked, checkedByUserId: isChecked ? currentUserId : null }
+              : item
           ),
         };
       });

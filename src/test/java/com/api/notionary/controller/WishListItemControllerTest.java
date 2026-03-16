@@ -80,7 +80,7 @@ class WishListItemControllerTest {
 
         sampleItemDto = new WishListItemDto("item-id-1", "wl-id-1", "PlayStation 5",
                 "https://store.sony.com/ps5", new BigDecimal("499.99"),
-                "Disc edition", "https://example.com/ps5.jpg", false,
+                "Disc edition", "https://example.com/ps5.jpg", false, null,
                 LocalDateTime.of(2024, 6, 1, 10, 0));
     }
 
@@ -244,7 +244,7 @@ class WishListItemControllerTest {
         UpdateWishListItemRequest request = new UpdateWishListItemRequest(
                 "PS5 Slim", null, null, null, null, null);
         WishListItemDto updatedItem = new WishListItemDto("item-id-1", "wl-id-1", "PS5 Slim",
-                null, null, null, null, false, LocalDateTime.now());
+                null, null, null, null, false, null, LocalDateTime.now());
         when(wishListItemService.updateWishlistItem(any(UpdateWishListItemRequest.class),
                 eq("wl-id-1"), eq("item-id-1"), any(User.class))).thenReturn(updatedItem);
 
