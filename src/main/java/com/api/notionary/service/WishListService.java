@@ -7,6 +7,7 @@ import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.WishList;
 import com.api.notionary.exception.WishlistNotFoundException;
+import com.api.notionary.repository.UserRepository;
 import com.api.notionary.repository.WishListAccessRepository;
 import com.api.notionary.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class WishListService {
 
     private final WishListRepository wishListRepository;
     private final WishListAccessRepository wishlistAccessRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
@@ -89,6 +91,12 @@ public class WishListService {
         WishList wishList = getWishlistById(wishlistId);
         checkOwnership(user, wishList);
         return wishList;
+    }
+
+    public List<WishListDto> getPublicWishlistsForUser(Long userId) {
+        return wishListRepository.findByUserIdAndIsPublicTrue(userId).stream()
+                .map(WishList::toDto)
+                .toList();
     }
 
     private void checkOwnership(User user, WishList wishlist) {

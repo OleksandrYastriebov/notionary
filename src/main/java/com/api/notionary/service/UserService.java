@@ -2,6 +2,7 @@ package com.api.notionary.service;
 
 import com.api.notionary.dto.payload.request.user.ChangePasswordRequest;
 import com.api.notionary.dto.payload.request.user.UpdateUserRequest;
+import com.api.notionary.dto.user.PublicUserDto;
 import com.api.notionary.dto.user.UserProfileDto;
 import com.api.notionary.entity.ConfirmationToken;
 import com.api.notionary.entity.User;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -104,6 +106,28 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
+    }
+
+    public List<PublicUserDto> searchPublicUsers(String query, User currentUser) {
+        if (query == null || query.trim().length() < 2) {
+            return List.of();
+        }
+
+        List<User> users = userRepository.searchUsersByQuery(
+                query.trim(),
+                currentUser.getId(),
+                PageRequest.of(0, 20)
+        );
+
+        return users.stream()
+                .map(u -> new PublicUserDto(u.getId(), u.getFirstName(), u.getLastName(), null))
+                .toList();
+    }
+
+    public PublicUserDto getPublicUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), null);
     }
 
     public User getUserByEmail(String email) {

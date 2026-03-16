@@ -15,4 +15,9 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
     List<WishList> findByUser(User user);
 
     int countByUser(User user);
+
+    /**
+     * Finds all wishlists where isPublic is true
+     */
+    List<WishList> findByUserIdAndIsPublicTrue(Long userId);
 }
