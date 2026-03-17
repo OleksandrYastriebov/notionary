@@ -88,13 +88,14 @@ class RefreshTokenServiceTest {
         RefreshToken oldToken = new RefreshToken();
         oldToken.setId(1L);
         List<RefreshToken> existing = List.of(oldToken, new RefreshToken(), new RefreshToken(), new RefreshToken(), new RefreshToken());
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(1L)).thenReturn(existing);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
 
         refreshTokenService.createRefreshToken(1L);
 
-        verify(refreshTokenRepository).delete(oldToken);
+        verify(refreshTokenRepository).deleteById(oldToken.getId());
         verify(refreshTokenRepository).save(any(RefreshToken.class));
     }
 

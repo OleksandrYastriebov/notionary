@@ -44,6 +44,7 @@ public class WebSecurityConfig {
                                 "/api/v1/refresh-token/**",
                                 "/api/v1/sign-up/**",
                                 "/api/v1/sign-in/**",
+                                "/api/v1/seo/**",
                                 "/api/v1/health",
                                 "/css/**",
                                 "/js/**").permitAll()

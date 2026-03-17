@@ -7,6 +7,10 @@
     {
       "source": "/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://notionary-8oyd.onrender.com/api/v1/seo/sitemap.xml"
     }
   ]
 }
