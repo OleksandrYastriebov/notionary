@@ -2,7 +2,6 @@ package com.api.notionary.dto.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -26,7 +25,7 @@ public record AiWishlistGenerationDto(
             String description,
 
             @JsonProperty(value = "price")
-            BigDecimal price,
+            String price,
 
             @JsonProperty(value = "url")
             String url

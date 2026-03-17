@@ -17,9 +17,15 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.List;
+
+import static com.api.notionary.util.AiResponseSanitizationUtil.sanitizeUrl;
+import static com.api.notionary.util.AiResponseSanitizationUtil.parsePriceSafe;
+import static com.api.notionary.util.AiResponseSanitizationUtil.truncate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +45,7 @@ public class AiAssistantService {
         wishListService.getWishlistEntityForOwner(wishlistId, currentUser);
         String title = truncate(request.title(), MAX_TITLE_LENGTH);
         try {
-            if (hasImage(request.base64Image())) {
+            if (StringUtils.hasText(request.base64Image())) {
                 return generateMultimodalDescription(title, request.base64Image(), request.mimeType());
             }
             return chatClient.prompt()
@@ -57,7 +63,9 @@ public class AiAssistantService {
         AiWishlistGenerationDto generated = fetchWishlistFromAi(request.description());
 
         WishListDto wishList = wishListService.createWishlist(
-                new CreateWishlistRequest(generated.title(), request.isPublic(), null),
+                new CreateWishlistRequest(truncate(generated.title(), MAX_TITLE_LENGTH),
+                        request.isPublic() != null ? request.isPublic() : false,
+                        null),
                 currentUser
         );
 
@@ -69,16 +77,14 @@ public class AiAssistantService {
     private AiWishlistGenerationDto fetchWishlistFromAi(String description) {
         try {
             AiWishlistGenerationDto response = chatClient.prompt()
-                    .user(AiPrompts.wishlistGenerationPrompt(description))
+                    .system(AiPrompts.wishlistGenerationSystemPrompt())
+                    .user(description)
                     .call()
                     .entity(AiWishlistGenerationDto.class);
             validateResponse(response);
             return response;
-        } catch (RuntimeException ex) {
-            log.error("AI wishlist generation failed", ex);
-            throw ex;
         } catch (Exception ex) {
-            log.error("Unexpected error during AI wishlist generation", ex);
+            log.error("Failed to generate wishlist via AI. Input: {}", description, ex);
             throw new RuntimeException("Failed to generate wishlist. Please try again later.");
         }
     }
@@ -87,7 +93,7 @@ public class AiAssistantService {
         if (response == null) {
             throw new RuntimeException("AI returned an empty response.");
         }
-        if (response.title() == null || response.title().isBlank()) {
+        if (!StringUtils.hasText(response.title())) {
             throw new RuntimeException("AI returned a wishlist without a title.");
         }
         if (response.items() == null || response.items().isEmpty()) {
@@ -99,25 +105,26 @@ public class AiAssistantService {
         items.stream()
                 .limit(MAX_AI_ITEMS)
                 .filter(item -> item.title() != null && !item.title().isBlank())
-                .forEach(item -> wishListItemService.createWishListItem(
-                        wishlistId,
-                        new CreateWishListItemRequest(
-                                truncate(item.title(), MAX_TITLE_LENGTH),
-                                item.url(),
-                                item.price(),
-                                truncate(item.description(), MAX_DESCRIPTION_LENGTH),
-                                null
-                        ),
-                        currentUser
-                ));
-    }
+                .forEach(item -> {
+                    BigDecimal parsedPrice = parsePriceSafe(item.price());
+                    String safeUrl = sanitizeUrl(item.url());
 
-    private boolean hasImage(String base64Image) {
-        return base64Image != null && !base64Image.isBlank();
+                    wishListItemService.createWishListItem(
+                            wishlistId,
+                            new CreateWishListItemRequest(
+                                    truncate(item.title(), MAX_TITLE_LENGTH),
+                                    safeUrl,
+                                    parsedPrice,
+                                    truncate(item.description(), MAX_DESCRIPTION_LENGTH),
+                                    null
+                            ),
+                            currentUser
+                    );
+                });
     }
 
     private String generateMultimodalDescription(String title, String base64Image, String mimeType) {
-        String cleanBase64 = base64Image.replaceFirst("^data:image/[^;]+;base64,", "");
+        String cleanBase64 = satitizeBase64String(base64Image);
         byte[] imageBytes = Base64.getDecoder().decode(cleanBase64);
         ByteArrayResource imageResource = new ByteArrayResource(imageBytes);
 
@@ -128,10 +135,10 @@ public class AiAssistantService {
                 .content();
     }
 
-    private String truncate(String value, int maxLength) {
-        if (value == null) {
-            return null;
-        }
-        return value.length() > maxLength ? value.substring(0, maxLength) : value;
+    private String satitizeBase64String(String base64Image) {
+        return base64Image
+                .replaceFirst("^data:image/[^;]+;base64,", "")
+                .replaceAll("\\s+", "");
     }
+
 }
