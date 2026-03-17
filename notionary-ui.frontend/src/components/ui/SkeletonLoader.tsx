@@ -8,16 +8,20 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse bg-gray-200 rounded-lg',
+        'animate-pulse bg-white/[0.07] rounded-lg',
         className
       )}
     />
   );
 }
 
-export function WishlistCardSkeleton() {
+interface WishlistCardSkeletonProps {
+  className?: string;
+}
+
+export function WishlistCardSkeleton({ className }: WishlistCardSkeletonProps) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+    <div className={cn('bg-[#111118] rounded-2xl overflow-hidden border border-white/[0.06]', className)}>
       <Skeleton className="w-full h-44 rounded-none" />
       <div className="p-4 space-y-2">
         <Skeleton className="h-5 w-3/4" />
@@ -29,7 +33,7 @@ export function WishlistCardSkeleton() {
 
 export function ItemCardSkeleton() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex gap-4 p-4">
+    <div className="bg-[#111118] rounded-2xl overflow-hidden border border-white/[0.06] flex gap-4 p-4">
       <Skeleton className="w-20 h-20 rounded-xl flex-shrink-0" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-5 w-2/3" />
@@ -42,7 +46,7 @@ export function ItemCardSkeleton() {
 
 export function PublicProfileHeaderSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5">
+    <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6 flex items-center gap-5">
       <Skeleton className="w-20 h-20 rounded-full flex-shrink-0" />
       <div className="flex-1 space-y-2">
         <Skeleton className="h-6 w-40" />

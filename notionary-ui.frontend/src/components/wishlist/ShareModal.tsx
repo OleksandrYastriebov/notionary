@@ -81,7 +81,7 @@ export function ShareModal({ isOpen, onClose, wishlistId, wishlistTitle }: Share
 
         {/* People with access */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-3">
+          <h4 className="text-sm font-medium text-[#c8c8da] mb-3">
             People with access
           </h4>
 
@@ -91,7 +91,7 @@ export function ShareModal({ isOpen, onClose, wishlistId, wishlistTitle }: Share
               <Skeleton className="h-10 w-full" />
             </div>
           ) : !accessData || accessData.emails.length === 0 ? (
-            <p className="text-sm text-gray-400 py-4 text-center">
+            <p className="text-sm text-[#55556e] py-4 text-center">
               No one has access yet. Invite someone above.
             </p>
           ) : (
@@ -99,18 +99,18 @@ export function ShareModal({ isOpen, onClose, wishlistId, wishlistTitle }: Share
               {accessData.emails.map((email) => (
                 <li
                   key={email}
-                  className="flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 border border-gray-100"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <div className="w-7 h-7 rounded-full bg-violet-100 flex items-center justify-center flex-shrink-0">
-                      <Mail size={13} className="text-violet-600" />
+                    <div className="w-7 h-7 rounded-full bg-violet-500/15 flex items-center justify-center flex-shrink-0">
+                      <Mail size={13} className="text-violet-400" />
                     </div>
-                    <span className="text-sm text-gray-700 truncate">{email}</span>
+                    <span className="text-sm text-[#c8c8da] truncate">{email}</span>
                   </div>
                   <button
                     onClick={() => handleRevoke(email)}
                     disabled={revokingEmail === email}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
+                    className="p-1.5 rounded-lg text-[#9898b4] hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400"
                     aria-label={`Remove ${email}`}
                   >
                     <UserMinus size={14} />

@@ -20,6 +20,16 @@ import type { WishListItemDto } from '../types';
 
 const MAX_ITEMS = 50;
 
+function getBentoClass(index: number): string {
+  return (index % 4 === 0 || index % 4 === 3)
+    ? 'lg:col-span-2 sm:col-span-2'
+    : 'col-span-1';
+}
+
+function isBentoWide(index: number): boolean {
+  return index % 4 === 0 || index % 4 === 3;
+}
+
 export default function WishlistDetailPage() {
   const { wishlistId } = useParams<{ wishlistId: string }>();
   const { user, isLoading: isAuthLoading } = useAuth();
@@ -42,8 +52,8 @@ export default function WishlistDetailPage() {
     return (
       <Layout>
         <div className="text-center py-16">
-          <p className="text-gray-500">Wishlist not found or access denied.</p>
-          <Link to="/wishlists" className="text-violet-600 hover:underline mt-2 inline-block text-sm">
+          <p className="text-[#9898b4]">Wishlist not found or access denied.</p>
+          <Link to="/wishlists" className="text-violet-400 hover:text-violet-300 hover:underline mt-2 inline-block text-sm transition-colors">
             Back to wishlists
           </Link>
         </div>
@@ -66,7 +76,7 @@ export default function WishlistDetailPage() {
             ? navigate(`/profile/${fromProfileId}`)
             : navigate(-1)
         }
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
+        className="flex items-center gap-1.5 text-sm text-[#9898b4] hover:text-white transition-colors mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
       >
         <ArrowLeft size={15} />
         {fromProfileId !== undefined ? 'Back to profile' : 'Back'}
@@ -75,14 +85,14 @@ export default function WishlistDetailPage() {
       {isLoading ? (
         <div className="space-y-6">
           {/* Header skeleton */}
-          <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
-            <div className="w-full h-40 bg-gray-200 animate-pulse" />
+          <div className="bg-[#111118] rounded-2xl overflow-hidden border border-white/[0.06]">
+            <div className="w-full h-48 bg-white/[0.07] animate-pulse" />
             <div className="p-5 space-y-2">
-              <div className="h-6 w-1/3 bg-gray-200 rounded animate-pulse" />
-              <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-6 w-1/3 bg-white/[0.07] rounded animate-pulse" />
+              <div className="h-4 w-1/4 bg-white/[0.07] rounded animate-pulse" />
             </div>
           </div>
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <ItemCardSkeleton key={i} />
             ))}
@@ -95,23 +105,26 @@ export default function WishlistDetailPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+            className="bg-[#111118] rounded-2xl overflow-hidden border border-white/[0.06]"
           >
-            <ImageFallback
-              src={wishlist.imageUrl}
-              alt={wishlist.title}
-              initials={wishlist.title.slice(0, 2).toUpperCase()}
-              className="w-full h-40 sm:h-52"
-            />
+            <div className="relative">
+              <ImageFallback
+                src={wishlist.imageUrl}
+                alt={wishlist.title}
+                initials={wishlist.title.slice(0, 2).toUpperCase()}
+                className="w-full h-48 sm:h-64"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d14] via-[#0d0d14]/20 to-transparent" />
+            </div>
             <div className="p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="min-w-0">
                 <div ref={titleRef} className="relative min-w-0 overflow-hidden" title={titleOverflowing ? wishlist.title : undefined}>
-                  <h1 className="text-xl font-bold text-gray-900 whitespace-nowrap">{wishlist.title}</h1>
+                  <h1 className="text-xl font-bold text-white whitespace-nowrap">{wishlist.title}</h1>
                   {titleOverflowing && (
-                    <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+                    <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#111118] to-transparent pointer-events-none" />
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mt-0.5">
+                <p className="text-sm text-[#9898b4] mt-0.5">
                   {items.length} {items.length === 1 ? 'item' : 'items'}
                   {items.filter((i) => i.isChecked).length > 0 &&
                     ` · ${items.filter((i) => i.isChecked).length} reserved`}
@@ -120,10 +133,10 @@ export default function WishlistDetailPage() {
 
               <div className="flex flex-col items-end gap-2 shrink-0">
                 <span
-                  className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${
+                  className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium border ${
                     wishlist.isPublic
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'bg-red-50 text-red-600'
+                      ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'
+                      : 'bg-white/[0.06] text-white/40 border-white/[0.08]'
                   }`}
                 >
                   {wishlist.isPublic ? <Globe size={10} /> : <Lock size={10} />}
@@ -163,7 +176,7 @@ export default function WishlistDetailPage() {
             </div>
           </motion.div>
 
-          {/* Items list */}
+          {/* Items grid */}
           {items.length === 0 ? (
             <EmptyState
               icon={<Package size={26} />}
@@ -185,25 +198,27 @@ export default function WishlistDetailPage() {
               }
             />
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <AnimatePresence>
-                {items.map((item) => (
-                  <ItemCard
-                    key={item.id}
-                    item={item}
-                    wishlistId={wishlist.id}
-                    isOwner={isOwner}
-                    currentUserId={user?.id ?? null}
-                    onEdit={(i) => setEditItem(i)}
-                    onOpenComments={(i) => setCommentsItem(i)}
-                    onRequireAuth={() => setRequireAuthOpen(true)}
-                  />
+                {items.map((item, index) => (
+                  <div key={item.id} className={getBentoClass(index)}>
+                    <ItemCard
+                      item={item}
+                      wishlistId={wishlist.id}
+                      isOwner={isOwner}
+                      currentUserId={user?.id ?? null}
+                      onEdit={(i) => setEditItem(i)}
+                      onOpenComments={(i) => setCommentsItem(i)}
+                      onRequireAuth={() => setRequireAuthOpen(true)}
+                      wide={isBentoWide(index)}
+                    />
+                  </div>
                 ))}
               </AnimatePresence>
               {isOwner && !atLimit && (
                 <button
                   onClick={() => setIsAddItemOpen(true)}
-                  className="w-full rounded-2xl border-2 border-dashed border-gray-200 hover:border-violet-400 hover:bg-violet-50 transition-all duration-200 flex items-center justify-center gap-2 text-gray-400 hover:text-violet-500 py-5"
+                  className="rounded-2xl border-2 border-dashed border-white/[0.08] hover:border-violet-500/40 hover:bg-violet-500/5 transition-all duration-200 flex items-center justify-center gap-2 text-[#55556e] hover:text-violet-400 py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
                 >
                   <Plus size={20} strokeWidth={1.5} />
                   <span className="text-sm font-medium">Add item</span>
@@ -213,7 +228,7 @@ export default function WishlistDetailPage() {
           )}
 
           {atLimit && isOwner && (
-            <p className="text-sm text-amber-600 text-center">
+            <p className="text-sm text-amber-500 text-center">
               You&apos;ve reached the maximum of {MAX_ITEMS} items per wishlist.
             </p>
           )}
@@ -275,20 +290,20 @@ export default function WishlistDetailPage() {
         size="sm"
       >
         <div className="px-6 py-5 text-center">
-          <p className="text-sm text-gray-600 mb-5">
+          <p className="text-sm text-[#9898b4] mb-5">
             You need to sign in or create an account to mark items as reserved.
           </p>
           <div className="flex gap-3">
             <Link
               to="/sign-in"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-700 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
             >
               <LogIn size={15} />
               Sign in
             </Link>
             <Link
               to="/sign-up"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-[#c8c8da] bg-white/[0.07] rounded-xl hover:bg-white/[0.12] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             >
               <UserPlusIcon size={15} />
               Sign up

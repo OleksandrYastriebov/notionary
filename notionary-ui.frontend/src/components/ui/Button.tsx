@@ -11,13 +11,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses = {
   primary:
-    'bg-violet-600 text-white hover:bg-violet-700 active:bg-violet-800 focus-visible:ring-violet-500 disabled:bg-violet-300',
+    'bg-violet-600 text-white hover:bg-violet-500 active:bg-violet-700 focus-visible:ring-violet-500 focus-visible:ring-offset-[#08080e] disabled:bg-violet-900 disabled:text-violet-400',
   secondary:
-    'bg-gray-100 text-gray-800 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-300 disabled:bg-gray-50 disabled:text-gray-400',
+    'bg-white/[0.07] text-[#c8c8da] hover:bg-white/[0.12] active:bg-white/[0.15] focus-visible:ring-white/30 disabled:opacity-40',
   ghost:
-    'bg-transparent text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus-visible:ring-gray-300 disabled:opacity-50',
+    'bg-transparent text-[#9898b4] hover:bg-white/[0.06] hover:text-white active:bg-white/[0.1] focus-visible:ring-white/30 disabled:opacity-40',
   danger:
-    'bg-red-500 text-white hover:bg-red-600 active:bg-red-700 focus-visible:ring-red-500 disabled:bg-red-300',
+    'bg-red-600 text-white hover:bg-red-500 active:bg-red-700 focus-visible:ring-red-500 focus-visible:ring-offset-[#08080e] disabled:bg-red-900 disabled:text-red-400',
 };
 
 const sizeClasses = {
@@ -50,25 +50,10 @@ export function Button({
     >
       {isLoading ? (
         <span className="flex items-center gap-2">
-          <svg
-            className="animate-spin h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-            />
-          </svg>
+          <span
+            className="w-4 h-4 rounded-full border-2 border-current border-t-transparent animate-spin flex-shrink-0"
+            aria-hidden="true"
+          />
           {children}
         </span>
       ) : (

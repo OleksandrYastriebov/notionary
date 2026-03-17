@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Gift, LogOut, User, List } from 'lucide-react';
+import { Sparkles, LogOut, User, List } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { Avatar } from '../ui/Avatar';
 import { UserSearchDropdown } from '../search/UserSearchDropdown';
@@ -23,15 +23,17 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <nav className="sticky top-0 z-40 bg-[#08080e]/80 backdrop-blur-xl border-b border-white/[0.06]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
         {/* Logo */}
         <Link
           to={user ? '/wishlists' : '/'}
-          className="flex items-center gap-2.5 font-bold text-gray-900 hover:text-violet-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
+          className="flex items-center gap-2.5 font-bold text-white hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
         >
-          <Gift size={24} className="text-violet-600" />
-          <span className="text-lg">Notionary</span>
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-500/30">
+            <Sparkles size={16} className="text-white" />
+          </div>
+          <span className="text-lg tracking-tight">Wishora</span>
         </Link>
 
         {/* Search — only when authenticated */}
@@ -46,16 +48,11 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen((p) => !p)}
-              className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+              className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
               aria-label="Open user menu"
             >
-              <Avatar
-                src={user.avatarUrl}
-                firstName={user.firstName}
-                lastName={user.lastName}
-                size="md"
-              />
-              <span className="hidden sm:block text-base font-medium text-gray-700 max-w-[140px] truncate">
+              <Avatar src={user.avatarUrl} firstName={user.firstName} lastName={user.lastName} size="md" />
+              <span className="hidden sm:block text-sm font-medium text-[#c8c8da] max-w-[140px] truncate">
                 {user.firstName}
               </span>
             </button>
@@ -63,47 +60,29 @@ export function Navbar() {
             <AnimatePresence>
               {menuOpen && (
                 <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setMenuOpen(false)}
-                  />
+                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: -4 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -4 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+                    className="absolute right-0 mt-2 w-52 bg-[#18181f] rounded-xl shadow-2xl shadow-black/50 border border-white/[0.08] overflow-hidden z-50"
                   >
-                    <div className="px-3 py-2.5 border-b border-gray-100">
-                      <p className="text-sm font-semibold text-gray-900 truncate">
-                        {user.firstName} {user.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <div className="px-4 py-3 border-b border-white/[0.06]">
+                      <p className="text-sm font-semibold text-white truncate">{user.firstName} {user.lastName}</p>
+                      <p className="text-xs text-[#9898b4] truncate mt-0.5">{user.email}</p>
                     </div>
-                    <div className="py-1">
-                      <Link
-                        to="/wishlists"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <List size={15} />
+                    <div className="py-1.5">
+                      <Link to="/wishlists" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c8c8da] hover:bg-white/[0.05] hover:text-white transition-colors">
+                        <List size={15} className="text-[#9898b4]" />
                         My Wishlists
                       </Link>
-                      <Link
-                        to="/profile"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        <User size={15} />
+                      <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#c8c8da] hover:bg-white/[0.05] hover:text-white transition-colors">
+                        <User size={15} className="text-[#9898b4]" />
                         Profile
                       </Link>
-                      <button
-                        onClick={() => {
-                          setMenuOpen(false);
-                          void handleLogout();
-                        }}
-                        className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                      >
+                      <div className="my-1 border-t border-white/[0.06]" />
+                      <button onClick={() => { setMenuOpen(false); void handleLogout(); }} className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
                         <LogOut size={15} />
                         Sign out
                       </button>
@@ -115,16 +94,10 @@ export function Navbar() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <Link
-              to="/sign-in"
-              className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg"
-            >
+            <Link to="/sign-in" className="px-3 py-1.5 text-sm font-medium text-[#9898b4] hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-lg">
               Sign in
             </Link>
-            <Link
-              to="/sign-up"
-              className="px-3 py-1.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-700 active:bg-violet-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
-            >
+            <Link to="/sign-up" className="px-3.5 py-1.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08080e]">
               Get started
             </Link>
           </div>

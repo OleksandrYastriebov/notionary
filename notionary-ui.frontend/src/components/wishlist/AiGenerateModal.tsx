@@ -68,14 +68,14 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl"
+              className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-[#111118]/90 backdrop-blur-sm rounded-2xl"
             >
               <div className="relative">
-                <div className="w-12 h-12 rounded-full border-[3px] border-violet-200 border-t-violet-600 animate-spin" />
-                <Sparkles size={16} className="absolute inset-0 m-auto text-violet-600" />
+                <div className="w-12 h-12 rounded-full border-[3px] border-violet-500/30 border-t-violet-500 animate-spin" />
+                <Sparkles size={16} className="absolute inset-0 m-auto text-violet-400" />
               </div>
-              <p className="text-sm font-medium text-gray-700">Generating your wishlist...</p>
-              <p className="text-xs text-gray-400">This may take a few seconds</p>
+              <p className="text-sm font-medium text-white">Generating your wishlist...</p>
+              <p className="text-xs text-[#9898b4]">This may take a few seconds</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -97,7 +97,7 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-5">
           {/* Textarea */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-[#c8c8da]">
               Describe your wishlist
             </label>
             <textarea
@@ -105,16 +105,16 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
               rows={4}
               maxLength={500}
               placeholder="e.g. Birthday wishlist for a tech enthusiast who loves gaming and smart home devices, budget around $500..."
-              className="w-full resize-none rounded-xl border border-gray-200 px-3.5 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition"
+              className="w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.05] px-3.5 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition hover:border-white/[0.14]"
             />
             <div className="flex items-start justify-between gap-2">
               {errors.description ? (
-                <p className="text-xs text-red-500">{errors.description.message}</p>
+                <p className="text-xs text-red-400">{errors.description.message}</p>
               ) : (
                 <span />
               )}
               <span
-                className={`text-xs tabular-nums flex-shrink-0 ${isNearLimit ? 'text-red-500' : 'text-gray-400'}`}
+                className={`text-xs tabular-nums flex-shrink-0 ${isNearLimit ? 'text-red-400' : 'text-[#55556e]'}`}
               >
                 {charsLeft} / 500
               </span>
@@ -123,15 +123,15 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
 
           {/* Visibility toggle */}
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-700">Visibility</span>
-            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+            <span className="text-sm font-medium text-[#c8c8da]">Visibility</span>
+            <div className="flex rounded-lg border border-white/[0.1] overflow-hidden">
               <button
                 type="button"
                 onClick={() => setValue('isPublic', false)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                   !isPublic
                     ? 'bg-violet-600 text-white'
-                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                    : 'bg-[#18181f] text-[#9898b4] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 <Lock size={12} />
@@ -143,7 +143,7 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
                 className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
                   isPublic
                     ? 'bg-violet-600 text-white'
-                    : 'bg-white text-gray-500 hover:bg-gray-50'
+                    : 'bg-[#18181f] text-[#9898b4] hover:bg-white/[0.06] hover:text-white'
                 }`}
               >
                 <Globe size={12} />
@@ -156,7 +156,7 @@ export function AiGenerateModal({ isOpen, onClose }: AiGenerateModalProps) {
           <button
             type="submit"
             disabled={generateMutation.isPending}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-violet-600 to-purple-600 hover:to-purple-700 active:from-violet-700 active:to-purple-800 transition-all disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 shadow-md shadow-violet-200"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 active:from-violet-700 active:to-purple-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08080e] shadow-lg shadow-violet-500/20"
           >
             <Sparkles size={15} />
             Generate Wishlist

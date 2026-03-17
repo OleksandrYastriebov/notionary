@@ -107,10 +107,10 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
       <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className="p-6 space-y-4">
         {/* Image upload */}
         <div>
-          <label className="text-sm font-medium text-gray-700 block mb-2">Cover Image</label>
+          <label className="text-sm font-medium text-[#c8c8da] block mb-2">Cover Image</label>
           <div className="relative">
             {(previewUrl ?? imageUrlValue) ? (
-              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-gray-200 mb-2">
+              <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/[0.08] mb-2">
                 <img
                   src={previewUrl ?? imageUrlValue}
                   alt="Preview"
@@ -124,7 +124,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
                     setValue('imageUrl', '');
                     setImageRemoved(true);
                   }}
-                  className="absolute top-2 right-2 p-1 rounded-lg bg-black/40 text-white hover:bg-black/60 transition-colors text-xs px-2"
+                  className="absolute top-2 right-2 p-1 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors text-xs px-2"
                 >
                   Remove
                 </button>
@@ -133,11 +133,11 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-24 rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:text-violet-500 hover:border-violet-300 transition-colors"
+                className="w-full h-24 rounded-xl border-2 border-dashed border-white/[0.08] flex flex-col items-center justify-center gap-1.5 text-[#55556e] hover:text-violet-400 hover:border-violet-500/40 transition-colors"
               >
                 <ImageIcon size={20} />
                 <span className="text-xs">Upload cover image</span>
-                <span className="text-[11px] text-gray-400">or paste (Ctrl+V)</span>
+                <span className="text-[11px] text-[#55556e]">or paste (Ctrl+V)</span>
               </button>
             )}
             <input
@@ -152,13 +152,13 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 mt-1"
+              className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 mt-1 transition-colors"
             >
               <Upload size={12} />
               Replace image
             </button>
           )}
-          <p className="text-xs text-gray-400 mt-1.5">Max file size: 5 MB</p>
+          <p className="text-xs text-[#55556e] mt-1.5">Max file size: 5 MB</p>
         </div>
 
         <Input
@@ -168,10 +168,10 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
           {...register('title')}
         />
 
-        <div className="flex items-center justify-between p-3.5 rounded-xl border border-gray-200 hover:border-gray-300 transition-colors">
+        <div className="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors bg-white/[0.03]">
           <div>
-            <p className="text-sm font-medium text-gray-800">Public wishlist</p>
-            <p className="text-xs text-gray-500 mt-0.5">Anyone with the link can view it</p>
+            <p className="text-sm font-medium text-[#c8c8da]">Public wishlist</p>
+            <p className="text-xs text-[#9898b4] mt-0.5">Anyone with the link can view it</p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input
@@ -179,7 +179,7 @@ export function WishlistModal({ isOpen, onClose, editWishlist }: WishlistModalPr
               className="sr-only peer"
               {...register('isPublic')}
             />
-            <div className="w-10 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-violet-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
+            <div className="w-10 h-6 bg-white/[0.1] peer-focus:ring-2 peer-focus:ring-violet-500 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600" />
           </label>
         </div>
 

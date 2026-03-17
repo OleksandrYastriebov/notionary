@@ -1,17 +1,17 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Gift, Globe, Lock, Users, ChevronRight } from 'lucide-react';
+import { Gift, Lock, Users, ChevronRight, Sparkles, Globe, Star, Heart, Package } from 'lucide-react';
 
 const features = [
   {
     icon: Gift,
     title: 'Curate your wishlists',
-    desc: 'Organize items from anywhere on the web — links, prices, images and descriptions in one place.',
+    desc: 'Add items from anywhere — links, prices, images and descriptions all in one beautiful place.',
   },
   {
-    icon: Globe,
-    title: 'Share publicly or privately',
-    desc: 'Make lists public for anyone to view, or keep them private and invite specific people by email.',
+    icon: Sparkles,
+    title: 'Generate with AI',
+    desc: "Describe what you want and Wishora's AI will build a complete wishlist for you in seconds.",
   },
   {
     icon: Users,
@@ -39,26 +39,95 @@ const fadeUpDelayed = (delay: number) => ({
   animate: { opacity: 1, y: 0, transition: { duration: 0.4, delay } },
 });
 
+// Bento tile data for the decorative preview section
+const bentoTiles = [
+  {
+    colSpan: 'lg:col-span-2 sm:col-span-2',
+    gradient: 'from-violet-600/30 to-purple-700/20',
+    icon: Heart,
+    label: 'Birthday Wishlist',
+    sub: '8 items · 2 reserved',
+    badge: 'Public',
+    badgeColor: 'bg-emerald-500/20 text-emerald-400',
+  },
+  {
+    colSpan: 'col-span-1',
+    gradient: 'from-blue-600/30 to-indigo-700/20',
+    icon: Star,
+    label: 'Holiday Gifts',
+    sub: '12 items',
+    badge: 'Private',
+    badgeColor: 'bg-white/10 text-white/40',
+  },
+  {
+    colSpan: 'col-span-1',
+    gradient: 'from-amber-600/30 to-orange-700/20',
+    icon: Package,
+    label: 'Tech Gadgets',
+    sub: '5 items · 1 reserved',
+    badge: 'Public',
+    badgeColor: 'bg-emerald-500/20 text-emerald-400',
+  },
+  {
+    colSpan: 'lg:col-span-2 sm:col-span-2',
+    gradient: 'from-emerald-600/30 to-teal-700/20',
+    icon: Gift,
+    label: 'Wedding Registry',
+    sub: '24 items · 8 reserved',
+    badge: 'Private',
+    badgeColor: 'bg-white/10 text-white/40',
+  },
+  {
+    colSpan: 'col-span-1',
+    gradient: 'from-pink-600/30 to-rose-700/20',
+    icon: Sparkles,
+    label: 'Dream Items',
+    sub: '3 items',
+    badge: 'Private',
+    badgeColor: 'bg-white/10 text-white/40',
+  },
+  {
+    colSpan: 'col-span-1',
+    gradient: 'from-violet-600/30 to-fuchsia-700/20',
+    icon: Globe,
+    label: 'Travel Gear',
+    sub: '7 items · 3 reserved',
+    badge: 'Public',
+    badgeColor: 'bg-emerald-500/20 text-emerald-400',
+  },
+];
+
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
+      {/* Dark base + landing aurora mesh — fixed */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-[#08080e]" />
+        <div className="absolute -top-48 -left-48 w-[800px] h-[800px] rounded-full bg-violet-700/[0.22] blur-[160px]" />
+        <div className="absolute top-[20%] -right-72 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.16] blur-[180px]" />
+        <div className="absolute top-[55%] left-[15%] w-[500px] h-[500px] rounded-full bg-purple-800/[0.14] blur-[200px]" />
+        <div className="absolute bottom-0 right-[10%] w-[400px] h-[400px] rounded-full bg-fuchsia-700/[0.10] blur-[160px]" />
+      </div>
+
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100">
+      <nav className="sticky top-0 z-40 bg-[#08080e]/80 backdrop-blur-xl border-b border-white/[0.06]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
-          <div className="flex items-center gap-2 font-bold text-gray-900">
-            <Gift size={20} className="text-violet-600" />
-            <span>Notionary</span>
+          <div className="flex items-center gap-2.5 font-bold text-white">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-md shadow-violet-500/30">
+              <Sparkles size={14} className="text-white" />
+            </div>
+            <span>Wishora</span>
           </div>
           <div className="flex items-center gap-2">
             <Link
               to="/sign-in"
-              className="px-3 py-1.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+              className="px-3 py-1.5 text-sm font-medium text-[#9898b4] hover:text-white transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
             >
               Sign in
             </Link>
             <Link
               to="/sign-up"
-              className="px-3 py-1.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-700 active:bg-violet-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+              className="px-3.5 py-1.5 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-500 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08080e]"
             >
               Get started free
             </Link>
@@ -67,32 +136,34 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
+      <section className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
+        {/* Hero-specific radial glow on top of the mesh */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(139,92,246,0.22),transparent)] pointer-events-none" />
         <motion.div
           variants={stagger}
           initial="initial"
           animate="animate"
-          className="flex flex-col items-center"
+          className="flex flex-col items-center relative"
         >
           <motion.div
             variants={fadeUp}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200 text-violet-700 text-sm font-medium mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-sm font-medium mb-6"
           >
-            <Gift size={14} />
-            Wishlist management, reimagined
+            <Sparkles size={14} />
+            Where wishes come to life
           </motion.div>
 
           <motion.h1
             variants={fadeUp}
-            className="text-4xl sm:text-6xl font-bold text-gray-900 leading-tight tracking-tight max-w-3xl"
+            className="text-4xl sm:text-6xl font-bold text-white leading-tight tracking-tight max-w-3xl"
           >
             Your wishlists,{' '}
-            <span className="text-violet-600">beautifully organized</span>
+            <span className="text-violet-400">beautifully organized</span>
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
-            className="mt-5 text-lg text-gray-500 max-w-xl leading-relaxed"
+            className="mt-5 text-lg text-[#9898b4] max-w-xl leading-relaxed"
           >
             Create and share wishlists for any occasion. Let friends secretly coordinate
             gifts without spoiling the surprise.
@@ -101,18 +172,54 @@ export default function LandingPage() {
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 mt-8">
             <Link
               to="/sign-up"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-white bg-violet-600 rounded-xl hover:bg-violet-700 active:bg-violet-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-white bg-violet-600 rounded-xl hover:bg-violet-500 active:bg-violet-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08080e]"
             >
               Create your first wishlist
               <ChevronRight size={18} />
             </Link>
             <Link
               to="/sign-in"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-semibold text-white bg-white/[0.07] rounded-xl hover:bg-white/[0.1] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
             >
               Sign in
             </Link>
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Bento preview section */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-8 pb-16">
+        <motion.div
+          {...fadeUpDelayed(0.3)}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
+        >
+          {bentoTiles.map((tile, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: 0.3 + i * 0.06 }}
+              className={`${tile.colSpan} relative bg-[#111118] rounded-2xl border border-white/[0.06] overflow-hidden`}
+              style={{ minHeight: '160px' }}
+            >
+              {/* Gradient background */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${tile.gradient} opacity-60`} />
+              <div className="relative p-5 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.1] flex items-center justify-center">
+                    <tile.icon size={18} className="text-white/70" />
+                  </div>
+                  <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium border border-white/10 ${tile.badgeColor}`}>
+                    {tile.badge}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white text-sm">{tile.label}</h3>
+                  <p className="text-white/40 text-xs mt-0.5">{tile.sub}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
       </section>
 
@@ -129,13 +236,13 @@ export default function LandingPage() {
             <motion.div
               key={f.title}
               variants={fadeUp}
-              className="p-5 rounded-2xl bg-gray-50 border border-gray-100 hover:border-violet-200 hover:bg-violet-50/30 transition-colors group"
+              className="p-5 rounded-2xl bg-[#111118] border border-white/[0.06] hover:border-violet-500/30 hover:bg-[#18181f] transition-colors group"
             >
-              <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center mb-3 group-hover:bg-violet-200 transition-colors">
-                <f.icon size={18} className="text-violet-600" />
+              <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center mb-3 group-hover:bg-violet-500/20 transition-colors">
+                <f.icon size={18} className="text-violet-400" />
               </div>
-              <h3 className="font-semibold text-gray-900 text-sm mb-1.5">{f.title}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+              <h3 className="font-semibold text-white text-sm mb-1.5">{f.title}</h3>
+              <p className="text-xs text-[#9898b4] leading-relaxed">{f.desc}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -145,17 +252,17 @@ export default function LandingPage() {
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <motion.div
           {...fadeUpDelayed(0.7)}
-          className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-3xl p-10 text-center text-white"
+          className="bg-gradient-to-br from-violet-700 to-purple-800 rounded-3xl p-10 text-center text-white"
         >
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">
             Ready to share your wishes?
           </h2>
           <p className="text-violet-200 mb-6 text-base">
-            Join thousands of people who use Notionary to organize their wishlists.
+            Join thousands of people who use Wishora to organize their wishlists.
           </p>
           <Link
             to="/sign-up"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-700 font-semibold rounded-xl hover:bg-violet-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-600"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-700 font-semibold rounded-xl hover:bg-violet-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-violet-700"
           >
             Get started for free
             <ChevronRight size={16} />
@@ -164,10 +271,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 py-8 text-center text-sm text-gray-400">
+      <footer className="border-t border-white/[0.06] py-8 text-center text-sm text-[#55556e]">
         <div className="flex items-center justify-center gap-2">
-          <Gift size={14} className="text-violet-400" />
-          <span>Notionary — wishlist management</span>
+          <Sparkles size={14} className="text-violet-500/50" />
+          <span>Wishora — where wishes come to life</span>
         </div>
       </footer>
     </div>

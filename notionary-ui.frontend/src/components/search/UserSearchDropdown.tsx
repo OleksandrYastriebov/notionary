@@ -68,16 +68,16 @@ export function UserSearchDropdown() {
   );
 
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative w-full">
       {/* Search input */}
       <div
         className={cn(
           'flex items-center gap-2 h-9 px-3 rounded-xl border transition-all duration-200',
-          'bg-gray-50 border-gray-200',
-          'focus-within:bg-white focus-within:border-violet-400 focus-within:shadow-sm focus-within:shadow-violet-100'
+          'bg-white/[0.04] border-white/[0.08]',
+          'focus-within:bg-white/[0.07] focus-within:border-violet-500/50 focus-within:shadow-sm focus-within:shadow-violet-500/10'
         )}
       >
-        <Search size={14} className="text-gray-400 flex-shrink-0" />
+        <Search size={14} className="text-[#55556e] flex-shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -89,7 +89,7 @@ export function UserSearchDropdown() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search people..."
-          className="bg-transparent text-sm text-gray-800 placeholder-gray-400 outline-none w-32 sm:w-44 md:w-52"
+          className="bg-transparent text-sm text-white placeholder:text-white/25 outline-none w-32 sm:w-44 md:w-52"
           aria-label="Search users"
           aria-expanded={showDropdown}
           aria-autocomplete="list"
@@ -103,7 +103,7 @@ export function UserSearchDropdown() {
               exit={{ opacity: 0, scale: 0.7 }}
               transition={{ duration: 0.1 }}
               onClick={handleClear}
-              className="text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors focus-visible:outline-none rounded"
+              className="text-[#55556e] hover:text-[#9898b4] active:text-white transition-colors focus-visible:outline-none rounded"
               aria-label="Clear search"
             >
               <X size={13} />
@@ -123,7 +123,7 @@ export function UserSearchDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full mt-1.5 w-64 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden z-50"
+            className="absolute left-0 top-full mt-1.5 w-64 bg-[#18181f] rounded-xl shadow-2xl shadow-black/50 border border-white/[0.08] overflow-hidden z-50"
             role="listbox"
             aria-label="Search results"
           >
@@ -139,7 +139,7 @@ export function UserSearchDropdown() {
                   >
                     <button
                       onClick={() => handleSelectUser(user.id)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-violet-50 active:bg-violet-100 transition-colors text-left focus-visible:outline-none focus-visible:bg-violet-50"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors text-left focus-visible:outline-none focus-visible:bg-white/[0.06]"
                     >
                       <Avatar
                         src={user.avatarUrl}
@@ -148,7 +148,7 @@ export function UserSearchDropdown() {
                         size="sm"
                       />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-[#c8c8da] truncate">
                           {user.firstName} {user.lastName}
                         </p>
                       </div>
@@ -160,14 +160,14 @@ export function UserSearchDropdown() {
 
             {showEmpty && (
               <div className="px-4 py-4 text-center">
-                <p className="text-sm text-gray-400">No users found</p>
+                <p className="text-sm text-[#55556e]">No users found</p>
               </div>
             )}
 
             {isFetching && !showResults && (
               <div className="px-4 py-4 flex items-center justify-center gap-2">
                 <Loader2 size={14} className="text-violet-400 animate-spin" />
-                <span className="text-sm text-gray-400">Searching...</span>
+                <span className="text-sm text-[#9898b4]">Searching...</span>
               </div>
             )}
           </motion.div>

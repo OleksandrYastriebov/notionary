@@ -142,8 +142,8 @@ export default function ProfilePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Profile</h1>
-          <p className="text-sm text-gray-500">Manage your account settings</p>
+          <h1 className="text-2xl font-bold text-white mb-1">Profile</h1>
+          <p className="text-sm text-[#9898b4]">Manage your account settings</p>
         </motion.div>
 
         {/* Avatar section */}
@@ -151,7 +151,7 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+          className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6"
         >
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -164,24 +164,24 @@ export default function ProfilePage() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadMutation.isPending}
-                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-violet-600 text-white hover:bg-violet-700 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 disabled:opacity-60"
+                className="absolute bottom-0 right-0 p-1.5 rounded-full bg-violet-600 text-white hover:bg-violet-500 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 disabled:opacity-60"
                 aria-label="Change avatar"
               >
                 <Camera size={12} />
               </button>
             </div>
             <div>
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold text-white">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <p className="text-sm text-[#9898b4]">{user.email}</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="text-xs text-violet-600 hover:text-violet-700 mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
+                className="text-xs text-violet-400 hover:text-violet-300 mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded transition-colors"
               >
                 {uploadMutation.isPending ? 'Uploading...' : 'Change photo'}
               </button>
-              <p className="text-xs text-gray-400 mt-0.5">Max file size: 5 MB</p>
+              <p className="text-xs text-[#55556e] mt-0.5">Max file size: 5 MB</p>
             </div>
           </div>
           <input
@@ -198,9 +198,9 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+          className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6"
         >
-          <h2 className="text-base font-semibold text-gray-900 mb-4">Personal Information</h2>
+          <h2 className="text-base font-semibold text-white mb-4">Personal Information</h2>
           <form
             onSubmit={(e) => void handleProfile(onProfileSave)(e)}
             className="space-y-4"
@@ -236,10 +236,10 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
-          className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6"
+          className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6"
         >
-          <h2 className="text-base font-semibold text-gray-900 mb-1">Security</h2>
-          <p className="text-sm text-gray-500 mb-4">Manage your password</p>
+          <h2 className="text-base font-semibold text-white mb-1">Security</h2>
+          <p className="text-sm text-[#9898b4] mb-4">Manage your password</p>
           <Button
             variant="secondary"
             leftIcon={<Key size={15} />}
@@ -254,13 +254,13 @@ export default function ProfilePage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
-          className="bg-white rounded-2xl border border-red-100 shadow-sm p-6"
+          className="bg-red-500/5 rounded-2xl border border-red-500/20 p-6"
         >
           <div className="flex items-center gap-2 mb-1">
-            <AlertTriangle size={16} className="text-red-500" />
-            <h2 className="text-base font-semibold text-red-700">Danger Zone</h2>
+            <AlertTriangle size={16} className="text-red-400" />
+            <h2 className="text-base font-semibold text-red-400">Danger Zone</h2>
           </div>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-[#9898b4] mb-4">
             Permanently delete your account and all associated data. This cannot be undone.
           </p>
           <Button
@@ -306,7 +306,7 @@ export default function ProfilePage() {
             {...regPassword('confirmPassword')}
           />
           {passwordErrors.root && (
-            <p className="text-sm text-red-500">{passwordErrors.root.message}</p>
+            <p className="text-sm text-red-400">{passwordErrors.root.message}</p>
           )}
           <div className="flex gap-3">
             <Button
@@ -339,21 +339,21 @@ export default function ProfilePage() {
         size="sm"
       >
         <div className="p-6">
-          <div className="p-3 rounded-xl bg-red-50 border border-red-200 mb-4">
-            <p className="text-sm text-red-700 leading-relaxed">
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 mb-4">
+            <p className="text-sm text-red-300 leading-relaxed">
               This will permanently delete your account, all wishlists, items, and comments.
               <strong> This action cannot be undone.</strong>
             </p>
           </div>
-          <p className="text-sm text-gray-600 mb-3">
-            Type <strong>DELETE</strong> to confirm:
+          <p className="text-sm text-[#9898b4] mb-3">
+            Type <strong className="text-white">DELETE</strong> to confirm:
           </p>
           <input
             type="text"
             value={deleteConfirmText}
             onChange={(e) => setDeleteConfirmText(e.target.value)}
             placeholder="DELETE"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-400"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.05] text-white placeholder:text-white/25 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors"
           />
           <div className="flex gap-3">
             <Button

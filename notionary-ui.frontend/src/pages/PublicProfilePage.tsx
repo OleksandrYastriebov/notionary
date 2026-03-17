@@ -30,40 +30,44 @@ function ProfileWishlistCard({ wishlist, ownerUserId, index }: ProfileWishlistCa
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.06 }}
-      className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+      className="group bg-[#111118] rounded-2xl overflow-hidden border border-white/[0.06] hover:border-violet-500/30 hover:shadow-xl hover:shadow-violet-500/10 transition-all duration-300"
     >
       <Link
         to={`/wishlists/${wishlist.id}`}
         state={{ fromProfileId: ownerUserId }}
         className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded-2xl"
       >
-        <ImageFallback
-          src={wishlist.imageUrl}
-          alt={wishlist.title}
-          initials={wishlist.title.slice(0, 2).toUpperCase()}
-          className="w-full h-44"
-        />
-        <div className="p-4">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold text-gray-900 truncate group-hover:text-violet-600 transition-colors flex items-center gap-1">
+        <div className="relative overflow-hidden" style={{ aspectRatio: '4/3' }}>
+          <ImageFallback
+            src={wishlist.imageUrl}
+            alt={wishlist.title}
+            initials={wishlist.title.slice(0, 2).toUpperCase()}
+            className="w-full h-full group-hover:scale-105 transition-transform duration-500"
+          />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d14] via-[#0d0d14]/30 to-transparent" />
+
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <h3 className="font-bold text-white text-base truncate drop-shadow-sm flex items-center gap-1">
               {wishlist.title}
               <ChevronRight
                 size={14}
-                className="text-gray-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                className="text-white/40 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
               />
             </h3>
-          </div>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="flex items-center gap-1 text-xs text-gray-500">
-              <Globe size={12} className="text-emerald-500" />
-              Public
-            </span>
-            <span className="text-xs text-gray-400">
-              {itemCount} {itemCount === 1 ? 'item' : 'items'}
-            </span>
-            {itemCount > 0 && (
-              <span className="text-xs text-gray-400">{checkedCount} reserved</span>
-            )}
+            <div className="flex items-center gap-3 mt-1">
+              <span className="flex items-center gap-1 text-xs text-white/50">
+                <Globe size={10} className="text-emerald-400" />
+                Public
+              </span>
+              <span className="text-xs text-white/40">
+                {itemCount} {itemCount === 1 ? 'item' : 'items'}
+              </span>
+              {itemCount > 0 && (
+                <span className="text-xs text-white/40">{checkedCount} reserved</span>
+              )}
+            </div>
           </div>
         </div>
       </Link>
@@ -90,10 +94,10 @@ export default function PublicProfilePage() {
     return (
       <Layout>
         <div className="text-center py-16 space-y-3">
-          <p className="text-gray-500 text-sm">User not found or the profile is unavailable.</p>
+          <p className="text-[#9898b4] text-sm">User not found or the profile is unavailable.</p>
           <button
             onClick={() => navigate(-1)}
-            className="text-violet-600 hover:underline text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
+            className="text-violet-400 hover:text-violet-300 hover:underline text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded transition-colors"
           >
             Go back
           </button>
@@ -107,7 +111,7 @@ export default function PublicProfilePage() {
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
+        className="flex items-center gap-1.5 text-sm text-[#9898b4] hover:text-white transition-colors mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
       >
         <ArrowLeft size={15} />
         Back
@@ -129,7 +133,7 @@ export default function PublicProfilePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex items-center gap-5"
+            className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6 flex items-center gap-5"
           >
             <Avatar
               src={profile.user.avatarUrl}
@@ -138,10 +142,10 @@ export default function PublicProfilePage() {
               size="xl"
             />
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-white">
                 {profile.user.firstName} {profile.user.lastName}
               </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-sm text-[#9898b4] mt-0.5">
                 {profile.publicWishlists.length}{' '}
                 {profile.publicWishlists.length === 1 ? 'public wishlist' : 'public wishlists'}
               </p>
@@ -150,7 +154,7 @@ export default function PublicProfilePage() {
 
           {/* Wishlists section */}
           <div>
-            <h2 className="text-base font-semibold text-gray-700 mb-3">Public wishlists</h2>
+            <h2 className="text-base font-semibold text-[#c8c8da] mb-3">Public wishlists</h2>
 
             {profile.publicWishlists.length === 0 ? (
               <EmptyState
