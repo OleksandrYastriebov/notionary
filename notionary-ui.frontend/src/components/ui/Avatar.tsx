@@ -1,4 +1,5 @@
 import { cn } from '../../utils/cn';
+import { useState, useEffect } from 'react';
 
 interface AvatarProps {
   src?: string | null;
@@ -41,8 +42,13 @@ function getColor(firstName?: string, lastName?: string): string {
 
 export function Avatar({ src, firstName, lastName, size = 'md', className }: AvatarProps) {
   const sizeClass = sizeClasses[size];
+  const [imageError, setImageError] = useState(false);
 
-  if (src) {
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
+  if (src && !imageError) {
     return (
       <img
         src={src}
@@ -52,10 +58,7 @@ export function Avatar({ src, firstName, lastName, size = 'md', className }: Ava
           sizeClass,
           className
         )}
-        onError={(e) => {
-          // fallback: hide broken image and let parent re-render or use initials
-          (e.target as HTMLImageElement).style.display = 'none';
-        }}
+        onError={() => setImageError(true)}
       />
     );
   }

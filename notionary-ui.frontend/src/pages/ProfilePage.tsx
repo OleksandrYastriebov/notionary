@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
-import { Camera, Key, Trash2, AlertTriangle } from 'lucide-react';
+import { Camera, Key, Trash2, AlertTriangle, Trash } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
@@ -48,6 +48,7 @@ export default function ProfilePage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingAvatar, setIsDeletingAvatar] = useState(false);
 
   // Profile form
   const {
@@ -97,6 +98,20 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
     void handleAvatarFile(file);
+  };
+
+  const handleDeleteAvatar = async () => {
+    if (!user?.avatarUrl || isDeletingAvatar) return;
+    setIsDeletingAvatar(true);
+    try {
+      const updated = await updateMe({ avatarUrl: null });
+      updateUser(updated);
+      toast.success('Avatar deleted!');
+    } catch {
+      toast.error('Failed to delete avatar.');
+    } finally {
+      setIsDeletingAvatar(false);
+    }
   };
 
   useClipboardPaste((file) => void handleAvatarFile(file));
@@ -169,18 +184,31 @@ export default function ProfilePage() {
               >
                 <Camera size={12} />
               </button>
+              {user.avatarUrl && (
+                <button
+                  onClick={() => void handleDeleteAvatar()}
+                  disabled={uploadMutation.isPending || isDeletingAvatar}
+                  className="absolute bottom-0 left-0 p-1.5 rounded-full bg-red-600 text-white hover:bg-red-500 transition-colors shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-60"
+                  aria-label="Remove avatar"
+                >
+                  <Trash size={12} />
+                </button>
+              )}
             </div>
-            <div>
+            <div className="flex-1">
               <p className="font-semibold text-white">
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-sm text-[#9898b4]">{user.email}</p>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="text-xs text-violet-400 hover:text-violet-300 mt-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded transition-colors"
-              >
-                {uploadMutation.isPending ? 'Uploading...' : 'Change photo'}
-              </button>
+              <div className="flex gap-2 mt-1">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadMutation.isPending}
+                  className="text-xs text-violet-400 hover:text-violet-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded transition-colors disabled:opacity-60"
+                >
+                  {uploadMutation.isPending ? 'Uploading...' : 'Change photo'}
+                </button>
+              </div>
               <p className="text-xs text-[#55556e] mt-0.5">Max file size: 5 MB</p>
             </div>
           </div>
