@@ -41,6 +41,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Used for /sign-in and /sign-up: shows a spinner while auth resolves to avoid
+// a flash of the auth form for already-logged-in users.
 function GuestRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
 
@@ -59,17 +61,23 @@ function GuestRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Used for the landing page (/): renders immediately without waiting for auth,
+// so animations and sections are always visible on hard refresh.
+// Redirects to /wishlists only once auth is confirmed.
+function LandingRoute() {
+  const { user, isLoading } = useAuth();
+
+  if (!isLoading && user) {
+    return <Navigate to="/wishlists" replace />;
+  }
+
+  return <LandingPage />;
+}
+
 function AppRoutes() {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          <GuestRoute>
-            <LandingPage />
-          </GuestRoute>
-        }
-      />
+      <Route path="/" element={<LandingRoute />} />
       <Route
         path="/sign-in"
         element={

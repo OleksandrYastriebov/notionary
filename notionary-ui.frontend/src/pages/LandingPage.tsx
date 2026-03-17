@@ -34,6 +34,11 @@ const fadeUp = {
   animate: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
+const fadeUpDelayed = (delay: number) => ({
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.4, delay } },
+});
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -116,8 +121,8 @@ export default function LandingPage() {
         <motion.div
           variants={stagger}
           initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
+          animate="animate"
+          transition={{ delayChildren: 0.35 }}
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
         >
           {features.map((f) => (
@@ -139,10 +144,7 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
+          {...fadeUpDelayed(0.7)}
           className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-3xl p-10 text-center text-white"
         >
           <h2 className="text-2xl sm:text-3xl font-bold mb-3">

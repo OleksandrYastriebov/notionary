@@ -3,6 +3,7 @@ package com.api.notionary.service.ai;
 import com.api.notionary.dto.payload.request.ai.GenerateDescriptionRequest;
 import com.api.notionary.entity.User;
 import com.api.notionary.entity.UserRole;
+import com.api.notionary.service.WishListItemService;
 import com.api.notionary.service.WishListService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,9 @@ import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.mockito.ArgumentMatchers;
+
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -35,6 +38,9 @@ class AiAssistantServiceTest {
     @Mock
     private WishListService wishListService;
 
+    @Mock
+    private WishListItemService wishListItemService;
+
     private AiAssistantService aiAssistantService;
 
     private User user;
@@ -44,7 +50,7 @@ class AiAssistantServiceTest {
     @BeforeEach
     void setUp() {
         when(chatClientBuilder.build()).thenReturn(chatClient);
-        aiAssistantService = new AiAssistantService(chatClientBuilder, wishListService);
+        aiAssistantService = new AiAssistantService(chatClient, wishListService, wishListItemService);
 
         user = new User("Jane", "Doe", "jane@notionary.app", "hashed",
                 Instant.now(), UserRole.ROLE_USER);

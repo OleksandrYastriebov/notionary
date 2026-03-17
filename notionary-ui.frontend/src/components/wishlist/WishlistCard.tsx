@@ -6,6 +6,7 @@ import type { WishListDto } from '../../types';
 import { ImageFallback } from '../ui/ImageFallback';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { useDeleteWishlist } from '../../hooks/useWishlists';
+import { useIsOverflowing } from '../../hooks/useIsOverflowing';
 
 interface WishlistCardProps {
   wishlist: WishListDto;
@@ -17,6 +18,7 @@ interface WishlistCardProps {
 export function WishlistCard({ wishlist, isOwner, onEdit, onShare }: WishlistCardProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const deleteMutation = useDeleteWishlist();
+  const { ref: titleRef, isOverflowing: titleOverflowing } = useIsOverflowing<HTMLDivElement>();
 
   const handleDelete = () => {
     deleteMutation.mutate(wishlist.id, {
@@ -51,12 +53,21 @@ export function WishlistCard({ wishlist, isOwner, onEdit, onShare }: WishlistCar
           <div className="flex items-start justify-between gap-2">
             <Link
               to={`/wishlists/${wishlist.id}`}
-              className="flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
+              className="flex items-center gap-1 flex-1 min-w-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 rounded"
             >
-              <h3 className="font-semibold text-gray-900 truncate hover:text-violet-600 transition-colors flex items-center gap-1">
-                {wishlist.title}
-                <ChevronRight size={14} className="text-gray-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </h3>
+              <div
+                ref={titleRef}
+                className="relative flex-1 min-w-0 overflow-hidden"
+                title={titleOverflowing ? wishlist.title : undefined}
+              >
+                <h3 className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors whitespace-nowrap">
+                  {wishlist.title}
+                </h3>
+                {titleOverflowing && (
+                  <div className="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+                )}
+              </div>
+              <ChevronRight size={14} className="text-violet-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
             </Link>
 
             {isOwner && (

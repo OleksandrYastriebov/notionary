@@ -1,7 +1,13 @@
 package com.api.notionary.controller;
 
+import com.api.notionary.controller.docs.ApiBadRequestDoc;
+import com.api.notionary.controller.docs.ApiGenerateWishlistDoc;
+import com.api.notionary.controller.docs.ApiUnauthorizedErrorDoc;
+import com.api.notionary.controller.docs.ApiWishlistLimitReachedDoc;
 import com.api.notionary.dto.ai.AiDescriptionDto;
 import com.api.notionary.dto.payload.request.ai.GenerateDescriptionRequest;
+import com.api.notionary.dto.payload.request.ai.GenerateWishlistRequest;
+import com.api.notionary.dto.wishlist.WishListDto;
 import com.api.notionary.entity.User;
 import com.api.notionary.security.interceptor.RateLimitPlan;
 import com.api.notionary.security.interceptor.RateLimited;
@@ -9,6 +15,7 @@ import com.api.notionary.service.ai.AiAssistantService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,5 +39,16 @@ public class AiController {
                                                                 @AuthenticationPrincipal User user) {
         String description = aiAssistantService.generateDescription(request, wishlistId, user);
         return ResponseEntity.ok(new AiDescriptionDto(description));
+    }
+
+    @ApiGenerateWishlistDoc
+    @ApiBadRequestDoc
+    @ApiUnauthorizedErrorDoc
+    @ApiWishlistLimitReachedDoc
+    @PostMapping("/wishlists/generate-wishlists")
+    public ResponseEntity<WishListDto> generateWishlist(@Valid @RequestBody GenerateWishlistRequest request,
+                                                        @AuthenticationPrincipal User user) {
+        WishListDto wishList = aiAssistantService.generateWishlist(request, user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(wishList);
     }
 }
