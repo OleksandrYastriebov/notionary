@@ -179,3 +179,8 @@ export interface GenerateDescriptionRequest {
 export interface GenerateDescriptionResponse {
   description: string;
 }
+
+export interface GenerateWishlistRequest {
+  description: string;
+  isPublic?: boolean;
+}

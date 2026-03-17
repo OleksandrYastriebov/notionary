@@ -23,6 +23,7 @@ import type {
   ImageUploadResponse,
   GenerateDescriptionRequest,
   GenerateDescriptionResponse,
+  GenerateWishlistRequest,
   PublicUserDto,
   UserProfileResponseDto,
 } from '../types';
@@ -142,6 +143,9 @@ export const generateItemDescription = (
       data
     )
     .then((r) => r.data);
+
+export const generateWishlist = (data: GenerateWishlistRequest) =>
+  api.post<WishListDto>('/ai/wishlists/generate-wishlists', data).then((r) => r.data);
 
 // ─── Profiles ─────────────────────────────────────────────────────────────────
 

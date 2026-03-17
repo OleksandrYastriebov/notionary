@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Gift } from 'lucide-react';
+import { Plus, Gift, Sparkles } from 'lucide-react';
 import { useWishlists } from '../hooks/useWishlists';
 import { useAuth } from '../hooks/useAuth';
 import { Layout } from '../components/layout/Layout';
 import { WishlistCard } from '../components/wishlist/WishlistCard';
 import { WishlistModal } from '../components/wishlist/WishlistModal';
 import { ShareModal } from '../components/wishlist/ShareModal';
+import { AiGenerateModal } from '../components/wishlist/AiGenerateModal';
 import { WishlistCardSkeleton } from '../components/ui/SkeletonLoader';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Button } from '../components/ui/Button';
@@ -18,6 +19,7 @@ export default function WishlistsPage() {
   const { user } = useAuth();
   const { data, isLoading, isError } = useWishlists();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(false);
   const [editWishlist, setEditWishlist] = useState<WishListDto | null>(null);
   const [shareWishlist, setShareWishlist] = useState<WishListDto | null>(null);
 
@@ -42,12 +44,27 @@ export default function WishlistsPage() {
         </div>
 
         {!atLimit && (
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            leftIcon={<Plus size={16} />}
-          >
-            New wishlist
-          </Button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsAiOpen(true)}
+              className="relative inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl hover:from-violet-600 hover:to-purple-700 active:from-violet-700 active:to-purple-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 shadow-md shadow-violet-200/60 overflow-hidden"
+            >
+              <motion.span
+                className="absolute inset-0 bg-white/20"
+                initial={{ x: '-100%', skewX: '-15deg' }}
+                animate={{ x: '200%', skewX: '-15deg' }}
+                transition={{ repeat: Infinity, repeatDelay: 3, duration: 0.6, ease: 'easeInOut' }}
+              />
+              <Sparkles size={15} />
+              Generate with AI
+            </button>
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              leftIcon={<Plus size={16} />}
+            >
+              New wishlist
+            </Button>
+          </div>
         )}
       </div>
 
@@ -108,6 +125,7 @@ export default function WishlistsPage() {
       )}
 
       {/* Modals */}
+      <AiGenerateModal isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
       <WishlistModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
       <WishlistModal
         isOpen={!!editWishlist}

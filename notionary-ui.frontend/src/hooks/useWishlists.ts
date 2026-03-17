@@ -5,8 +5,9 @@ import {
   createWishlist,
   updateWishlist,
   deleteWishlist,
+  generateWishlist,
 } from '../api/endpoints';
-import type { CreateWishlistRequest, UpdateWishlistRequest } from '../types';
+import type { CreateWishlistRequest, GenerateWishlistRequest, UpdateWishlistRequest, WishListDto } from '../types';
 
 export const WISHLISTS_KEY = ['wishlists'] as const;
 
@@ -57,6 +58,21 @@ export function useDeleteWishlist() {
     },
     onError: () => {
       toast.error('Failed to delete wishlist.');
+    },
+  });
+}
+
+export function useGenerateWishlist(onSuccess?: (wishlist: WishListDto) => void) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: GenerateWishlistRequest) => generateWishlist(data),
+    onSuccess: (wishlist) => {
+      void qc.invalidateQueries({ queryKey: WISHLISTS_KEY });
+      toast.success('Wishlist generated!');
+      onSuccess?.(wishlist);
+    },
+    onError: () => {
+      toast.error('Failed to generate wishlist. Please try again.');
     },
   });
 }
