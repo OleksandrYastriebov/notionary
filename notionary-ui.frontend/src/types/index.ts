@@ -42,7 +42,7 @@ export interface UserProfileDto {
 export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 }
 
 export interface ChangePasswordRequest {
