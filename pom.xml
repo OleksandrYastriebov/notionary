@@ -8,11 +8,11 @@
         <version>4.0.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.api.notionary</groupId>
-    <artifactId>notionary</artifactId>
+    <groupId>com.api.wishoria</groupId>
+    <artifactId>wishoria</artifactId>
     <version>1.0.0</version>
-    <name>notionary</name>
-    <description>Notionary project</description>
+    <name>wishoria</name>
+    <description>Wishoria project</description>
     <url/>
     <licenses>
         <license/>
