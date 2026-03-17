@@ -11,7 +11,7 @@ const features = [
   {
     icon: Sparkles,
     title: 'Generate with AI',
-    desc: "Describe what you want and Wishora's AI will build a complete wishlist for you in seconds.",
+    desc: "Describe what you want and Wishoria's AI will build a complete wishlist for you in seconds.",
   },
   {
     icon: Users,
@@ -103,20 +103,30 @@ export default function LandingPage() {
       {/* Dark base + landing aurora mesh — fixed */}
       <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
         <div className="absolute inset-0 bg-[#08080e]" />
+        {/* Violet — top-left hero glow */}
         <div className="absolute -top-48 -left-48 w-[800px] h-[800px] rounded-full bg-violet-700/[0.22] blur-[160px]" />
-        <div className="absolute top-[20%] -right-72 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.16] blur-[180px]" />
-        <div className="absolute top-[55%] left-[15%] w-[500px] h-[500px] rounded-full bg-purple-800/[0.14] blur-[200px]" />
-        <div className="absolute bottom-0 right-[10%] w-[400px] h-[400px] rounded-full bg-fuchsia-700/[0.10] blur-[160px]" />
+        {/* Tiffany — top-right */}
+        <div className="absolute -top-24 right-0 w-[550px] h-[550px] rounded-full bg-[#0abfbc]/[0.10] blur-[180px]" />
+        {/* Indigo — mid-right */}
+        <div className="absolute top-[20%] -right-72 w-[600px] h-[600px] rounded-full bg-indigo-600/[0.13] blur-[180px]" />
+        {/* Pink — mid-center-left */}
+        <div className="absolute top-[40%] left-[10%] w-[500px] h-[500px] rounded-full bg-pink-600/[0.10] blur-[180px]" />
+        {/* Purple — lower-left */}
+        <div className="absolute top-[55%] left-[15%] w-[500px] h-[500px] rounded-full bg-purple-800/[0.12] blur-[200px]" />
+        {/* Tiffany — bottom-right */}
+        <div className="absolute bottom-0 right-[5%] w-[450px] h-[450px] rounded-full bg-[#2dd4bf]/[0.09] blur-[160px]" />
+        {/* Fuchsia/pink — bottom-center */}
+        <div className="absolute -bottom-20 left-[35%] w-[500px] h-[350px] rounded-full bg-fuchsia-700/[0.09] blur-[160px]" />
       </div>
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-40 bg-[#08080e]/80 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+      <nav className="sticky top-0 z-40 px-3 sm:px-5 pt-3 pb-1.5">
+        <div className="max-w-5xl mx-auto bg-[#13131f]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl shadow-black/30 px-4 sm:px-5 flex items-center justify-between h-14">
           <div className="flex items-center gap-2.5 font-bold text-white">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-md shadow-violet-500/30">
               <Sparkles size={14} className="text-white" />
             </div>
-            <span>Wishora</span>
+            <span>Wishoria</span>
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -258,7 +268,7 @@ export default function LandingPage() {
             Ready to share your wishes?
           </h2>
           <p className="text-violet-200 mb-6 text-base">
-            Join thousands of people who use Wishora to organize their wishlists.
+            Join thousands of people who use Wishoria to organize their wishlists.
           </p>
           <Link
             to="/sign-up"
@@ -274,7 +284,7 @@ export default function LandingPage() {
       <footer className="border-t border-white/[0.06] py-8 text-center text-sm text-[#55556e]">
         <div className="flex items-center justify-center gap-2">
           <Sparkles size={14} className="text-violet-500/50" />
-          <span>Wishora — where wishes come to life</span>
+          <span>Wishoria — where wishes come to life</span>
         </div>
       </footer>
     </div>

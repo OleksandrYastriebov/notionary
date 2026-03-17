@@ -23,8 +23,8 @@ export function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-40 bg-[#08080e]/80 backdrop-blur-xl border-b border-white/[0.06]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-40 px-3 sm:px-5 pt-3 pb-1.5">
+      <div className="max-w-6xl mx-auto bg-[#13131f]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl shadow-black/30 px-4 sm:px-5 flex items-center justify-between h-14">
         {/* Logo */}
         <Link
           to={user ? '/wishlists' : '/'}
@@ -33,7 +33,7 @@ export function Navbar() {
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-500/30">
             <Sparkles size={16} className="text-white" />
           </div>
-          <span className="text-lg tracking-tight">Wishora</span>
+          <span className="text-lg tracking-tight">Wishoria</span>
         </Link>
 
         {/* Search — only when authenticated */}
@@ -48,7 +48,7 @@ export function Navbar() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen((p) => !p)}
-              className="flex items-center gap-2.5 p-1.5 rounded-xl hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+              className="flex items-center gap-2.5 px-2 py-1 rounded-xl hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
               aria-label="Open user menu"
             >
               <Avatar src={user.avatarUrl} firstName={user.firstName} lastName={user.lastName} size="md" />
