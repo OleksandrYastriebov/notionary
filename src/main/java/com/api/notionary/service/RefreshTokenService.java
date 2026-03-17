@@ -38,7 +38,7 @@ public class RefreshTokenService {
         List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(userId);
 
         if (activeTokens.size() >= maxSessions) {
-            refreshTokenRepository.delete(activeTokens.getFirst());
+            refreshTokenRepository.deleteById(activeTokens.getFirst().getId());
         }
 
         RefreshToken refreshToken = new RefreshToken();

@@ -67,7 +67,7 @@ public class UserService {
         User userToDelete = getUserEntityById(id);
 
         String randomHash = UUID.randomUUID().toString().substring(0, 8);
-        userToDelete.setEmail("deleted_" + randomHash + "@notionary.deleted");
+        userToDelete.setEmail("deleted_" + randomHash + "@wishoria.deleted");
         userToDelete.setFirstName("Deleted");
         userToDelete.setLastName("User");
 
