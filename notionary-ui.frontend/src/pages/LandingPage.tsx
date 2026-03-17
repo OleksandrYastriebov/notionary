@@ -147,8 +147,6 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative max-w-5xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
-        {/* Hero-specific radial glow on top of the mesh */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_0%,rgba(139,92,246,0.22),transparent)] pointer-events-none" />
         <motion.div
           variants={stagger}
           initial="initial"
