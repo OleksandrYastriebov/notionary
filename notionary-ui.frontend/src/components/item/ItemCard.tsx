@@ -114,7 +114,7 @@ export function ItemCard({
                 </div>
 
                 {isOwner && (
-                  <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
                     <button
                       onClick={() => onEdit(item)}
                       className="p-1.5 rounded-lg text-[#9898b4] hover:text-white hover:bg-white/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
@@ -212,7 +212,7 @@ export function ItemCard({
                   </div>
 
                   {isOwner && (
-                    <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
                       <button
                         onClick={() => onEdit(item)}
                         className="p-1.5 rounded-lg text-[#9898b4] hover:text-white hover:bg-white/[0.08] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"

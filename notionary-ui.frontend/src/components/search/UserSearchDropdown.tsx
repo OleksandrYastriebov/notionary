@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, Loader2 } from 'lucide-react';
@@ -20,6 +21,7 @@ function useDebounce(value: string, delay: number): string {
 export function UserSearchDropdown() {
   const [inputValue, setInputValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -30,6 +32,24 @@ export function UserSearchDropdown() {
   const showDropdown = isOpen && debouncedQuery.trim().length >= 2;
   const showResults = showDropdown && results.length > 0;
   const showEmpty = showDropdown && !isFetching && results.length === 0;
+
+  // Update dropdown position
+  const updatePos = useCallback(() => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setDropdownPos({ top: rect.bottom + 6, left: rect.left, width: rect.width });
+  }, []);
+
+  useEffect(() => {
+    if (!showDropdown) return;
+    updatePos();
+    window.addEventListener('scroll', updatePos, true);
+    window.addEventListener('resize', updatePos);
+    return () => {
+      window.removeEventListener('scroll', updatePos, true);
+      window.removeEventListener('resize', updatePos);
+    };
+  }, [showDropdown, updatePos]);
 
   // Close on outside click
   useEffect(() => {
@@ -89,7 +109,7 @@ export function UserSearchDropdown() {
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder="Search people..."
-          className="bg-transparent text-sm text-white placeholder:text-white/25 outline-none w-32 sm:w-44 md:w-52"
+          className="bg-transparent text-sm text-white placeholder:text-white/25 outline-none flex-1 min-w-0"
           aria-label="Search users"
           aria-expanded={showDropdown}
           aria-autocomplete="list"
@@ -103,7 +123,7 @@ export function UserSearchDropdown() {
               exit={{ opacity: 0, scale: 0.7 }}
               transition={{ duration: 0.1 }}
               onClick={handleClear}
-              className="text-[#55556e] hover:text-[#9898b4] active:text-white transition-colors focus-visible:outline-none rounded"
+              className="text-[#55556e] hover:text-[#9898b4] active:text-white transition-colors focus-visible:outline-none rounded ml-auto flex-shrink-0"
               aria-label="Clear search"
             >
               <X size={13} />
@@ -115,64 +135,74 @@ export function UserSearchDropdown() {
         )}
       </div>
 
-      {/* Dropdown */}
-      <AnimatePresence>
-        {showDropdown && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-0 top-full mt-1.5 w-64 bg-[#18181f] rounded-xl shadow-2xl shadow-black/50 border border-white/[0.08] overflow-hidden z-50"
-            role="listbox"
-            aria-label="Search results"
-          >
-            {showResults && (
-              <ul className="py-1.5 max-h-64 overflow-y-auto">
-                {results.map((user, index) => (
-                  <motion.li
-                    key={user.id}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.12, delay: index * 0.04 }}
-                    role="option"
-                  >
-                    <button
-                      onClick={() => handleSelectUser(user.id)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors text-left focus-visible:outline-none focus-visible:bg-white/[0.06]"
+      {/* Dropdown — rendered in body via portal to escape overflow:hidden */}
+      {createPortal(
+        <AnimatePresence>
+          {showDropdown && dropdownPos && (
+            <motion.div
+              initial={{ opacity: 0, y: -6, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+              style={{
+                position: 'fixed',
+                top: dropdownPos.top,
+                left: dropdownPos.left,
+                width: dropdownPos.width,
+                zIndex: 9999,
+              }}
+              className="bg-[#18181f] rounded-xl shadow-2xl shadow-black/50 border border-white/[0.08] overflow-hidden"
+              role="listbox"
+              aria-label="Search results"
+            >
+              {showResults && (
+                <ul className="py-1.5 max-h-64 overflow-y-auto">
+                  {results.map((user, index) => (
+                    <motion.li
+                      key={user.id}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.12, delay: index * 0.04 }}
+                      role="option"
                     >
-                      <Avatar
-                        src={user.avatarUrl}
-                        firstName={user.firstName}
-                        lastName={user.lastName}
-                        size="sm"
-                      />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-[#c8c8da] truncate">
-                          {user.firstName} {user.lastName}
-                        </p>
-                      </div>
-                    </button>
-                  </motion.li>
-                ))}
-              </ul>
-            )}
+                      <button
+                        onClick={() => handleSelectUser(user.id)}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.06] active:bg-white/[0.1] transition-colors text-left focus-visible:outline-none focus-visible:bg-white/[0.06]"
+                      >
+                        <Avatar
+                          src={user.avatarUrl}
+                          firstName={user.firstName}
+                          lastName={user.lastName}
+                          size="sm"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-[#c8c8da] truncate">
+                            {user.firstName} {user.lastName}
+                          </p>
+                        </div>
+                      </button>
+                    </motion.li>
+                  ))}
+                </ul>
+              )}
 
-            {showEmpty && (
-              <div className="px-4 py-4 text-center">
-                <p className="text-sm text-[#55556e]">No users found</p>
-              </div>
-            )}
+              {showEmpty && (
+                <div className="px-4 py-4 text-center">
+                  <p className="text-sm text-[#55556e]">No users found</p>
+                </div>
+              )}
 
-            {isFetching && !showResults && (
-              <div className="px-4 py-4 flex items-center justify-center gap-2">
-                <Loader2 size={14} className="text-violet-400 animate-spin" />
-                <span className="text-sm text-[#9898b4]">Searching...</span>
-              </div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {isFetching && !showResults && (
+                <div className="px-4 py-4 flex items-center justify-center gap-2">
+                  <Loader2 size={14} className="text-violet-400 animate-spin" />
+                  <span className="text-sm text-[#9898b4]">Searching...</span>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }

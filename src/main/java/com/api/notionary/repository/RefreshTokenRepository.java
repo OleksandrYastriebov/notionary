@@ -4,6 +4,7 @@ import com.api.notionary.entity.RefreshToken;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,10 +15,14 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByToken(String token);
 
     @Modifying
-    void deleteByToken(String token);
+    @Transactional
+    @Query("DELETE FROM RefreshToken r WHERE r.token = :token")
+    void deleteByToken(@Param("token") String token);
 
     @Modifying
-    void deleteByUserId(Long userId);
+    @Transactional
+    @Query("DELETE FROM RefreshToken r WHERE r.user.id = :userId")
+    void deleteByUserId(@Param("userId") Long userId);
 
     List<RefreshToken> findAllByUserIdOrderByExpiresAtAsc(Long userId);
 

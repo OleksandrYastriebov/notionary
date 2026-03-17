@@ -51,11 +51,25 @@ export default function WishlistDetailPage() {
   if (isError) {
     return (
       <Layout>
-        <div className="text-center py-16">
-          <p className="text-[#9898b4]">Wishlist not found or access denied.</p>
-          <Link to="/wishlists" className="text-violet-400 hover:text-violet-300 hover:underline mt-2 inline-block text-sm transition-colors">
-            Back to wishlists
-          </Link>
+        <div className="text-center py-16 space-y-3">
+          {!user ? (
+            <>
+              <p className="text-[#9898b4]">Sign in to view this wishlist.</p>
+              <Link
+                to="/sign-in"
+                className="inline-flex items-center gap-2 px-4 py-2 mt-1 text-sm font-medium text-white bg-violet-600 rounded-xl hover:bg-violet-500 transition-colors"
+              >
+                Sign in
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-[#9898b4]">Wishlist not found or access denied.</p>
+              <Link to="/wishlists" className="text-violet-400 hover:text-violet-300 hover:underline inline-block text-sm transition-colors">
+                Back to wishlists
+              </Link>
+            </>
+          )}
         </div>
       </Layout>
     );

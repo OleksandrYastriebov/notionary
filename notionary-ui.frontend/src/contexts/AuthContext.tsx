@@ -3,9 +3,11 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
+import axios from 'axios';
 import { getMe, signIn as apiSignIn, signOut as apiSignOut } from '../api/endpoints';
 import { setAccessToken, setAuthFailureHandler, refreshAccessToken } from '../api/axios';
 import type { SignInRequest, UserProfileDto } from '../types';
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfileDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const bootstrapped = useRef(false);
 
   const clearAuth = useCallback(() => {
     setUser(null);
@@ -36,15 +39,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // On mount: refresh access token first, then fetch the user — avoids spurious 401 on /me
   useEffect(() => {
+    if (bootstrapped.current) return;
+    bootstrapped.current = true;
+
     const bootstrap = async () => {
       try {
         const { accessToken: token } = await refreshAccessToken();
         setAccessToken(token);
         const me = await getMe();
         setUser(me);
-      } catch {
-        // No valid refresh cookie — user is not authenticated, that's fine
-        clearAuth();
+      } catch (err) {
+        const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+        if (status === 401 || status === 403) {
+          // No valid session — clear auth
+          clearAuth();
+        }
+        // Network error, 500, or other — don't clear auth (server may be cold-starting)
       } finally {
         setIsLoading(false);
       }

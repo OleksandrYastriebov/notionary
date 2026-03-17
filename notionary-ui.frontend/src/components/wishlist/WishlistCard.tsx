@@ -77,7 +77,7 @@ export function WishlistCard({ wishlist, isOwner, onEdit, onShare, wide = false 
 
         {/* Action bar (owner only) */}
         {isOwner && (
-          <div className="flex items-center justify-end gap-1 px-3 py-2 border-t border-white/[0.05] opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center justify-end gap-1 px-3 py-2 border-t border-white/[0.05] opacity-0 group-hover:opacity-100 [@media(hover:none)]:opacity-100 transition-opacity">
             {!wishlist.isPublic && (
               <button
                 onClick={() => onShare(wishlist)}
