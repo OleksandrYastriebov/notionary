@@ -24,7 +24,11 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-40 px-3 sm:px-5 pt-3 pb-1.5">
-      <div className="max-w-6xl mx-auto bg-[#13131f]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl shadow-black/30 px-4 sm:px-5 flex items-center justify-between h-14">
+      <div className="relative max-w-6xl mx-auto bg-[#13131f]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-xl shadow-black/30 px-4 sm:px-5 flex items-center justify-between h-16 overflow-hidden">
+        {/* Left glow — violet */}
+        <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-72 h-20 rounded-full bg-violet-500/30 blur-2xl pointer-events-none" />
+        {/* Right glow — tiffany */}
+        <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-72 h-20 rounded-full bg-[#0abfbc]/25 blur-2xl pointer-events-none" />
         {/* Logo */}
         <Link
           to={user ? '/wishlists' : '/'}
