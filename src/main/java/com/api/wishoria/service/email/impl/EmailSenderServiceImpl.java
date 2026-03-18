@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.TemplateEngine;
@@ -33,12 +32,14 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     @Value("${app.email.from}")
     private String fromEmail;
 
+    @Value("${app.url.frontend}")
+    private String frontendUrl;
+
     private final TemplateEngine templateEngine;
     private final EmailValidator emailValidator;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Async
     @Override
     public void send(String to, String emailHtml, String subject) {
         HttpHeaders headers = new HttpHeaders();
@@ -63,9 +64,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     @Override
     public void sendConfirmationEmail(String emailTo, String name, String link) {
         String normalizedEmail = emailTo.toLowerCase().trim();
-        if (!emailValidator.test(normalizedEmail)) {
-            throw new IllegalStateException(String.format("Email %s is invalid.", normalizedEmail));
-        }
+        validateEmail(normalizedEmail);
         Context context = new Context();
         context.setVariable("name", name);
         context.setVariable("link", link);
@@ -78,9 +77,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     public void sendWishListSharedEmail(User wlOwner, String emailTo, boolean isTargetRegistered, String wlTitle,
                                         String wishlistLink, String registrationLink) {
         String normalizedEmail = emailTo.toLowerCase().trim();
-        if (!emailValidator.test(normalizedEmail)) {
-            throw new IllegalStateException(String.format("Email %s is invalid.", normalizedEmail));
-        }
+        validateEmail(normalizedEmail);
         Context context = new Context();
         context.setVariable("ownerName", wlOwner.getFirstName() + wlOwner.getLastName());
         context.setVariable("wishlistTitle", wlTitle);
@@ -90,5 +87,27 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         String htmlContent = templateEngine.process("wishlist-shared-template", context);
 
         send(normalizedEmail, htmlContent, "Someone shared a Wishlist with you.");
+    }
+
+    @Override
+    public void sendPasswordRecovery(String emailTo, String name, String token) {
+        String normalizedEmail = emailTo.toLowerCase().trim();
+        validateEmail(normalizedEmail);
+
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
+
+        Context context = new Context();
+        context.setVariable("name", name);
+        context.setVariable("link", resetLink);
+
+        String htmlContent = templateEngine.process("password-reset-template", context);
+
+        send(normalizedEmail, htmlContent, "Reset your Wishoria password");
+    }
+
+    private void validateEmail(String normalizedEmail) {
+        if (!emailValidator.test(normalizedEmail)) {
+            throw new IllegalStateException(String.format("Email %s is invalid.", normalizedEmail));
+        }
     }
 }

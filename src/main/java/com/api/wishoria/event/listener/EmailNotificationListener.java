@@ -1,5 +1,6 @@
 package com.api.wishoria.event.listener;
 
+import com.api.wishoria.event.PasswordRecoveryEvent;
 import com.api.wishoria.event.UserRegisteredEvent;
 import com.api.wishoria.event.WishlistSharedEvent;
 import com.api.wishoria.service.email.EmailSenderService;
@@ -24,7 +25,6 @@ public class EmailNotificationListener {
 
     /**
      * Listen for the UserRegisteredEvent.
-     * Async Guarantees a separate thread for this method.
      */
     @Async
     @EventListener
@@ -55,5 +55,18 @@ public class EmailNotificationListener {
                 event.getWishlist().getTitle(),
                 wishlistLink,
                 registrationLink);
+    }
+
+
+    /**
+     * Listen for the PasswordRecoveryEvent.
+     */
+    @Async
+    @EventListener
+    public void handlePasswordRecoveryEvent(PasswordRecoveryEvent event) {
+        log.info("Handling PasswordRecoveryEvent. Sending email to: {}", event.getOwner().getEmail());
+        emailSenderService.sendPasswordRecovery(event.getOwner().getEmail(),
+                event.getOwner().getFirstName(),
+                event.getToken());
     }
 }

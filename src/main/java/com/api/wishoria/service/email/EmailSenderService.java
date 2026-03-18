@@ -8,4 +8,6 @@ public interface EmailSenderService {
     void sendConfirmationEmail(String to, String name, String link);
 
     void sendWishListSharedEmail(User wlOwner, String emailTo, boolean isTargetRegistered, String wlTitle, String wishlistLink, String registrationLink);
+
+    void sendPasswordRecovery(String emailTo, String name, String token);
 }

@@ -9,7 +9,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public enum RateLimitPlan {
     EMAIL(5, Duration.ofMinutes(1)),
-    AUTH(20, Duration.ofMinutes(1)),
+    AUTH(10, Duration.ofMinutes(1)),
     MUTATION(50, Duration.ofMinutes(1)),
     DEFAULT(100, Duration.ofMinutes(1));
 

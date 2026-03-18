@@ -1,5 +1,7 @@
 package com.api.wishoria.controller;
 
+import com.api.wishoria.dto.payload.request.user.ForgotPasswordRequest;
+import com.api.wishoria.dto.payload.request.user.ResetPasswordRequest;
 import com.api.wishoria.dto.payload.request.user.SignInRequest;
 import com.api.wishoria.dto.payload.request.user.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
@@ -10,6 +12,7 @@ import com.api.wishoria.exception.TokenRefreshException;
 import com.api.wishoria.security.interceptor.RateLimitPlan;
 import com.api.wishoria.security.interceptor.RateLimited;
 import com.api.wishoria.service.AuthenticationService;
+import com.api.wishoria.service.PasswordResetService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final PasswordResetService passwordResetService;
 
     @Value("${token.refresh.expiration.sec}")
     private int refreshCookieMaxAge;
@@ -83,6 +87,23 @@ public class UserAuthenticationController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cleanRefreshCookie.toString())
                 .body(new ApiResponseWrapper("Log out successful!"));
+    }
+
+    @Operation(
+            summary = "Request password reset", description = "Initiates the password reset process. Generates a token and sends an email if the account exists. " +
+            "To prevent email enumeration attacks, this endpoint always returns a 200 OK response.")
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponseWrapper> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.initiatePasswordReset(request.email());
+        return ResponseEntity.ok(new ApiResponseWrapper("If an account with this email exists, a password reset link has been sent."));
+    }
+
+    @Operation(summary = "Reset password",
+            description = "Sets a new password for the user using the UUID token provided in the email link.")
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponseWrapper> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordResetService.resetPassword(request.token(), request.newPassword());
+        return ResponseEntity.ok(new ApiResponseWrapper("Password has been successfully reset."));
     }
 
     private ResponseCookie createRefreshCookie(String value, int maxAge) {
