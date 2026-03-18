@@ -34,14 +34,16 @@ email:
 server:
   port: ${PORT:8080}
   address: ${SERVER_ADDRESS:0.0.0.0}
-  error:
-    path: /error
-    include-message: never
-    include-binding-errors: never
-    whitelabel:
-      enabled: false
 
 spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: 5671
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: komdjyax
+    ssl:
+      enabled: true
   main:
     lazy-initialization: ${SPRING_MAIN_LAZY_INITIALIZATION:false}
   datasource:

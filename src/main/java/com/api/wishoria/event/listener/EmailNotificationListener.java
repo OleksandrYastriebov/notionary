@@ -30,6 +30,7 @@ public class EmailNotificationListener {
     @EventListener
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
         log.info("Handling UserRegisteredEvent for user: {}", event.getUser().getEmail());
+        
         String activationLink = String.format("%s/api/v1/confirm-email?token=%s", appUrl, event.getConfirmationToken());
         emailSenderService.sendConfirmationEmail(
                 event.getUser().getEmail(),
@@ -65,6 +66,7 @@ public class EmailNotificationListener {
     @EventListener
     public void handlePasswordRecoveryEvent(PasswordRecoveryEvent event) {
         log.info("Handling PasswordRecoveryEvent. Sending email to: {}", event.getOwner().getEmail());
+
         emailSenderService.sendPasswordRecovery(event.getOwner().getEmail(),
                 event.getOwner().getFirstName(),
                 event.getToken());

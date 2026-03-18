@@ -1,6 +1,5 @@
 package com.api.wishoria.event;
 
-
 import com.api.wishoria.entity.User;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
