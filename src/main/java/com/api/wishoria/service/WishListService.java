@@ -10,6 +10,7 @@ import com.api.wishoria.exception.WishlistNotFoundException;
 import com.api.wishoria.repository.WishListAccessRepository;
 import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,8 +92,10 @@ public class WishListService {
         return wishList;
     }
 
-    public List<WishListDto> getPublicWishlistsForUser(Long userId) {
-        return wishListRepository.findByUserIdAndIsPublicTrue(userId).stream()
+    public List<WishListDto> getAvailableWishlists(Long ownerId, User currentUser) {
+        String viewerEmail = currentUser == null ? StringUtils.EMPTY : currentUser.getEmail().trim().toLowerCase();
+
+        return wishListRepository.findAvailableWishlists(ownerId, viewerEmail).stream()
                 .map(WishList::toDto)
                 .toList();
     }

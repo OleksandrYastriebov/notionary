@@ -40,11 +40,12 @@ public class ProfileController {
 
     @Operation(summary = "Get user Profile", description = "Returns base info and all public wishlists.")
     @GetMapping("/{userId}")
-    public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable Long userId) {
+    public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable Long userId,
+                                                                 @AuthenticationPrincipal User currentUser) {
 
         PublicUserDto publicUser = userService.getPublicUserById(userId);
-        List<WishListDto> publicWishlists = wishListService.getPublicWishlistsForUser(userId);
+        List<WishListDto> availableWishlists = wishListService.getAvailableWishlists(userId, currentUser);
 
-        return ResponseEntity.ok(new UserProfileResponseDto(publicUser, publicWishlists));
+        return ResponseEntity.ok(new UserProfileResponseDto(publicUser, availableWishlists));
     }
 }

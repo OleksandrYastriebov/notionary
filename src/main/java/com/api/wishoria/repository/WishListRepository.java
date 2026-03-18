@@ -4,6 +4,8 @@ import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,11 +18,10 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
 
     int countByUser(User user);
 
-    /**
-     * Finds all wishlists for user where isPublic is true
-     */
-    List<WishList> findByUserIdAndIsPublicTrue(Long userId);
-
     List<WishList> findAllByIsPublicTrue();
 
+    @Query("SELECT w FROM WishList w WHERE w.user.id = :ownerId AND " +
+            "(w.isPublic = true OR w IN " +
+            "(SELECT wa.wishList FROM WishlistAccess wa WHERE LOWER(wa.grantedUserEmail) = LOWER(:viewerEmail)))")
+    List<WishList> findAvailableWishlists(@Param("ownerId") Long ownerId, @Param("viewerEmail") String viewerEmail);
 }
