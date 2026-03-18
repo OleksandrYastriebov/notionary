@@ -1,6 +1,7 @@
 package com.api.wishoria.entity;
 
 import com.api.wishoria.dto.wishlistitem.WishListItemDto;
+import com.api.wishoria.util.IdGenerationUtil;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -85,9 +86,7 @@ public class WishListItem {
     @PrePersist
     protected void onCreate() {
         this.isChecked = false;
-        this.id = UUID.randomUUID()
-                .toString()
-                .replace("-", "");
+        this.id = IdGenerationUtil.generateNanoId();
         this.createdAt = Instant.now();
     }
 
