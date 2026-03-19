@@ -17,8 +17,7 @@ public record UserAutocompleteDto(
         @Schema(description = "User's email address", example = "alex.smith@example.com")
         String email,
 
-        @Schema(description = "URL to the user's profile picture. Can be null if the user has no photo.",
-                example = "https://res.cloudinary.com/image.jpg",
+        @Schema(description = "URL to the user's profile picture.", example = "https://res.cloudinary.com/image.jpg",
                 nullable = true)
         String avatarUrl
 ) {

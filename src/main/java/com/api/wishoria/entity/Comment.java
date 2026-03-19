@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -23,7 +24,10 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item_comment")
+@Table(name = "item_comment", indexes = {
+        @Index(name = "idx_comment_item_id", columnList = "item_id"),
+        @Index(name = "idx_comment_author_id", columnList = "author_id")
+})
 public class Comment {
 
     @Id

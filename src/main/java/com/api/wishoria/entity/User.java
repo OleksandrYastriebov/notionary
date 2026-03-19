@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -32,8 +33,10 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "users")
 @SQLRestriction("is_deleted = false")
+@Table(name = "users", indexes = {
+        @Index(name = "idx_users_is_deleted", columnList = "is_deleted")
+})
 public class User implements UserDetails {
 
     @Id

@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -31,7 +32,9 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "wishlist_item")
+@Table(name = "wishlist_item", indexes = {
+        @Index(name = "idx_wishlist_item_wishlist_id", columnList = "wishlist_id")
+})
 public class WishListItem {
 
     @Id

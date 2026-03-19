@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -25,8 +26,9 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Table(name = "wishlist_access", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"wishlist_id", "granted_user_email"})
-})
+        @UniqueConstraint(columnNames = {"wishlist_id", "granted_user_email"})},
+        indexes = {@Index(name = "idx_wishlist_access_email", columnList = "granted_user_email")
+        })
 public class WishlistAccess {
 
     @Id
