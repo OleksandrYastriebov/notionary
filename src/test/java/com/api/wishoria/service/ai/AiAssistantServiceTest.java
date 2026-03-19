@@ -1,8 +1,12 @@
 package com.api.wishoria.service.ai;
 
+import com.api.wishoria.dto.ai.GiftSuggestionsDto;
 import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
+import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
+import com.api.wishoria.exception.UserNotFoundException;
+import com.api.wishoria.service.UserService;
 import com.api.wishoria.service.WishListItemService;
 import com.api.wishoria.service.WishListService;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.mockito.ArgumentMatchers;
 
+import java.time.Instant;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -41,6 +50,9 @@ class AiAssistantServiceTest {
     @Mock
     private WishListItemService wishListItemService;
 
+    @Mock
+    private UserService userService;
+
     private AiAssistantService aiAssistantService;
 
     private User user;
@@ -50,7 +62,7 @@ class AiAssistantServiceTest {
     @BeforeEach
     void setUp() {
         when(chatClientBuilder.build()).thenReturn(chatClient);
-        aiAssistantService = new AiAssistantService(chatClient, wishListService, wishListItemService);
+        aiAssistantService = new AiAssistantService(chatClient, wishListService, wishListItemService, userService);
 
         user = new User("Jane", "Doe", "jane@wishoria.app", "hashed",
                 Instant.now(), UserRole.ROLE_USER);
@@ -123,5 +135,44 @@ class AiAssistantServiceTest {
         assertThatThrownBy(() -> aiAssistantService.generateDescription(request, WISHLIST_ID, user))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Impossible to generate description");
+    }
+
+    @Test
+    void generateGiftSuggestions_whenUserHasWishlistsAndDescription_shouldReturnSuggestions() {
+        User targetUser = new User("Jane", "Doe", "jane@wishoria.app", "hashed",
+                Instant.now(), UserRole.ROLE_USER);
+        targetUser.setId(5L);
+        targetUser.setProfileDescription("I love fitness and outdoor sports");
+
+        WishListDto wishlist = new WishListDto("wl-1", 5L, List.of(), "Fitness Gear", true, null, Instant.now());
+
+        when(userService.getUserById(5L)).thenReturn(targetUser);
+        when(wishListService.getAvailableWishlists(5L, user)).thenReturn(List.of(wishlist));
+        when(chatClient.prompt().user(anyString()).call().content())
+                .thenReturn("[\"Running shoes\", \"Yoga mat\", \"Protein powder\", \"Fitness tracker\", \"Water bottle\"]");
+
+        GiftSuggestionsDto result = aiAssistantService.generateGiftSuggestions(5L, user);
+
+        assertThat(result).isNotNull();
+        assertThat(result.suggestions()).hasSize(5);
+        assertThat(result.suggestions()).contains("Running shoes");
+        verify(userService).getUserById(5L);
+        verify(wishListService).getAvailableWishlists(5L, user);
+    }
+
+    @Test
+    void generateGiftSuggestions_whenChatClientThrows_shouldThrowRuntimeException() {
+        User targetUser = new User("Jane", "Doe", "jane@wishoria.app", "hashed",
+                Instant.now(), UserRole.ROLE_USER);
+        targetUser.setId(5L);
+
+        when(userService.getUserById(5L)).thenReturn(targetUser);
+        when(wishListService.getAvailableWishlists(5L, user)).thenReturn(List.of());
+        when(chatClient.prompt().user(anyString()).call().content())
+                .thenThrow(new RuntimeException("AI service unavailable"));
+
+        assertThatThrownBy(() -> aiAssistantService.generateGiftSuggestions(5L, user))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Failed to generate gift suggestions");
     }
 }

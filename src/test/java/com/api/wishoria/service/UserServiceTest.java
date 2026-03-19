@@ -2,6 +2,7 @@ package com.api.wishoria.service;
 
 import com.api.wishoria.dto.payload.request.user.ChangePasswordRequest;
 import com.api.wishoria.dto.payload.request.user.UpdateUserRequest;
+import com.api.wishoria.dto.user.PublicUserDto;
 import com.api.wishoria.dto.user.UserProfileDto;
 import com.api.wishoria.entity.ConfirmationToken;
 import com.api.wishoria.entity.User;
@@ -158,7 +159,7 @@ class UserServiceTest {
     @Test
     void updateUser_shouldApplyRequestAndReturnDto() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UpdateUserRequest request = new UpdateUserRequest("Jane", "Smith", "https://example.com/avatar.jpg");
+        UpdateUserRequest request = new UpdateUserRequest("Jane", "Smith", "https://example.com/avatar.jpg", null, null);
 
         UserProfileDto result = userService.updateUser(user, request);
 
@@ -223,5 +224,65 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.getUserByEmail("missing@example.com"))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("missing@example.com");
+    }
+
+    @Test
+    void searchPublicUsers_whenPrivateProfile_shouldNotBeIncluded() {
+        when(userRepository.searchUsersByQuery(any(), any(), any())).thenReturn(List.of());
+
+        List<PublicUserDto> result = userService.searchPublicUsers("john", user);
+
+        verify(userRepository).searchUsersByQuery(any(), any(), any());
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getPublicUserById_whenProfileIsPrivate_shouldThrowUserNotFoundException() {
+        user.setPrivateProfile(true);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        assertThatThrownBy(() -> userService.getPublicUserById(1L))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessage("User profile is private.");
+    }
+
+    @Test
+    void updateUser_whenProfileDescriptionProvided_shouldUpdateIt() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, "I love coffee and tech", null);
+
+        UserProfileDto result = userService.updateUser(user, request);
+
+        assertThat(user.getProfileDescription()).isEqualTo("I love coffee and tech");
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void updateUser_whenIsPrivateSet_shouldUpdatePrivateProfile() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, true);
+
+        userService.updateUser(user, request);
+
+        assertThat(user.isPrivateProfile()).isTrue();
+    }
+
+    @Test
+    void getUserById_whenFound_shouldReturnUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        User result = userService.getUserById(1L);
+
+        assertThat(result).isSameAs(user);
+        verify(userRepository).findById(1L);
+    }
+
+    @Test
+    void getUserById_whenNotFound_shouldThrowUserNotFoundException() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.getUserById(999L))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("999");
     }
 }

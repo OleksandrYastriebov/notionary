@@ -9,7 +9,7 @@ public final class AiPrompts {
         return """
                 You are a creative UX-assistant in a Wishlists application.
                 Write a short, engaging 'wish description' (maximum 2 sentences) for the wish with the title: '%s'.
-
+                
                 Strict Rules:
                 1. Do not use hashtags.
                 2. Write in a friendly tone.
@@ -31,5 +31,23 @@ public final class AiPrompts {
                 6. For 'url', provide a valid HTTP/HTTPS url ONLY if highly confident. Otherwise, strictly return null.
                 7. Do not use hashtags.
                 """;
+    }
+
+    public static String giftSuggestionsPrompt(String profileDescription, String wishlistsSummary) {
+        return """
+                You are a thoughtful gift advisor.
+                Based on this person's profile and their wishlists, suggest 5 specific gift ideas.
+                Profile description: %s
+                Their wishlists and items:
+                %s
+                Strict Rules:
+                1. Return ONLY a JSON array of 5 strings. Example: ["Gift 1", "Gift 2", ...]
+                2. Each suggestion must be specific (max 100 characters each).
+                3. Do not use hashtags.
+                4. Base suggestions on both profile description and wishlist items.
+                """.formatted(
+                profileDescription != null ? profileDescription : "No description provided",
+                wishlistsSummary
+        );
     }
 }

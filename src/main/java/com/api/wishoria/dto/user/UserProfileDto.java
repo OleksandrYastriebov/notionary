@@ -23,7 +23,13 @@ public record UserProfileDto(
         String avatarUrl,
 
         @Schema(description = "Timestamp when the account was created", example = "2023-10-01T12:00:00Z")
-        Instant createdAt
+        Instant createdAt,
+
+        @Schema(description = "User's profile description", example = "I love gadgets and outdoor sports.")
+        String profileDescription,
+
+        @Schema(description = "Whether the user profile is private", example = "false")
+        boolean isPrivate
 ) {
     public UserProfileDto(User user) {
         this(
@@ -32,7 +38,9 @@ public record UserProfileDto(
                 user.getLastName(),
                 user.getEmail(),
                 user.getAvatarUrl(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                user.getProfileDescription(),
+                user.isPrivateProfile()
         );
     }
 }

@@ -5,6 +5,7 @@ import com.api.wishoria.controller.docs.ApiGenerateWishlistDoc;
 import com.api.wishoria.controller.docs.ApiUnauthorizedErrorDoc;
 import com.api.wishoria.controller.docs.ApiWishlistLimitReachedDoc;
 import com.api.wishoria.dto.ai.AiDescriptionDto;
+import com.api.wishoria.dto.ai.GiftSuggestionsDto;
 import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
 import com.api.wishoria.dto.payload.request.ai.GenerateWishlistRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
@@ -50,5 +51,12 @@ public class AiController {
                                                         @AuthenticationPrincipal User user) {
         WishListDto wishList = aiAssistantService.generateWishlist(request, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(wishList);
+    }
+
+    @PostMapping("/users/{userId}/gift-suggestions")
+    public ResponseEntity<GiftSuggestionsDto> generateGiftSuggestions(@PathVariable Long userId,
+                                                                       @AuthenticationPrincipal User user) {
+        GiftSuggestionsDto suggestions = aiAssistantService.generateGiftSuggestions(userId, user);
+        return ResponseEntity.ok(suggestions);
     }
 }

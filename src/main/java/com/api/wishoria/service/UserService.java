@@ -114,7 +114,8 @@ public class UserService {
                         user.getId(),
                         user.getFirstName(),
                         user.getLastName(),
-                        user.getAvatarUrl()))
+                        user.getAvatarUrl(),
+                        user.getProfileDescription()))
                 .toList();
     }
 
@@ -136,7 +137,15 @@ public class UserService {
 
     public PublicUserDto getPublicUserById(Long userId) {
         User user = getUserEntityById(userId);
-        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
+        if (user.isPrivateProfile()) {
+            throw new UserNotFoundException("User profile is private.");
+        }
+        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl(), user.getProfileDescription());
+    }
+
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User with id %s can not be found.", userId)));
     }
 
     public User getUserByEmail(String email) {

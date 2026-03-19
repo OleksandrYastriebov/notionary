@@ -49,6 +49,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             WHERE u.id != :currentUserId
               AND u.enabled = true
               AND u.locked = false
+              AND u.privateProfile = false
               AND (
                 LOWER(u.firstName) LIKE LOWER(CONCAT('%', :query, '%')) OR
                 LOWER(u.lastName)  LIKE LOWER(CONCAT('%', :query, '%')) OR
@@ -57,10 +58,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> searchUsersByQuery(@Param("query") String query, @Param("currentUserId") Long currentUserId, Pageable pageable);
 
     @Query("""
-            SELECT new com.api.wishoria.dto.user.UserAutocompleteDto(u.id, u.firstName, u.lastName, u.email, u.avatarUrl) 
-            FROM User u 
-            WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) 
+            SELECT new com.api.wishoria.dto.user.UserAutocompleteDto(u.id, u.firstName, u.lastName, u.email, u.avatarUrl)
+            FROM User u
+            WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))
               AND u.id != :currentUserId
+              AND u.privateProfile = false
             """)
     List<UserAutocompleteDto> searchByEmailForAutocomplete(@Param("query") String query,
                                                            @Param("currentUserId") Long currentUserId, Pageable pageable);

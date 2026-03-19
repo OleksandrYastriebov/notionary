@@ -22,6 +22,11 @@ public record PublicUserDto(
         @Schema(description = "Secure URL to the user's avatar image. Can be null if the user hasn't uploaded an avatar",
                 example = "https://res.cloudinary.com/demo/image/upload/v1234567890/avatar.jpg",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        String avatarUrl
+        String avatarUrl,
+
+        @Schema(description = "User's profile description. Can be null if the user hasn't set one",
+                example = "I love gadgets and outdoor sports.",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        String profileDescription
 ) {
 }

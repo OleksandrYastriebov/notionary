@@ -9,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -72,6 +71,12 @@ public class User implements UserDetails {
 
     @Column(name = "is_deleted")
     private boolean deleted = false;
+
+    @Column(name = "profile_description", length = 1000)
+    private String profileDescription;
+
+    @Column(name = "is_private")
+    private boolean privateProfile = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

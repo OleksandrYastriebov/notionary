@@ -116,10 +116,10 @@ class UserControllerTest {
 
     @Test
     void updateUserProfile_whenValidRequest_shouldReturnUpdatedProfile() throws Exception {
-        UpdateUserRequest request = new UpdateUserRequest("Johnny", "Smith", null);
+        UpdateUserRequest request = new UpdateUserRequest("Johnny", "Smith", null, null, null);
         UserProfileDto updatedProfile = new UserProfileDto(
                 10L, "Johnny", "Smith", "john@wishoria.app", null,
-                Instant.now());
+                Instant.now(), null, false);
         when(userService.updateUser(any(User.class), any(UpdateUserRequest.class))).thenReturn(updatedProfile);
 
         mockMvc.perform(patch("/api/v1/users/me")
@@ -132,7 +132,7 @@ class UserControllerTest {
 
     @Test
     void updateUserProfile_whenFirstNameEmptyString_shouldReturn400() throws Exception {
-        UpdateUserRequest request = new UpdateUserRequest("", "Smith", null);
+        UpdateUserRequest request = new UpdateUserRequest("", "Smith", null, null, null);
 
         mockMvc.perform(patch("/api/v1/users/me")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +142,7 @@ class UserControllerTest {
 
     @Test
     void updateUserProfile_whenAvatarUrlInvalid_shouldReturn400() throws Exception {
-        UpdateUserRequest request = new UpdateUserRequest(null, null, "not-a-url");
+        UpdateUserRequest request = new UpdateUserRequest(null, null, "not-a-url", null, null);
 
         mockMvc.perform(patch("/api/v1/users/me")
                         .contentType(MediaType.APPLICATION_JSON)

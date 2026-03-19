@@ -18,11 +18,20 @@ public record UpdateUserRequest(
         @Schema(description = "URL to the new avatar image", example = "https://example.com/avatars/new.jpg")
         @Size(max = 2048, message = "Avatar URL is too long")
         @URL(message = "Invalid URL format")
-        String avatarUrl
+        String avatarUrl,
+
+        @Schema(description = "Profile description", example = "I love gadgets and outdoor sports.")
+        @Size(max = 1000, message = "Profile description must not exceed 1000 characters")
+        String profileDescription,
+
+        @Schema(description = "Whether the profile should be private", example = "false")
+        Boolean isPrivate
 ) {
     public void updateEntity(User user) {
         if (this.firstName != null) user.setFirstName(this.firstName);
         if (this.lastName != null) user.setLastName(this.lastName);
         if (this.avatarUrl != null) user.setAvatarUrl(this.avatarUrl);
+        if (this.profileDescription != null) user.setProfileDescription(this.profileDescription);
+        if (this.isPrivate != null) user.setPrivateProfile(this.isPrivate);
     }
 }

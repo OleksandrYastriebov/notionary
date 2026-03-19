@@ -1,15 +1,19 @@
 package com.api.wishoria.service.ai;
 
 import com.api.wishoria.dto.ai.AiWishlistGenerationDto;
+import com.api.wishoria.dto.ai.GiftSuggestionsDto;
 import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
 import com.api.wishoria.dto.payload.request.ai.GenerateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlistitem.CreateWishListItemRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
+import com.api.wishoria.service.UserService;
 import com.api.wishoria.service.WishListItemService;
 import com.api.wishoria.service.WishListService;
 import com.api.wishoria.service.ai.util.AiPrompts;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -40,6 +44,7 @@ public class AiAssistantService {
     private final ChatClient chatClient;
     private final WishListService wishListService;
     private final WishListItemService wishListItemService;
+    private final UserService userService;
 
     public String generateDescription(GenerateDescriptionRequest request, String wishlistId, User currentUser) {
         wishListService.getWishlistEntityForOwner(wishlistId, currentUser);
@@ -121,6 +126,53 @@ public class AiAssistantService {
                             currentUser
                     );
                 });
+    }
+
+    public GiftSuggestionsDto generateGiftSuggestions(Long userId, User currentUser) {
+        User targetUser = userService.getUserById(userId);
+        List<WishListDto> wishlists = wishListService.getAvailableWishlists(userId, currentUser);
+
+        String wishlistsSummary = buildWishlistsSummary(wishlists);
+        String prompt = AiPrompts.giftSuggestionsPrompt(targetUser.getProfileDescription(), wishlistsSummary);
+
+        try {
+            String response = chatClient.prompt()
+                    .user(prompt)
+                    .call()
+                    .content();
+            List<String> suggestions = parseSuggestions(response);
+            return new GiftSuggestionsDto(suggestions);
+        } catch (Exception ex) {
+            log.error("Error generating gift suggestions for userId={}", userId, ex);
+            throw new RuntimeException("Failed to generate gift suggestions. Please try again later.");
+        }
+    }
+
+    private String buildWishlistsSummary(List<WishListDto> wishlists) {
+        if (wishlists.isEmpty()) {
+            return "No public wishlists available.";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (WishListDto wl : wishlists) {
+            sb.append("- Wishlist: ").append(wl.title()).append("\n");
+            if (wl.wishListItems() != null) {
+                wl.wishListItems().forEach(item ->
+                        sb.append("  * ").append(item.title()).append("\n"));
+            }
+        }
+        return sb.toString();
+    }
+
+    private List<String> parseSuggestions(String response) {
+        try {
+            String clean = response.replaceAll("```json|```", "").trim();
+            ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.readValue(clean, new TypeReference<>() {
+            });
+        } catch (Exception ex) {
+            log.warn("Could not parse AI gift suggestions as JSON array, returning raw response");
+            return List.of(response);
+        }
     }
 
     private String generateMultimodalDescription(String title, String base64Image, String mimeType) {

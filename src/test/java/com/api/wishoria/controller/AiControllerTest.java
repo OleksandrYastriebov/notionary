@@ -1,8 +1,10 @@
 package com.api.wishoria.controller;
 
+import com.api.wishoria.dto.ai.GiftSuggestionsDto;
 import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
+import com.api.wishoria.exception.EntityNotFoundException;
 import com.api.wishoria.exception.GlobalExceptionHandler;
 import com.api.wishoria.service.ai.AiAssistantService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -111,6 +113,37 @@ class AiControllerTest {
         mockMvc.perform(post(ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void generateGiftSuggestions_whenValidRequest_shouldReturn200() throws Exception {
+        GiftSuggestionsDto dto = new GiftSuggestionsDto(
+                java.util.List.of("Running shoes", "Yoga mat", "Protein powder", "Fitness tracker", "Water bottle")
+        );
+        when(aiAssistantService.generateGiftSuggestions(eq(5L), any(User.class))).thenReturn(dto);
+
+        mockMvc.perform(post("/api/v1/ai/users/5/gift-suggestions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.suggestions.length()").value(5))
+                .andExpect(jsonPath("$.suggestions[0]").value("Running shoes"));
+    }
+
+    @Test
+    void generateGiftSuggestions_whenUserNotFound_shouldReturn404() throws Exception {
+        when(aiAssistantService.generateGiftSuggestions(eq(999L), any(User.class)))
+                .thenThrow(new EntityNotFoundException("User not found"));
+
+        mockMvc.perform(post("/api/v1/ai/users/999/gift-suggestions"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void generateGiftSuggestions_whenServiceThrows_shouldReturn500() throws Exception {
+        when(aiAssistantService.generateGiftSuggestions(eq(5L), any(User.class)))
+                .thenThrow(new RuntimeException("Failed to generate gift suggestions. Please try again later."));
+
+        mockMvc.perform(post("/api/v1/ai/users/5/gift-suggestions"))
                 .andExpect(status().isInternalServerError());
     }
 }
