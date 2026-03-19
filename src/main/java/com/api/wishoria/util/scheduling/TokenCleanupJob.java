@@ -36,7 +36,7 @@ public class TokenCleanupJob {
     @Scheduled(cron = "0 0 3 * * ?")
     @Transactional
     public void cleanupExpiredPasswordResetTokens() {
-        passwordResetTokenRepository.deleteAllByExpiryDateBefore(Instant.now());
+        passwordResetTokenRepository.deleteAllByExpiresAtBefore(Instant.now());
         log.info("Successfully cleaned up expired password reset tokens.");
     }
 }

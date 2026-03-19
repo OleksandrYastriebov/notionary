@@ -51,7 +51,7 @@ public class PasswordResetService {
         PasswordResetToken resetToken = tokenRepository.findByToken(token)
                 .orElseThrow(() -> new TokenInvalidException("This password reset link is invalid or has already been used."));
 
-        if (resetToken.getExpiryDate().isBefore(Instant.now())) {
+        if (resetToken.getExpiresAt().isBefore(Instant.now())) {
             tokenRepository.delete(resetToken);
             throw new TokenInvalidException("Token has expired. Please request a new one.");
         }

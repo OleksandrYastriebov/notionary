@@ -25,7 +25,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "item_comment", indexes = {
-        @Index(name = "idx_comment_item_id", columnList = "item_id"),
+        @Index(name = "idx_comment_item_created", columnList = "item_id, created_at"),
         @Index(name = "idx_comment_author_id", columnList = "author_id")
 })
 public class Comment {

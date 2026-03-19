@@ -32,13 +32,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "wishlist", indexes = {
-        @Index(name = "idx_wishlist_user_id", columnList = "user_id"),
-        @Index(name = "idx_wishlist_created_at", columnList = "created_at")
+        @Index(name = "idx_wishlist_user_created", columnList = "user_id, created_at"),
+        @Index(name = "idx_wishlist_public_created", columnList = "is_public, created_at")
 })
 public class WishList {
 
     @Id
-    @Column(name = "id", length = 50)
+    @Column(name = "id", length = 21)
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)

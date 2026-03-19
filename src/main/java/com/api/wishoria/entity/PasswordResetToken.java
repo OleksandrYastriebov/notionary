@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -20,7 +21,10 @@ import java.time.Instant;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "password_reset_tokens")
+@Table(name = "password_reset_tokens", indexes = {
+        @Index(name = "idx_prt_user_id", columnList = "user_id"),
+        @Index(name = "idx_prt_expires_at", columnList = "expires_at")
+})
 public class PasswordResetToken {
 
     @Id
@@ -38,12 +42,12 @@ public class PasswordResetToken {
     private Instant createdAt;
 
     @Column(nullable = false)
-    private Instant expiryDate;
+    private Instant expiresAt;
 
-    public PasswordResetToken(String token, User user, Instant expiryDate) {
+    public PasswordResetToken(String token, User user, Instant expiresAt) {
         this.token = token;
         this.user = user;
-        this.expiryDate = expiryDate;
+        this.expiresAt = expiresAt;
     }
 
     @PrePersist

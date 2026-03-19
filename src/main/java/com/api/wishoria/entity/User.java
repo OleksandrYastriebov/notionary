@@ -34,9 +34,7 @@ import java.util.Objects;
 @ToString
 @Entity
 @SQLRestriction("is_deleted = false")
-@Table(name = "users", indexes = {
-        @Index(name = "idx_users_is_deleted", columnList = "is_deleted")
-})
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id

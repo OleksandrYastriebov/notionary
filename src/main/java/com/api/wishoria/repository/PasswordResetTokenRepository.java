@@ -15,5 +15,5 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 
     void deleteByUser(User user);
 
-    void deleteAllByExpiryDateBefore(Instant now);
+    void deleteAllByExpiresAtBefore(Instant now);
 }

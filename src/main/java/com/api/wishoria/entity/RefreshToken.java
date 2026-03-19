@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -22,7 +23,10 @@ import java.util.Objects;
 @Setter
 @ToString
 @NoArgsConstructor
-@Table(name = "refresh_token")
+@Table(name = "refresh_token", indexes = {
+        @Index(name = "idx_rt_user_id", columnList = "user_id"),
+        @Index(name = "idx_rt_expires_at", columnList = "expires_at")
+})
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
