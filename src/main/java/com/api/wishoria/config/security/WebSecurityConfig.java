@@ -47,9 +47,9 @@ public class WebSecurityConfig {
                                 "/api/v1/seo/**",
                                 "/api/v1/health",
                                 "/css/**",
+                                "/api/v1/forgot-password", "/api/v1/forgot-password/",
                                 "/js/**").permitAll()
                         .requestMatchers("/api/v1/wishlists/*/access", "/api/v1/wishlists/*/access/**").authenticated()
-                        .requestMatchers("/api/v1/forgot-password", "/api/v1/forgot-password/").authenticated()
                         .requestMatchers("/api/v1/reset-password", "/api/v1/reset-password/").authenticated()
                         .requestMatchers("/api/v1/ai/wishlists/*/generate-description", "/api/v1/ai/wishlists/(*)/generate-description/").authenticated()
                         .requestMatchers("/api/v1/ai/wishlists/generate-wishlists", "/api/v1/ai/wishlists/generate-wishlists").authenticated()
