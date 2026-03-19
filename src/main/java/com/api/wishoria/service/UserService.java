@@ -3,6 +3,7 @@ package com.api.wishoria.service;
 import com.api.wishoria.dto.payload.request.user.ChangePasswordRequest;
 import com.api.wishoria.dto.payload.request.user.UpdateUserRequest;
 import com.api.wishoria.dto.user.PublicUserDto;
+import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.dto.user.UserProfileDto;
 import com.api.wishoria.entity.ConfirmationToken;
 import com.api.wishoria.entity.User;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,13 +43,11 @@ public class UserService {
 
     @Transactional
     public String signUpUser(User user) {
-        if (userRepository.existsByEmail(user.getEmail().toLowerCase().trim())) {
-            throw new UserAlreadyExistsException("Email already taken.");
-        }
+        validateEmailIsUnique(user.getEmail());
 
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
+
         return generateNewConfirmationToken(user);
     }
 
@@ -65,17 +66,7 @@ public class UserService {
     @PreAuthorize("#id == #currentUser.id or hasRole('ROLE_ADMIN')")
     public void deleteUserById(Long id, User currentUser) {
         User userToDelete = getUserEntityById(id);
-
-        String randomHash = UUID.randomUUID().toString().substring(0, 8);
-        userToDelete.setEmail("deleted_" + randomHash + "@wishoria.deleted");
-        userToDelete.setFirstName("Deleted");
-        userToDelete.setLastName("User");
-
-        userToDelete.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-
-        userToDelete.setEnabled(false);
-        userToDelete.setDeleted(true);
-
+        anonymizeUser(userToDelete);
         refreshTokenService.deleteByUserId(userToDelete.getId());
     }
 
@@ -101,42 +92,78 @@ public class UserService {
     @Transactional
     public void changePassword(User currentUser, ChangePasswordRequest request) {
         User user = getUserEntityById(currentUser.getId());
-
-        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Incorrect current password.");
-        }
-
+        validateCurrentPassword(request.currentPassword(), user.getPassword());
         user.setPassword(passwordEncoder.encode(request.newPassword()));
     }
 
     public List<PublicUserDto> searchPublicUsers(String query, User currentUser) {
         if (query == null || query.trim().length() < 2) {
-            return List.of();
+            return Collections.emptyList();
         }
+
+        Long excludeUserId = currentUser != null ? currentUser.getId() : null;
 
         List<User> users = userRepository.searchUsersByQuery(
                 query.trim(),
-                currentUser.getId(),
+                excludeUserId,
                 PageRequest.of(0, 20)
         );
 
         return users.stream()
-                .map(user -> new PublicUserDto(user.getId(),
+                .map(user -> new PublicUserDto(
+                        user.getId(),
                         user.getFirstName(),
                         user.getLastName(),
                         user.getAvatarUrl()))
                 .toList();
     }
 
+    public List<UserAutocompleteDto> getUsersForAutocomplete(String query, User currentUser) {
+        if (currentUser == null) {
+            throw new AccessDeniedException("You need to be logged in to search users.");
+        }
+
+        if (query == null || query.trim().length() < 2) {
+            return Collections.emptyList();
+        }
+
+        return userRepository.searchByEmailForAutocomplete(
+                query.trim(),
+                currentUser.getId(),
+                PageRequest.of(0, 5)
+        );
+    }
+
     public PublicUserDto getPublicUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = getUserEntityById(userId);
         return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl());
     }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email.toLowerCase().trim())
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found.", email)));
+    }
+
+    private void validateEmailIsUnique(String email) {
+        if (userRepository.existsByEmail(email.toLowerCase().trim())) {
+            throw new UserAlreadyExistsException("Email already taken.");
+        }
+    }
+
+    private void validateCurrentPassword(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new IllegalArgumentException("Incorrect current password.");
+        }
+    }
+
+    private void anonymizeUser(User user) {
+        String randomHash = UUID.randomUUID().toString().substring(0, 8);
+        user.setEmail("deleted_" + randomHash + "@wishoria.deleted");
+        user.setFirstName("Deleted");
+        user.setLastName("User");
+        user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setEnabled(false);
+        user.setDeleted(true);
     }
 
     private User getUserEntityById(Long id) {
@@ -152,5 +179,4 @@ public class UserService {
                 user
         );
     }
-
 }

@@ -1,6 +1,7 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.user.PublicUserDto;
+import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.dto.user.UserProfileResponseDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
@@ -36,6 +37,13 @@ public class ProfileController {
     public ResponseEntity<List<PublicUserDto>> searchUsers(@RequestParam("q") String query,
                                                            @AuthenticationPrincipal User currentUser) {
         return ResponseEntity.ok(userService.searchPublicUsers(query, currentUser));
+    }
+
+    @Operation(summary = "Autocomplete helper for searching users", description = "Returns top 5 users by email for sharing suggestions")
+    @GetMapping("/autocomplete")
+    public ResponseEntity<List<UserAutocompleteDto>> autocompleteUsers(@RequestParam("q") String query,
+                                                                       @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(userService.getUsersForAutocomplete(query, currentUser));
     }
 
     @Operation(summary = "Get user Profile", description = "Returns base info and all public wishlists.")

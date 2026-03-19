@@ -1,5 +1,6 @@
 package com.api.wishoria.repository;
 
+import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.entity.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -54,4 +55,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 LOWER(u.email)     LIKE LOWER(CONCAT('%', :query, '%'))
               )""")
     List<User> searchUsersByQuery(@Param("query") String query, @Param("currentUserId") Long currentUserId, Pageable pageable);
+
+    @Query("""
+            SELECT new com.api.wishoria.dto.user.UserAutocompleteDto(u.id, u.firstName, u.lastName, u.email, u.avatarUrl) 
+            FROM User u 
+            WHERE LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) 
+              AND u.id != :currentUserId
+            """)
+    List<UserAutocompleteDto> searchByEmailForAutocomplete(@Param("query") String query,
+                                                           @Param("currentUserId") Long currentUserId, Pageable pageable);
 }

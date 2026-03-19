@@ -20,8 +20,17 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
 
     List<WishList> findAllByIsPublicTrue();
 
-    @Query("SELECT w FROM WishList w WHERE w.user.id = :ownerId AND " +
-            "(w.isPublic = true OR w IN " +
-            "(SELECT wa.wishList FROM WishlistAccess wa WHERE LOWER(wa.grantedUserEmail) = LOWER(:viewerEmail)))")
+    @Query("""
+            SELECT w FROM WishList w
+            WHERE w.user.id = :ownerId
+              AND (
+                  w.isPublic = true
+                  OR EXISTS (
+                      SELECT 1 FROM WishlistAccess wa
+                      WHERE wa.wishList = w
+                        AND LOWER(wa.grantedUserEmail) = LOWER(:viewerEmail)
+                  )
+              )
+            """)
     List<WishList> findAvailableWishlists(@Param("ownerId") Long ownerId, @Param("viewerEmail") String viewerEmail);
 }

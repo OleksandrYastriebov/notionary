@@ -55,6 +55,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/ai/wishlists/generate-wishlists", "/api/v1/ai/wishlists/generate-wishlists").authenticated()
                         .requestMatchers("/api/v1/profiles/search", "/api/v1/profiles/search/").authenticated()
                         .requestMatchers("/api/v1/profiles/search/**").authenticated()
+                        .requestMatchers("/api/v1/profiles/autocomplete", "/api/v1/profiles/autocomplete/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists", "/api/v1/wishlists/").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/wishlists/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/wishlists/*/wishes/*/checked").permitAll()
