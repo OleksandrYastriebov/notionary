@@ -53,6 +53,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/wishlists/*/access", "/api/v1/wishlists/*/access/**").authenticated()
                         .requestMatchers("/api/v1/ai/wishlists/*/generate-description", "/api/v1/ai/wishlists/(*)/generate-description/").authenticated()
                         .requestMatchers("/api/v1/ai/wishlists/generate-wishlists", "/api/v1/ai/wishlists/generate-wishlists").authenticated()
+                        .requestMatchers("/api/v1/ai/users/(*)/gift-suggestions", "/api/v1/ai/users/(*)/gift-suggestions/").authenticated()
                         .requestMatchers(HttpMethod.GET,"/api/v1/profiles/search", "/api/v1/profiles/search/").authenticated()
                         .requestMatchers(HttpMethod.GET,"/api/v1/profiles/search/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/profiles/autocomplete", "/api/v1/profiles/autocomplete/").authenticated()
