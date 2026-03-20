@@ -1,6 +1,9 @@
 package com.api.wishoria.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDate;
 
 @Schema(description = "Public Information about the User for search and profile информация о пользователе для поиска и профиля")
 public record PublicUserDto(
@@ -27,6 +30,11 @@ public record PublicUserDto(
         @Schema(description = "User's profile description. Can be null if the user hasn't set one",
                 example = "I love gadgets and outdoor sports.",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-        String profileDescription
+        String profileDescription,
+
+        @Schema(description = "User's date of birth", example = "1995-06-15",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        LocalDate dateOfBirth
 ) {
 }

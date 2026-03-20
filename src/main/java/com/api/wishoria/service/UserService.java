@@ -115,7 +115,8 @@ public class UserService {
                         user.getFirstName(),
                         user.getLastName(),
                         user.getAvatarUrl(),
-                        user.getProfileDescription()))
+                        user.getProfileDescription(),
+                        user.getDateOfBirth()))
                 .toList();
     }
 
@@ -140,7 +141,9 @@ public class UserService {
         if (user.isPrivateProfile()) {
             throw new UserNotFoundException("User profile is private.");
         }
-        return new PublicUserDto(user.getId(), user.getFirstName(), user.getLastName(), user.getAvatarUrl(), user.getProfileDescription());
+        return new PublicUserDto(user.getId(), user.getFirstName(),
+                user.getLastName(), user.getAvatarUrl(),
+                user.getProfileDescription(), user.getDateOfBirth());
     }
 
     public User getUserById(Long userId) {
