@@ -73,8 +73,8 @@ class ProfileControllerTest {
     @Test
     void searchUsers_whenValidQuery_shouldReturnOk() throws Exception {
         List<PublicUserDto> results = List.of(
-                new PublicUserDto(1L, "Alice", "Brown", "https://example.com/avatar.jpg", "Loves reading"),
-                new PublicUserDto(2L, "Bob", "Green", null, null)
+                new PublicUserDto(1L, "Alice", "Brown", "https://example.com/avatar.jpg", "Loves reading", null),
+                new PublicUserDto(2L, "Bob", "Green", null, null, null)
         );
         when(userService.searchPublicUsers(eq("alice"), any(User.class))).thenReturn(results);
 
@@ -112,7 +112,7 @@ class ProfileControllerTest {
 
     @Test
     void getUserProfile_whenExists_shouldReturnProfileWithWishlists() throws Exception {
-        PublicUserDto publicUser = new PublicUserDto(5L, "Jane", "Smith", null, "Coffee lover");
+        PublicUserDto publicUser = new PublicUserDto(5L, "Jane", "Smith", null, "Coffee lover", null);
         List<WishListDto> wishlists = List.of(
                 new WishListDto("wl-1", 5L, List.of(), "Birthday Wishes", true, null, Instant.now())
         );
