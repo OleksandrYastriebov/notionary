@@ -1,9 +1,11 @@
 package com.api.wishoria.dto.user;
 
 import com.api.wishoria.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Schema(description = "User profile information")
 public record UserProfileDto(
@@ -29,7 +31,11 @@ public record UserProfileDto(
         String profileDescription,
 
         @Schema(description = "Whether the user profile is private", example = "false")
-        boolean isPrivate
+        boolean isPrivate,
+
+        @Schema(description = "User's date of birth", example = "1995-06-15")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        LocalDate dateOfBirth
 ) {
     public UserProfileDto(User user) {
         this(
@@ -40,7 +46,8 @@ public record UserProfileDto(
                 user.getAvatarUrl(),
                 user.getCreatedAt(),
                 user.getProfileDescription(),
-                user.isPrivateProfile()
+                user.isPrivateProfile(),
+                user.getDateOfBirth()
         );
     }
 }
