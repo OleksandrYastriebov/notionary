@@ -1,5 +1,6 @@
 package com.api.wishoria.service;
 
+import com.api.wishoria.config.CacheConfig;
 import com.api.wishoria.dto.payload.request.user.ChangePasswordRequest;
 import com.api.wishoria.dto.payload.request.user.UpdateUserRequest;
 import com.api.wishoria.dto.user.PublicUserDto;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,6 +65,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "#currentUser.email")
     @PreAuthorize("#id == #currentUser.id or hasRole('ROLE_ADMIN')")
     public void deleteUserById(Long id, User currentUser) {
         User userToDelete = getUserEntityById(id);
@@ -83,6 +86,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "#currentUser.email")
     public UserProfileDto updateUser(User currentUser, UpdateUserRequest request) {
         User user = getUserEntityById(currentUser.getId());
         request.updateEntity(user);
@@ -90,6 +94,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "#currentUser.email")
     public UserProfileDto deleteAvatar(User currentUser) {
         User user = getUserEntityById(currentUser.getId());
         user.setAvatarUrl(null);
@@ -97,6 +102,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "#currentUser.email")
     public void changePassword(User currentUser, ChangePasswordRequest request) {
         User user = getUserEntityById(currentUser.getId());
         validateCurrentPassword(request.currentPassword(), user.getPassword());

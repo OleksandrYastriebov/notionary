@@ -1,10 +1,12 @@
 package com.api.wishoria.service;
 
+import com.api.wishoria.config.CacheConfig;
 import com.api.wishoria.entity.WishList;
 import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +29,7 @@ public class SitemapService {
     private static final String URLSET_OPEN = "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n";
     private static final String URLSET_CLOSE = "</urlset>";
 
+    @Cacheable(value = CacheConfig.SITEMAP_CACHE)
     public String generateSitemapXml() {
         StringBuilder xmlBuilder = new StringBuilder();
         xmlBuilder.append(XML_HEADER);

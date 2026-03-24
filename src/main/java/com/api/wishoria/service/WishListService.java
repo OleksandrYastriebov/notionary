@@ -1,5 +1,6 @@
 package com.api.wishoria.service;
 
+import com.api.wishoria.config.CacheConfig;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
 import com.api.wishoria.dto.wishlist.WishListContainerDto;
@@ -12,6 +13,9 @@ import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,10 @@ public class WishListService {
     private final WishListAccessRepository wishlistAccessRepository;
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.SITEMAP_CACHE, allEntries = true),
+            @CacheEvict(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE, allEntries = true)
+    })
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
         if (wishListRepository.countByUser(user) >= maxWishlistsPerAccount) {
             throw new IllegalStateException("Maximum limit WishLists per account reached.");
@@ -40,12 +48,20 @@ public class WishListService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.SITEMAP_CACHE, allEntries = true),
+            @CacheEvict(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE, allEntries = true)
+    })
     public void deleteWishList(String wishlistId, User user) {
         WishList wishList = getWishlistEntityForOwner(wishlistId, user);
         wishListRepository.delete(wishList);
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.SITEMAP_CACHE, allEntries = true),
+            @CacheEvict(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE, allEntries = true)
+    })
     public WishListDto updateWishlist(String wishlistId, UpdateWishlistRequest request, User user) {
         WishList wishList = getWishlistEntityForOwner(wishlistId, user);
         request.updateEntity(wishList);
@@ -92,6 +108,8 @@ public class WishListService {
         return wishList;
     }
 
+    @Cacheable(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE,
+            key = "#ownerId + '-' + (#currentUser != null ? #currentUser.email.toLowerCase().trim() : '')")
     public List<WishListDto> getAvailableWishlists(Long ownerId, User currentUser) {
         String viewerEmail = currentUser == null ? StringUtils.EMPTY : currentUser.getEmail().trim().toLowerCase();
 
