@@ -90,6 +90,13 @@ public class UserService {
     }
 
     @Transactional
+    public UserProfileDto deleteAvatar(User currentUser) {
+        User user = getUserEntityById(currentUser.getId());
+        user.setAvatarUrl(null);
+        return new UserProfileDto(user);
+    }
+
+    @Transactional
     public void changePassword(User currentUser, ChangePasswordRequest request) {
         User user = getUserEntityById(currentUser.getId());
         validateCurrentPassword(request.currentPassword(), user.getPassword());

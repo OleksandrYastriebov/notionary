@@ -72,6 +72,14 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(user, request));
     }
 
+    @Operation(summary = "Delete current user avatar", description = "Removes the avatar of the authenticated user.")
+    @ApiUnauthorizedErrorDoc
+    @DeleteMapping("/me/avatar")
+    @RateLimited(action = RateLimitPlan.MUTATION)
+    public ResponseEntity<UserProfileDto> deleteAvatar(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.deleteAvatar(user));
+    }
+
     @Operation(summary = "Change user password", description = "Updates the authenticated user's password after verifying the current password.")
     @ApiUnauthorizedErrorDoc
     @PatchMapping("/me/password")
