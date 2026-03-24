@@ -2,8 +2,10 @@ package com.api.wishoria.repository;
 
 import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.entity.User;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,11 +23,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    Optional<User> findByIdWithLock(@Param("id") Long id);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM User u WHERE u.id IN :ids")
     void bulkDeleteByIds(@Param("ids") List<Long> ids);
-
 
     /**
      * Finds all users with "enabled = false" property and expired confirmation token;
@@ -42,7 +47,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                 )
             """)
     List<Long> findIdsOfExpiredAndDisabledUsers();
-
 
     @Query("""
             SELECT u FROM User u

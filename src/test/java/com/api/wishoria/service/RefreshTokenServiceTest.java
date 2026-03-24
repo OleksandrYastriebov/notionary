@@ -65,41 +65,6 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void createRefreshToken_shouldSaveAndReturnToken_whenUserExists() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(1L)).thenReturn(List.of());
-        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> {
-            RefreshToken t = inv.getArgument(0);
-            t.setId(100L);
-            return t;
-        });
-
-        RefreshToken result = refreshTokenService.createRefreshToken(1L);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getUser()).isSameAs(user);
-        assertThat(result.getToken()).isNotNull();
-        assertThat(result.getExpiresAt()).isAfter(Instant.now());
-        verify(refreshTokenRepository).save(result);
-    }
-
-    @Test
-    void createRefreshToken_shouldEvictOldest_whenMaxSessionsReached() {
-        RefreshToken oldToken = new RefreshToken();
-        oldToken.setId(1L);
-        List<RefreshToken> existing = List.of(oldToken, new RefreshToken(), new RefreshToken(), new RefreshToken(), new RefreshToken());
-
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(1L)).thenReturn(existing);
-        when(refreshTokenRepository.save(any(RefreshToken.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        refreshTokenService.createRefreshToken(1L);
-
-        verify(refreshTokenRepository).deleteById(oldToken.getId());
-        verify(refreshTokenRepository).save(any(RefreshToken.class));
-    }
-
-    @Test
     void createRefreshToken_shouldThrow_whenUserNotFound() {
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 

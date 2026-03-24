@@ -35,7 +35,7 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken createRefreshToken(Long userId) {
-        List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserIdOrderByExpiresAtAsc(userId);
+        List<RefreshToken> activeTokens = refreshTokenRepository.findAllByUserIdOrderByExpiresAtAscWithLock(userId);
 
         if (activeTokens.size() >= maxSessions) {
             refreshTokenRepository.deleteById(activeTokens.getFirst().getId());

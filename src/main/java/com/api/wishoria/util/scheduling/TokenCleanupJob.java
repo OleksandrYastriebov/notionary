@@ -2,7 +2,7 @@ package com.api.wishoria.util.scheduling;
 
 import com.api.wishoria.repository.PasswordResetTokenRepository;
 import com.api.wishoria.repository.RefreshTokenRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

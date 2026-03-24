@@ -8,6 +8,7 @@ import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
 import com.api.wishoria.entity.UserRole;
 import com.api.wishoria.exception.WishlistNotFoundException;
+import com.api.wishoria.repository.UserRepository;
 import com.api.wishoria.repository.WishListAccessRepository;
 import com.api.wishoria.repository.WishListRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,8 @@ class WishListServiceTest {
     private WishListRepository wishListRepository;
     @Mock
     private WishListAccessRepository wishlistAccessRepository;
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private WishListService wishListService;
@@ -58,6 +61,7 @@ class WishListServiceTest {
 
     @Test
     void createWishlist_shouldSaveAndReturnDto_whenUnderLimit() {
+        when(userRepository.findByIdWithLock(1L)).thenReturn(Optional.of(user));
         when(wishListRepository.countByUser(user)).thenReturn(2);
         when(wishListRepository.save(any(WishList.class))).thenAnswer(inv -> {
             WishList wl = inv.getArgument(0);
@@ -76,6 +80,7 @@ class WishListServiceTest {
 
     @Test
     void createWishlist_shouldThrow_whenMaxLimitReached() {
+        when(userRepository.findByIdWithLock(1L)).thenReturn(Optional.of(user));
         when(wishListRepository.countByUser(user)).thenReturn(MAX_WISHLISTS);
         CreateWishlistRequest request = new CreateWishlistRequest("New List", false, null);
 

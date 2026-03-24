@@ -2,12 +2,14 @@ package com.api.wishoria.security;
 
 import com.api.wishoria.service.UserDetailsServiceImpl;
 import com.api.wishoria.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -60,7 +63,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
+        } catch (JwtException ex) {
+            log.warn("JWT validation failed for [{}]: {}", request.getRequestURI(), ex.getMessage());
+            SecurityContextHolder.clearContext();
+            filterChain.doFilter(request, response);
         } catch (Exception ex) {
+            log.error("Unexpected error during JWT processing for [{}]", request.getRequestURI(), ex);
+            SecurityContextHolder.clearContext();
             filterChain.doFilter(request, response);
         }
     }

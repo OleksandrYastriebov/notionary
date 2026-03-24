@@ -2,13 +2,16 @@ package com.api.wishoria.repository;
 
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WishListRepository extends JpaRepository<WishList, String> {
@@ -17,6 +20,10 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
     List<WishList> findByUser(User user);
 
     int countByUser(User user);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT w FROM WishList w WHERE w.id = :id")
+    Optional<WishList> findByIdWithLock(@Param("id") String id);
 
     List<WishList> findAllByIsPublicTrue();
 

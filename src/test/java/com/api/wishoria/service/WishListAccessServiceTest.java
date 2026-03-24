@@ -95,7 +95,7 @@ class WishListAccessServiceTest {
 
     @Test
     void grantAccess_shouldSaveAndPublishEvent() {
-        when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
+        when(wishListRepository.findByIdWithLock("wl-1")).thenReturn(Optional.of(wishList));
         when(wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishList, "friend@example.com"))
                 .thenReturn(false);
         when(wishlistAccessRepository.countByWishListId("wl-1")).thenReturn(2);
@@ -115,7 +115,7 @@ class WishListAccessServiceTest {
 
     @Test
     void grantAccess_shouldThrow_whenSharingWithSelf() {
-        when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
+        when(wishListRepository.findByIdWithLock("wl-1")).thenReturn(Optional.of(wishList));
         ShareWishListRequest request = new ShareWishListRequest("owner@example.com");
 
         assertThatThrownBy(() -> wishListAccessService.grantAccess("wl-1", request, owner))
@@ -126,7 +126,7 @@ class WishListAccessServiceTest {
 
     @Test
     void grantAccess_shouldThrow_whenAlreadyHasAccess() {
-        when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
+        when(wishListRepository.findByIdWithLock("wl-1")).thenReturn(Optional.of(wishList));
         when(wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishList, "friend@example.com"))
                 .thenReturn(true);
         ShareWishListRequest request = new ShareWishListRequest("friend@example.com");
@@ -138,7 +138,7 @@ class WishListAccessServiceTest {
 
     @Test
     void grantAccess_shouldThrow_whenMaxSharesReached() {
-        when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
+        when(wishListRepository.findByIdWithLock("wl-1")).thenReturn(Optional.of(wishList));
         when(wishlistAccessRepository.existsByWishListAndGrantedUserEmail(wishList, "friend@example.com"))
                 .thenReturn(false);
         when(wishlistAccessRepository.countByWishListId("wl-1")).thenReturn(MAX_SHARES);
@@ -177,7 +177,7 @@ class WishListAccessServiceTest {
 
     @Test
     void grantAccess_shouldThrow_whenWishlistNotFound() {
-        when(wishListRepository.findById("wl-missing")).thenReturn(Optional.empty());
+        when(wishListRepository.findByIdWithLock("wl-missing")).thenReturn(Optional.empty());
         ShareWishListRequest request = new ShareWishListRequest("friend@example.com");
 
         assertThatThrownBy(() -> wishListAccessService.grantAccess("wl-missing", request, owner))

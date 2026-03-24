@@ -7,7 +7,9 @@ import com.api.wishoria.dto.wishlist.WishListContainerDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
+import com.api.wishoria.exception.UserNotFoundException;
 import com.api.wishoria.exception.WishlistNotFoundException;
+import com.api.wishoria.repository.UserRepository;
 import com.api.wishoria.repository.WishListAccessRepository;
 import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ public class WishListService {
 
     private final WishListRepository wishListRepository;
     private final WishListAccessRepository wishlistAccessRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     @Caching(evict = {
@@ -39,6 +42,9 @@ public class WishListService {
             @CacheEvict(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE, allEntries = true)
     })
     public WishListDto createWishlist(CreateWishlistRequest createWishlistRequest, User user) {
+        userRepository.findByIdWithLock(user.getId())
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + user.getId()));
+
         if (wishListRepository.countByUser(user) >= maxWishlistsPerAccount) {
             throw new IllegalStateException("Maximum limit WishLists per account reached.");
         }
@@ -104,6 +110,14 @@ public class WishListService {
 
     public WishList getWishlistEntityForOwner(String wishlistId, User user) {
         WishList wishList = getWishlistById(wishlistId);
+        checkOwnership(user, wishList);
+        return wishList;
+    }
+
+    public WishList getWishlistEntityForOwnerWithLock(String wishlistId, User user) {
+        WishList wishList = wishListRepository.findByIdWithLock(wishlistId)
+                .orElseThrow(() -> new WishlistNotFoundException(
+                        String.format("Wishlist with id %s can not be found.", wishlistId)));
         checkOwnership(user, wishList);
         return wishList;
     }

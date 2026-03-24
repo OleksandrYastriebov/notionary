@@ -11,4 +11,6 @@ public interface WishListItemRepository extends JpaRepository<WishListItem, Stri
 
     Optional<WishListItem> findByIdAndWishListId(String wishlistItemId, String wishlistId);
 
+    int countByWishListId(String wishListId);
+
 }

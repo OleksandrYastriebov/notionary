@@ -44,13 +44,12 @@ public class WishListItemService {
 
     @Transactional
     public WishListItemDto createWishListItem(String wishListId, CreateWishListItemRequest createWishListItemRequest, User user) {
-        WishListDto wishListDto = wishListService.findWishlistById(wishListId, user);
+        WishList wishList = wishListService.getWishlistEntityForOwnerWithLock(wishListId, user);
 
-        if (wishListDto.wishListItems().size() >= maxWishlistsPerWishlist) {
+        if (wishListItemRepository.countByWishListId(wishListId) >= maxWishlistsPerWishlist) {
             throw new IllegalStateException("Maximum Wishlist item limit per reached.");
         }
 
-        WishList wishList = wishListService.getWishlistEntityForOwner(wishListId, user);
         return wishListItemRepository.save(createWishListItemRequest.toEntity(wishList)).toDto();
     }
 

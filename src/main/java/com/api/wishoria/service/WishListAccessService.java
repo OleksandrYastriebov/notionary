@@ -39,7 +39,7 @@ public class WishListAccessService {
 
     @Transactional
     public ApiResponseWrapper grantAccess(String wishlistId, ShareWishListRequest request, User user) {
-        WishList wishlist = getWishlistAndVerifyOwner(wishlistId, user);
+        WishList wishlist = getWishlistAndVerifyOwnerWithLock(wishlistId, user);
         String targetEmail = request.email().toLowerCase().trim();
 
         if (user.getEmail().equalsIgnoreCase(targetEmail)) {
@@ -76,6 +76,20 @@ public class WishListAccessService {
         }
 
         WishList wishlist = wishListRepository.findById(wishlistId)
+                .orElseThrow(() -> new EntityNotFoundException("Wishlist not found"));
+
+        if (!wishlist.getUser().getId().equals(owner.getId())) {
+            throw new AccessDeniedException("Only the owner can manage access to this wishlist");
+        }
+        return wishlist;
+    }
+
+    private WishList getWishlistAndVerifyOwnerWithLock(String wishlistId, User owner) {
+        if (owner == null) {
+            throw new AccessDeniedException("Authentication is required to perform this action");
+        }
+
+        WishList wishlist = wishListRepository.findByIdWithLock(wishlistId)
                 .orElseThrow(() -> new EntityNotFoundException("Wishlist not found"));
 
         if (!wishlist.getUser().getId().equals(owner.getId())) {

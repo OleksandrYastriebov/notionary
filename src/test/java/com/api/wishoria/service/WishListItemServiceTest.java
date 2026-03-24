@@ -88,8 +88,8 @@ class WishListItemServiceTest {
 
     @Test
     void createWishListItem_shouldSaveAndReturnDto() {
-        when(wishListService.findWishlistById("wl-1", user)).thenReturn(wishListDto);
-        when(wishListService.getWishlistEntityForOwner("wl-1", user)).thenReturn(wishList);
+        when(wishListService.getWishlistEntityForOwnerWithLock("wl-1", user)).thenReturn(wishList);
+        when(wishListItemRepository.countByWishListId("wl-1")).thenReturn(0);
         when(wishListItemRepository.save(any(WishListItem.class))).thenAnswer(inv -> {
             WishListItem item = inv.getArgument(0);
             item.setId("new-item");
@@ -106,11 +106,9 @@ class WishListItemServiceTest {
 
     @Test
     void createWishListItem_shouldThrow_whenMaxItemsReached() {
-        WishListDto fullList = new WishListDto("wl-1", 1L,
-                List.of(wishListItem.toDto(), wishListItem.toDto() /* 50 items in real scenario */),
-                "My List", false, null, Instant.now());
-        when(wishListService.findWishlistById("wl-1", user)).thenReturn(fullList);
         ReflectionTestUtils.setField(wishListItemService, "maxWishlistsPerWishlist", 2);
+        when(wishListService.getWishlistEntityForOwnerWithLock("wl-1", user)).thenReturn(wishList);
+        when(wishListItemRepository.countByWishListId("wl-1")).thenReturn(2);
         CreateWishListItemRequest request = new CreateWishListItemRequest("New", null, null, null, null);
 
         assertThatThrownBy(() -> wishListItemService.createWishListItem("wl-1", request, user))
