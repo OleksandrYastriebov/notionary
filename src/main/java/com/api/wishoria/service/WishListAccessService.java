@@ -12,6 +12,7 @@ import com.api.wishoria.exception.EntityNotFoundException;
 import com.api.wishoria.repository.UserRepository;
 import com.api.wishoria.repository.WishListAccessRepository;
 import com.api.wishoria.repository.WishListRepository;
+import com.api.wishoria.util.EmailNormalizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +41,7 @@ public class WishListAccessService {
     @Transactional
     public ApiResponseWrapper grantAccess(String wishlistId, ShareWishListRequest request, User user) {
         WishList wishlist = getWishlistAndVerifyOwnerWithLock(wishlistId, user);
-        String targetEmail = request.email().toLowerCase().trim();
+        String targetEmail = EmailNormalizer.normalize(request.email());
 
         if (user.getEmail().equalsIgnoreCase(targetEmail)) {
             throw new IllegalStateException("You cannot share a wishlist with yourself");
@@ -62,7 +63,7 @@ public class WishListAccessService {
         WishList wishlist = getWishlistAndVerifyOwner(wishlistId, user);
 
         WishlistAccess access = wishlistAccessRepository
-                .findByWishListAndGrantedUserEmail(wishlist, request.email().toLowerCase().trim())
+                .findByWishListAndGrantedUserEmail(wishlist, EmailNormalizer.normalize(request.email()))
                 .orElseThrow(() -> new EntityNotFoundException("Access record not found for this email"));
 
         wishlistAccessRepository.delete(access);

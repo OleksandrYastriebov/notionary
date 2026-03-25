@@ -2,6 +2,7 @@ package com.api.wishoria.service;
 
 
 import com.api.wishoria.entity.User;
+import com.api.wishoria.util.EmailNormalizer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -33,13 +34,13 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
             claims.put("id", customUserDetails.getId());
-            claims.put("email", customUserDetails.getEmail().toLowerCase().trim());
+            claims.put("email", EmailNormalizer.normalize(customUserDetails.getEmail()));
         }
         return generateToken(claims, userDetails);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token).toLowerCase().trim();
+        final String email = EmailNormalizer.normalize(extractEmail(token));
         return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 

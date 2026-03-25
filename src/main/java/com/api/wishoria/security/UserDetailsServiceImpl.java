@@ -2,6 +2,7 @@ package com.api.wishoria.security;
 
 import com.api.wishoria.config.CacheConfig;
 import com.api.wishoria.repository.UserRepository;
+import com.api.wishoria.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,9 +20,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    @Cacheable(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "#email.toLowerCase().trim()")
+    @Cacheable(value = CacheConfig.USERS_BY_EMAIL_CACHE, key = "T(com.api.wishoria.util.EmailNormalizer).normalize(#email)")
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        String normalizedEmail = email.toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(email);
         return userRepository.findByEmail(normalizedEmail).orElseThrow(() ->
                 new UsernameNotFoundException(String.format(EMAIL_NOT_FOUND_MESSAGE, normalizedEmail)));
     }

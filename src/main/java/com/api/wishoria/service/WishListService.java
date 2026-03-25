@@ -10,6 +10,7 @@ import com.api.wishoria.entity.WishList;
 import com.api.wishoria.exception.UserNotFoundException;
 import com.api.wishoria.exception.WishlistNotFoundException;
 import com.api.wishoria.repository.UserRepository;
+import com.api.wishoria.util.EmailNormalizer;
 import com.api.wishoria.repository.WishListAccessRepository;
 import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +85,7 @@ public class WishListService {
             throw new AccessDeniedException("This is a private wishlist. Please, log in.");
         }
 
-        String userEmail = user.getEmail().toLowerCase().trim();
+        String userEmail = EmailNormalizer.normalize(user.getEmail());
 
         if (wishlist.getUser().getEmail().equalsIgnoreCase(user.getEmail())) {
             return wishlist.toDto();
@@ -123,9 +124,9 @@ public class WishListService {
     }
 
     @Cacheable(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE,
-            key = "#ownerId + '-' + (#currentUser != null ? #currentUser.email.toLowerCase().trim() : '') + '-p' + #page + '-s' + #size")
+            key = "#ownerId + '-' + (#currentUser != null ? T(com.api.wishoria.util.EmailNormalizer).normalize(#currentUser.email) : '') + '-p' + #page + '-s' + #size")
     public PagedResponse<WishListDto> getAvailableWishlists(Long ownerId, User currentUser, int page, int size) {
-        String viewerEmail = currentUser == null ? StringUtils.EMPTY : currentUser.getEmail().trim().toLowerCase();
+        String viewerEmail = currentUser == null ? StringUtils.EMPTY : EmailNormalizer.normalize(currentUser.getEmail());
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
         return PagedResponse.of(wishListRepository.findAvailableWishlists(ownerId, viewerEmail, pageable).map(WishList::toDto)

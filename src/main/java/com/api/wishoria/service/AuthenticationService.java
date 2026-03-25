@@ -13,6 +13,7 @@ import com.api.wishoria.exception.TokenExpiredException;
 import com.api.wishoria.exception.TokenRefreshException;
 import com.api.wishoria.exception.UserAlreadyActivatedException;
 import com.api.wishoria.repository.UserRepository;
+import com.api.wishoria.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +49,7 @@ public class AuthenticationService {
 
     @Transactional
     public AuthResultDto signIn(SignInRequest request) {
-        String userEmail = request.email().toLowerCase().trim();
+        String userEmail = EmailNormalizer.normalize(request.email());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userEmail, request.password())
         );
@@ -75,7 +76,7 @@ public class AuthenticationService {
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
         String newJwt = jwtService.generateToken(user);
 
-        return new AuthResultDto(newJwt, newRefreshToken.getToken(), user.getId(), user.getEmail().toLowerCase().trim());
+        return new AuthResultDto(newJwt, newRefreshToken.getToken(), user.getId(), EmailNormalizer.normalize(user.getEmail()));
     }
 
     @Transactional
@@ -101,7 +102,7 @@ public class AuthenticationService {
 
     @Transactional
     public ApiResponseWrapper resendConfirmationEmail(String email) {
-        User user = userService.getUserByEmail(email.toLowerCase().trim());
+        User user = userService.getUserByEmail(EmailNormalizer.normalize(email));
 
         if (user.isEnabled()) {
             throw new UserAlreadyActivatedException(EMAIL_CONFIRMED_LOG_IN);

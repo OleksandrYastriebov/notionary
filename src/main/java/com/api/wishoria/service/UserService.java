@@ -11,6 +11,7 @@ import com.api.wishoria.entity.User;
 import com.api.wishoria.exception.UserAlreadyExistsException;
 import com.api.wishoria.exception.UserNotFoundException;
 import com.api.wishoria.repository.UserRepository;
+import com.api.wishoria.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -165,12 +166,12 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email.toLowerCase().trim())
+        return userRepository.findByEmail(EmailNormalizer.normalize(email))
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with email %s not found.", email)));
     }
 
     private void validateEmailIsUnique(String email) {
-        if (userRepository.existsByEmail(email.toLowerCase().trim())) {
+        if (userRepository.existsByEmail(EmailNormalizer.normalize(email))) {
             throw new UserAlreadyExistsException("Email already taken.");
         }
     }

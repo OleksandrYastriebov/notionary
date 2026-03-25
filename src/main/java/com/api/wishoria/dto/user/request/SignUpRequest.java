@@ -2,6 +2,7 @@ package com.api.wishoria.dto.user.request;
 
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
+import com.api.wishoria.util.EmailNormalizer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,7 +37,7 @@ public record SignUpRequest(
         return new User(
                 this.firstName,
                 this.lastName,
-                this.email.toLowerCase().trim(),
+                EmailNormalizer.normalize(this.email),
                 this.password,
                 Instant.now(),
                 UserRole.ROLE_USER);

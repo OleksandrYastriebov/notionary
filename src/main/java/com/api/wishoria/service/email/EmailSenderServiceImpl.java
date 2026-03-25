@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.api.wishoria.util.EmailNormalizer;
+
 import static com.api.wishoria.util.Constants.EMAIL_EXCHANGE;
 import static com.api.wishoria.util.Constants.EMAIL_ROUTING_KEY;
 
@@ -41,7 +43,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     @Override
     public void sendConfirmationEmail(String emailTo, String name, String link) {
-        String normalizedEmail = emailTo.toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(emailTo);
         validateEmail(normalizedEmail);
         Context context = new Context();
         context.setVariable("name", name);
@@ -54,7 +56,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     @Override
     public void sendWishListSharedEmail(User wlOwner, String emailTo, boolean isTargetRegistered, String wlTitle,
                                         String wishlistLink, String registrationLink) {
-        String normalizedEmail = emailTo.toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(emailTo);
         validateEmail(normalizedEmail);
         Context context = new Context();
         context.setVariable("ownerName", wlOwner.getFirstName() + wlOwner.getLastName());
@@ -69,7 +71,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
     @Override
     public void sendPasswordRecovery(String emailTo, String name, String token) {
-        String normalizedEmail = emailTo.toLowerCase().trim();
+        String normalizedEmail = EmailNormalizer.normalize(emailTo);
         validateEmail(normalizedEmail);
 
         String resetLink = frontendUrl + "/reset-password?token=" + token;
