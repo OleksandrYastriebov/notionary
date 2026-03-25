@@ -1,6 +1,6 @@
 package com.api.wishoria.controller;
 
-import com.api.wishoria.dto.comment.CommentContainerDto;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
 import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
 import com.api.wishoria.entity.User;
@@ -83,31 +83,35 @@ class CommentControllerTest {
 
     @Test
     void getCommentsForItem_whenAuthenticated_shouldReturnCommentList() throws Exception {
-        CommentContainerDto container = new CommentContainerDto(List.of(sampleCommentDto));
-        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class)))
-                .thenReturn(container);
+        PagedResponse<CommentDto> pagedResponse = new PagedResponse<>(List.of(sampleCommentDto), 0, 20, 1L, 1, true);
+        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class), eq(0), eq(20)))
+                .thenReturn(pagedResponse);
 
         mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.comments", hasSize(1)))
-                .andExpect(jsonPath("$.comments[0].id").value(1))
-                .andExpect(jsonPath("$.comments[0].text").value("Let's chip in!"))
-                .andExpect(jsonPath("$.comments[0].authorId").value(5));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].text").value("Let's chip in!"))
+                .andExpect(jsonPath("$.content[0].authorId").value(5))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.last").value(true));
     }
 
     @Test
     void getCommentsForItem_whenEmptyList_shouldReturnEmptyContainer() throws Exception {
-        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class)))
-                .thenReturn(new CommentContainerDto(List.of()));
+        PagedResponse<CommentDto> empty = new PagedResponse<>(List.of(), 0, 20, 0L, 0, true);
+        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class), eq(0), eq(20)))
+                .thenReturn(empty);
 
         mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.comments", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
     void getCommentsForItem_whenOwnerAttempts_shouldReturn403() throws Exception {
-        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class)))
+        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("item-id-1"), any(User.class), eq(0), eq(20)))
                 .thenThrow(new AccessDeniedException("Wishlist owner cannot view comments"));
 
         mockMvc.perform(get(BASE_URL))
@@ -116,7 +120,7 @@ class CommentControllerTest {
 
     @Test
     void getCommentsForItem_whenItemNotFound_shouldReturn404() throws Exception {
-        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("ghost"), any()))
+        when(commentService.getCommentsForItem(eq("wl-id-1"), eq("ghost"), any(), eq(0), eq(20)))
                 .thenThrow(new EntityNotFoundException("Item not found"));
 
         mockMvc.perform(get("/api/v1/wishlists/wl-id-1/wishes/ghost/comments"))

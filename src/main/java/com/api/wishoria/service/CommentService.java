@@ -1,6 +1,6 @@
 package com.api.wishoria.service;
 
-import com.api.wishoria.dto.comment.CommentContainerDto;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
 import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
 import com.api.wishoria.entity.Comment;
@@ -14,12 +14,13 @@ import com.api.wishoria.repository.CommentRepository;
 import com.api.wishoria.repository.WishListItemRepository;
 import com.api.wishoria.repository.WishListRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -31,19 +32,18 @@ public class CommentService {
     private final WishListRepository wishListRepository;
     private final WishListService wishListService;
 
-    public CommentContainerDto getCommentsForItem(String wishlistId, String itemId, User user) {
+    public PagedResponse<CommentDto> getCommentsForItem(String wishlistId, String itemId, User user, int page, int size) {
         if (isWishlistOwner(wishlistId, user)) {
-            return new CommentContainerDto(Collections.emptyList());
+            return new PagedResponse<>(Collections.emptyList(), page, size, 0L, 0, true);
         }
 
         WishListItem item = validateAccessAndFetchItem(wishlistId, itemId, user);
 
-        List<CommentDto> comments = commentRepository.findByWishListItemOrderByCreatedAtAsc(item)
-                .stream()
-                .map(CommentDto::fromEntity)
-                .toList();
-
-        return new CommentContainerDto(comments);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        return PagedResponse.of(
+                commentRepository.findByWishListItemOrderByCreatedAtAsc(item, pageable)
+                        .map(CommentDto::fromEntity)
+        );
     }
 
     @Transactional

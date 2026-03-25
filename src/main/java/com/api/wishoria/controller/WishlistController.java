@@ -3,9 +3,9 @@ package com.api.wishoria.controller;
 import com.api.wishoria.controller.docs.ApiForbiddenErrorDoc;
 import com.api.wishoria.controller.docs.ApiNotFoundErrorDoc;
 import com.api.wishoria.controller.docs.ApiUnauthorizedErrorDoc;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
-import com.api.wishoria.dto.wishlist.WishListContainerDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.dto.ApiResponseWrapper;
 import com.api.wishoria.entity.User;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -38,11 +39,13 @@ public class WishlistController {
 
     private final WishListService wishlistService;
 
-    @Operation(summary = "Get all wishlists", description = "Retrieves all wishlists belonging to the authenticated user.")
+    @Operation(summary = "Get paginated wishlists", description = "Retrieves a page of wishlists belonging to the authenticated user.")
     @ApiUnauthorizedErrorDoc
     @GetMapping
-    public ResponseEntity<WishListContainerDto> getWishlists(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok().body(wishlistService.getWishlistsForUser(user));
+    public ResponseEntity<PagedResponse<WishListDto>> getWishlists(@RequestParam(defaultValue = "0") int page,
+                                                                   @RequestParam(defaultValue = "12") int size,
+                                                                   @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok().body(wishlistService.getWishlistsForUser(user, page, size));
     }
 
     @Operation(summary = "Get a specific wishlist", description = "Retrieves details of a specific wishlist by its ID.")

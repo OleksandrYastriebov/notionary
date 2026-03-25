@@ -1,6 +1,6 @@
 package com.api.wishoria.service;
 
-import com.api.wishoria.dto.comment.CommentContainerDto;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
 import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
 import com.api.wishoria.entity.Comment;
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
@@ -29,6 +31,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,9 +76,10 @@ class CommentServiceTest {
     void getCommentsForItem_shouldReturnEmpty_whenOwner() {
         when(wishListRepository.findById("wl-1")).thenReturn(Optional.of(wishList));
 
-        CommentContainerDto result = commentService.getCommentsForItem("wl-1", "item-1", owner);
+        PagedResponse<CommentDto> result = commentService.getCommentsForItem("wl-1", "item-1", owner, 0, 20);
 
-        assertThat(result.comments()).isEmpty();
+        assertThat(result.content()).isEmpty();
+        assertThat(result.totalElements()).isZero();
         verify(wishListRepository).findById("wl-1");
     }
 
@@ -85,20 +89,21 @@ class CommentServiceTest {
         when(wishListService.findWishlistById("wl-1", commenter)).thenReturn(null);
         when(wishListItemRepository.findByIdAndWishListId("item-1", "wl-1"))
                 .thenReturn(Optional.of(wishListItem));
-        when(commentRepository.findByWishListItemOrderByCreatedAtAsc(wishListItem))
-                .thenReturn(List.of(comment));
+        when(commentRepository.findByWishListItemOrderByCreatedAtAsc(eq(wishListItem), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(comment)));
 
-        CommentContainerDto result = commentService.getCommentsForItem("wl-1", "item-1", commenter);
+        PagedResponse<CommentDto> result = commentService.getCommentsForItem("wl-1", "item-1", commenter, 0, 20);
 
-        assertThat(result.comments()).hasSize(1);
-        assertThat(result.comments().getFirst().text()).isEqualTo("Hello");
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().getFirst().text()).isEqualTo("Hello");
+        assertThat(result.totalElements()).isEqualTo(1L);
     }
 
     @Test
     void getCommentsForItem_shouldThrow_whenWishlistNotFound() {
         when(wishListRepository.findById("wl-missing")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> commentService.getCommentsForItem("wl-missing", "item-1", owner))
+        assertThatThrownBy(() -> commentService.getCommentsForItem("wl-missing", "item-1", owner, 0, 20))
                 .isInstanceOf(WishlistNotFoundException.class);
     }
 
@@ -208,7 +213,7 @@ class CommentServiceTest {
         when(wishListItemRepository.findByIdAndWishListId("item-missing", "wl-1"))
                 .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> commentService.getCommentsForItem("wl-1", "item-missing", commenter))
+        assertThatThrownBy(() -> commentService.getCommentsForItem("wl-1", "item-missing", commenter, 0, 20))
                 .isInstanceOf(WishlistItemNotFoundException.class);
     }
 }

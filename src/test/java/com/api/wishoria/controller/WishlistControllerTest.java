@@ -1,8 +1,8 @@
 package com.api.wishoria.controller;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
-import com.api.wishoria.dto.wishlist.WishListContainerDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
@@ -86,25 +86,28 @@ class WishlistControllerTest {
     }
 
     @Test
-    void getWishlists_whenAuthenticated_shouldReturnContainerDtoWithWishlists() throws Exception {
-        WishListContainerDto container = new WishListContainerDto(List.of(sampleWishListDto));
-        when(wishlistService.getWishlistsForUser(any(User.class))).thenReturn(container);
+    void getWishlists_whenAuthenticated_shouldReturnPagedResponse() throws Exception {
+        PagedResponse<WishListDto> paged = new PagedResponse<>(List.of(sampleWishListDto), 0, 12, 1L, 1, true);
+        when(wishlistService.getWishlistsForUser(any(User.class), eq(0), eq(12))).thenReturn(paged);
 
         mockMvc.perform(get("/api/v1/wishlists"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.wishLists", hasSize(1)))
-                .andExpect(jsonPath("$.wishLists[0].id").value("wl-id-1"))
-                .andExpect(jsonPath("$.wishLists[0].title").value("Birthday Wishes"));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value("wl-id-1"))
+                .andExpect(jsonPath("$.content[0].title").value("Birthday Wishes"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.last").value(true));
     }
 
     @Test
-    void getWishlists_whenEmptyList_shouldReturnEmptyContainer() throws Exception {
-        when(wishlistService.getWishlistsForUser(any(User.class)))
-                .thenReturn(new WishListContainerDto(List.of()));
+    void getWishlists_whenEmptyList_shouldReturnEmptyPagedResponse() throws Exception {
+        PagedResponse<WishListDto> empty = new PagedResponse<>(List.of(), 0, 12, 0L, 0, true);
+        when(wishlistService.getWishlistsForUser(any(User.class), eq(0), eq(12))).thenReturn(empty);
 
         mockMvc.perform(get("/api/v1/wishlists"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.wishLists", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test

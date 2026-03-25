@@ -23,6 +23,7 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.api.wishoria.dto.PagedResponse;
 import org.mockito.ArgumentMatchers;
 
 import java.time.Instant;
@@ -147,7 +148,8 @@ class AiAssistantServiceTest {
         WishListDto wishlist = new WishListDto("wl-1", 5L, List.of(), "Fitness Gear", true, null, Instant.now());
 
         when(userService.getUserById(5L)).thenReturn(targetUser);
-        when(wishListService.getAvailableWishlists(5L, user)).thenReturn(List.of(wishlist));
+        when(wishListService.getAvailableWishlists(ArgumentMatchers.eq(5L), ArgumentMatchers.eq(user), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt()))
+                .thenReturn(new PagedResponse<>(List.of(wishlist), 0, 50, 1L, 1, true));
         when(chatClient.prompt().user(anyString()).call().content())
                 .thenReturn("[\"Running shoes\", \"Yoga mat\", \"Protein powder\", \"Fitness tracker\", \"Water bottle\"]");
 
@@ -157,7 +159,7 @@ class AiAssistantServiceTest {
         assertThat(result.suggestions()).hasSize(5);
         assertThat(result.suggestions()).contains("Running shoes");
         verify(userService).getUserById(5L);
-        verify(wishListService).getAvailableWishlists(5L, user);
+        verify(wishListService).getAvailableWishlists(ArgumentMatchers.eq(5L), ArgumentMatchers.eq(user), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt());
     }
 
     @Test
@@ -167,7 +169,8 @@ class AiAssistantServiceTest {
         targetUser.setId(5L);
 
         when(userService.getUserById(5L)).thenReturn(targetUser);
-        when(wishListService.getAvailableWishlists(5L, user)).thenReturn(List.of());
+        when(wishListService.getAvailableWishlists(ArgumentMatchers.eq(5L), ArgumentMatchers.eq(user), ArgumentMatchers.anyInt(), ArgumentMatchers.anyInt()))
+                .thenReturn(new PagedResponse<>(List.of(), 0, 50, 0L, 0, true));
         when(chatClient.prompt().user(anyString()).call().content())
                 .thenThrow(new RuntimeException("AI service unavailable"));
 

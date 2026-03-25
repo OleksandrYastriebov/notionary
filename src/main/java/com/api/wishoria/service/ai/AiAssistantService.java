@@ -130,7 +130,7 @@ public class AiAssistantService {
 
     public GiftSuggestionsDto generateGiftSuggestions(Long userId, User currentUser) {
         User targetUser = userService.getUserById(userId);
-        List<WishListDto> wishlists = wishListService.getAvailableWishlists(userId, currentUser);
+        List<WishListDto> wishlists = wishListService.getAvailableWishlists(userId, currentUser, 0, 50).content();
 
         String wishlistsSummary = buildWishlistsSummary(wishlists);
         String prompt = AiPrompts.giftSuggestionsPrompt(targetUser.getProfileDescription(), wishlistsSummary);

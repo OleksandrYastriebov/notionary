@@ -1,9 +1,9 @@
 package com.api.wishoria.service;
 
 import com.api.wishoria.config.CacheConfig;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
-import com.api.wishoria.dto.wishlist.WishListContainerDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
@@ -18,11 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -96,11 +96,11 @@ public class WishListService {
         throw new AccessDeniedException("This is a private wishlist. You don't have permissions to see it.");
     }
 
-    public WishListContainerDto getWishlistsForUser(User user) {
-        List<WishListDto> wisLists = wishListRepository.findByUser(user).stream()
-                .map(WishList::toDto)
-                .toList();
-        return new WishListContainerDto(wisLists);
+    public PagedResponse<WishListDto> getWishlistsForUser(User user, int page, int size) {
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+        return PagedResponse.of(
+                wishListRepository.findByUser(user, pageable).map(WishList::toDto)
+        );
     }
 
     private WishList getWishlistById(String wishlistId) {
@@ -123,13 +123,13 @@ public class WishListService {
     }
 
     @Cacheable(value = CacheConfig.AVAILABLE_WISHLISTS_CACHE,
-            key = "#ownerId + '-' + (#currentUser != null ? #currentUser.email.toLowerCase().trim() : '')")
-    public List<WishListDto> getAvailableWishlists(Long ownerId, User currentUser) {
+            key = "#ownerId + '-' + (#currentUser != null ? #currentUser.email.toLowerCase().trim() : '') + '-p' + #page + '-s' + #size")
+    public PagedResponse<WishListDto> getAvailableWishlists(Long ownerId, User currentUser, int page, int size) {
         String viewerEmail = currentUser == null ? StringUtils.EMPTY : currentUser.getEmail().trim().toLowerCase();
+        PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
 
-        return wishListRepository.findAvailableWishlists(ownerId, viewerEmail).stream()
-                .map(WishList::toDto)
-                .toList();
+        return PagedResponse.of(wishListRepository.findAvailableWishlists(ownerId, viewerEmail, pageable).map(WishList::toDto)
+        );
     }
 
     private void checkOwnership(User user, WishList wishlist) {

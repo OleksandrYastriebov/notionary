@@ -1,5 +1,6 @@
 package com.api.wishoria.controller;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.user.PublicUserDto;
 import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.dto.user.UserProfileResponseDto;
@@ -46,13 +47,15 @@ public class ProfileController {
         return ResponseEntity.ok(userService.getUsersForAutocomplete(query, currentUser));
     }
 
-    @Operation(summary = "Get user Profile", description = "Returns base info and all public wishlists.")
+    @Operation(summary = "Get user Profile", description = "Returns base info and a paginated list of available wishlists.")
     @GetMapping("/{userId}")
     public ResponseEntity<UserProfileResponseDto> getUserProfile(@PathVariable Long userId,
+                                                                 @RequestParam(defaultValue = "0") int page,
+                                                                 @RequestParam(defaultValue = "6") int size,
                                                                  @AuthenticationPrincipal User currentUser) {
 
         PublicUserDto publicUser = userService.getPublicUserById(userId);
-        List<WishListDto> availableWishlists = wishListService.getAvailableWishlists(userId, currentUser);
+        PagedResponse<WishListDto> availableWishlists = wishListService.getAvailableWishlists(userId, currentUser, page, size);
 
         return ResponseEntity.ok(new UserProfileResponseDto(publicUser, availableWishlists));
     }

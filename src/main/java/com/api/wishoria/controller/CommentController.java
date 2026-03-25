@@ -4,7 +4,7 @@ import com.api.wishoria.controller.docs.ApiForbiddenErrorDoc;
 import com.api.wishoria.controller.docs.ApiNotFoundErrorDoc;
 import com.api.wishoria.controller.docs.ApiUnauthorizedErrorDoc;
 import com.api.wishoria.dto.ApiResponseWrapper;
-import com.api.wishoria.dto.comment.CommentContainerDto;
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
 import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
 import com.api.wishoria.entity.User;
@@ -28,17 +28,19 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @Operation(summary = "Get all comments", description = "Retrieves all comments for a specific item. Returns an empty list or 403 if the user is the owner of the wishlist.")
+    @Operation(summary = "Get comments (paginated)", description = "Retrieves a page of comments for a specific item. Returns an empty page if the user is the owner of the wishlist.")
     @ApiUnauthorizedErrorDoc
     @ApiNotFoundErrorDoc
     @ApiForbiddenErrorDoc
     @RateLimited(action = RateLimitPlan.DEFAULT)
     @GetMapping
-    public ResponseEntity<CommentContainerDto> getCommentsForItem(@PathVariable String wishlistId,
-                                                                  @PathVariable String itemId,
-                                                                  @AuthenticationPrincipal User user) {
+    public ResponseEntity<PagedResponse<CommentDto>> getCommentsForItem(@PathVariable String wishlistId,
+                                                                        @PathVariable String itemId,
+                                                                        @RequestParam(defaultValue = "0") int page,
+                                                                        @RequestParam(defaultValue = "20") int size,
+                                                                        @AuthenticationPrincipal User user) {
 
-        return ResponseEntity.ok(commentService.getCommentsForItem(wishlistId, itemId, user));
+        return ResponseEntity.ok(commentService.getCommentsForItem(wishlistId, itemId, user, page, size));
     }
 
     @Operation(summary = "Create a comment", description = "Adds a comment to an item. The wishlist owner cannot perform this action.")

@@ -1,5 +1,6 @@
 package com.api.wishoria.controller;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.user.PublicUserDto;
 import com.api.wishoria.dto.user.UserAutocompleteDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
@@ -26,6 +27,7 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -113,20 +115,23 @@ class ProfileControllerTest {
     @Test
     void getUserProfile_whenExists_shouldReturnProfileWithWishlists() throws Exception {
         PublicUserDto publicUser = new PublicUserDto(5L, "Jane", "Smith", null, "Coffee lover", null);
-        List<WishListDto> wishlists = List.of(
-                new WishListDto("wl-1", 5L, List.of(), "Birthday Wishes", true, null, Instant.now())
+        PagedResponse<WishListDto> pagedWishlists = new PagedResponse<>(
+                List.of(new WishListDto("wl-1", 5L, List.of(), "Birthday Wishes", true, null, Instant.now())),
+                0, 6, 1L, 1, true
         );
 
         when(userService.getPublicUserById(5L)).thenReturn(publicUser);
-        when(wishListService.getAvailableWishlists(eq(5L), any(User.class))).thenReturn(wishlists);
+        when(wishListService.getAvailableWishlists(eq(5L), any(User.class), anyInt(), anyInt()))
+                .thenReturn(pagedWishlists);
 
         mockMvc.perform(get("/api/v1/profiles/5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user.id").value(5))
                 .andExpect(jsonPath("$.user.firstName").value("Jane"))
                 .andExpect(jsonPath("$.user.profileDescription").value("Coffee lover"))
-                .andExpect(jsonPath("$.publicWishlists.length()").value(1))
-                .andExpect(jsonPath("$.publicWishlists[0].title").value("Birthday Wishes"));
+                .andExpect(jsonPath("$.publicWishlists.content.length()").value(1))
+                .andExpect(jsonPath("$.publicWishlists.content[0].title").value("Birthday Wishes"))
+                .andExpect(jsonPath("$.publicWishlists.totalElements").value(1));
     }
 
     @Test

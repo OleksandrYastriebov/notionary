@@ -1,9 +1,8 @@
 package com.api.wishoria.dto.user;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import java.util.List;
 
 @Schema(description = "Full public profile of User with user open Wishlists")
 public record UserProfileResponseDto(
@@ -12,8 +11,8 @@ public record UserProfileResponseDto(
                 requiredMode = Schema.RequiredMode.REQUIRED)
         PublicUserDto user,
 
-        @Schema(description = "List of the user's public wishlists. Private wishlists are strictly excluded from this list",
+        @Schema(description = "Paginated list of wishlists available to the viewer",
                 requiredMode = Schema.RequiredMode.REQUIRED)
-        List<WishListDto> publicWishlists
+        PagedResponse<WishListDto> publicWishlists
 ) {
 }

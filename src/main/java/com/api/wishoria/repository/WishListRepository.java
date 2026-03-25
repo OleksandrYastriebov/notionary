@@ -3,6 +3,8 @@ package com.api.wishoria.repository;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -17,7 +19,7 @@ import java.util.Optional;
 public interface WishListRepository extends JpaRepository<WishList, String> {
 
     @EntityGraph(attributePaths = {"items"})
-    List<WishList> findByUser(User user);
+    Page<WishList> findByUser(User user, Pageable pageable);
 
     int countByUser(User user);
 
@@ -39,5 +41,5 @@ public interface WishListRepository extends JpaRepository<WishList, String> {
                   )
               )
             """)
-    List<WishList> findAvailableWishlists(@Param("ownerId") Long ownerId, @Param("viewerEmail") String viewerEmail);
+    Page<WishList> findAvailableWishlists(@Param("ownerId") Long ownerId, @Param("viewerEmail") String viewerEmail, Pageable pageable);
 }

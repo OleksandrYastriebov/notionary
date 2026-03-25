@@ -1,8 +1,8 @@
 package com.api.wishoria.service;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
 import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
-import com.api.wishoria.dto.wishlist.WishListContainerDto;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;
@@ -17,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -27,6 +29,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -189,13 +192,16 @@ class WishListServiceTest {
     }
 
     @Test
-    void getWishlistsForUser_shouldReturnContainer() {
-        when(wishListRepository.findByUser(user)).thenReturn(List.of(wishList));
+    void getWishlistsForUser_shouldReturnPagedResult() {
+        when(wishListRepository.findByUser(eq(user), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(wishList)));
 
-        WishListContainerDto result = wishListService.getWishlistsForUser(user);
+        PagedResponse<WishListDto> result = wishListService.getWishlistsForUser(user, 0, 12);
 
-        assertThat(result.wishLists()).hasSize(1);
-        assertThat(result.wishLists().getFirst().title()).isEqualTo("My List");
+        assertThat(result.content()).hasSize(1);
+        assertThat(result.content().getFirst().title()).isEqualTo("My List");
+        assertThat(result.totalElements()).isEqualTo(1L);
+        assertThat(result.page()).isZero();
     }
 
     @Test
