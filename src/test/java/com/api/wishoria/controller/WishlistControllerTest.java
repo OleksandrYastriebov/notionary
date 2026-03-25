@@ -1,8 +1,8 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.PagedResponse;
-import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
-import com.api.wishoria.dto.payload.request.wishlist.UpdateWishlistRequest;
+import com.api.wishoria.dto.wishlist.request.CreateWishlistRequest;
+import com.api.wishoria.dto.wishlist.request.UpdateWishlistRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;

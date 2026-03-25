@@ -1,7 +1,7 @@
 package com.api.wishoria.service;
 
-import com.api.wishoria.dto.payload.request.user.ChangePasswordRequest;
-import com.api.wishoria.dto.payload.request.user.UpdateUserRequest;
+import com.api.wishoria.dto.user.request.ChangePasswordRequest;
+import com.api.wishoria.dto.user.request.UpdateUserRequest;
 import com.api.wishoria.dto.user.PublicUserDto;
 import com.api.wishoria.dto.user.UserProfileDto;
 import com.api.wishoria.entity.ConfirmationToken;

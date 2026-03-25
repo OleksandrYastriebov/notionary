@@ -2,7 +2,7 @@ package com.api.wishoria.service;
 
 import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
-import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
+import com.api.wishoria.dto.comment.request.CreateCommentRequest;
 import com.api.wishoria.entity.Comment;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.WishList;

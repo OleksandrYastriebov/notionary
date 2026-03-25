@@ -1,8 +1,8 @@
 package com.api.wishoria.service;
 
-import com.api.wishoria.dto.payload.request.wishlistitem.CreateWishListItemRequest;
-import com.api.wishoria.dto.payload.request.wishlistitem.UpdateWishListItemRequest;
-import com.api.wishoria.dto.payload.request.wishlistitem.WishlistItemIsCheckedRequest;
+import com.api.wishoria.dto.wishlistitem.request.CreateWishListItemRequest;
+import com.api.wishoria.dto.wishlistitem.request.UpdateWishListItemRequest;
+import com.api.wishoria.dto.wishlistitem.request.WishlistItemIsCheckedRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.dto.wishlistitem.WishListItemContainerDto;
 import com.api.wishoria.dto.wishlistitem.WishListItemDto;

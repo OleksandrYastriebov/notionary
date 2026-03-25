@@ -2,10 +2,10 @@ package com.api.wishoria.service.ai;
 
 import com.api.wishoria.dto.ai.AiWishlistGenerationDto;
 import com.api.wishoria.dto.ai.GiftSuggestionsDto;
-import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
-import com.api.wishoria.dto.payload.request.ai.GenerateWishlistRequest;
-import com.api.wishoria.dto.payload.request.wishlist.CreateWishlistRequest;
-import com.api.wishoria.dto.payload.request.wishlistitem.CreateWishListItemRequest;
+import com.api.wishoria.dto.ai.request.GenerateDescriptionRequest;
+import com.api.wishoria.dto.ai.request.GenerateWishlistRequest;
+import com.api.wishoria.dto.wishlist.request.CreateWishlistRequest;
+import com.api.wishoria.dto.wishlistitem.request.CreateWishListItemRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.service.UserService;
@@ -27,9 +27,9 @@ import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.List;
 
-import static com.api.wishoria.util.AiResponseSanitizationUtil.sanitizeUrl;
-import static com.api.wishoria.util.AiResponseSanitizationUtil.parsePriceSafe;
-import static com.api.wishoria.util.AiResponseSanitizationUtil.truncate;
+import static com.api.wishoria.service.ai.util.AiResponseSanitizationUtil.sanitizeUrl;
+import static com.api.wishoria.service.ai.util.AiResponseSanitizationUtil.parsePriceSafe;
+import static com.api.wishoria.service.ai.util.AiResponseSanitizationUtil.truncate;
 
 @Slf4j
 @RequiredArgsConstructor

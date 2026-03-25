@@ -2,8 +2,8 @@ package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
 import com.api.wishoria.dto.access.AccessesContainerDto;
-import com.api.wishoria.dto.payload.request.wishlist.RevokeAccessRequest;
-import com.api.wishoria.dto.payload.request.wishlist.ShareWishListRequest;
+import com.api.wishoria.dto.wishlist.request.RevokeAccessRequest;
+import com.api.wishoria.dto.wishlist.request.ShareWishListRequest;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
 import com.api.wishoria.exception.EntityNotFoundException;

@@ -1,7 +1,7 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
-import com.api.wishoria.dto.payload.request.user.ResendConfirmationTokenRequest;
+import com.api.wishoria.dto.user.request.ResendConfirmationTokenRequest;
 import com.api.wishoria.security.interceptor.RateLimitPlan;
 import com.api.wishoria.security.interceptor.RateLimited;
 import com.api.wishoria.service.AuthenticationService;

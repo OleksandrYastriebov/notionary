@@ -1,9 +1,9 @@
 package com.api.wishoria.controller;
 
-import com.api.wishoria.dto.payload.request.user.ForgotPasswordRequest;
-import com.api.wishoria.dto.payload.request.user.ResetPasswordRequest;
-import com.api.wishoria.dto.payload.request.user.SignInRequest;
-import com.api.wishoria.dto.payload.request.user.SignUpRequest;
+import com.api.wishoria.dto.user.request.ForgotPasswordRequest;
+import com.api.wishoria.dto.user.request.ResetPasswordRequest;
+import com.api.wishoria.dto.user.request.SignInRequest;
+import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
 import com.api.wishoria.dto.token.JwtDto;
 import com.api.wishoria.dto.ApiResponseWrapper;

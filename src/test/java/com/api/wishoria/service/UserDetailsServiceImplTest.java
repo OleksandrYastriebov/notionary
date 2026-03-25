@@ -3,6 +3,7 @@ package com.api.wishoria.service;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
 import com.api.wishoria.repository.UserRepository;
+import com.api.wishoria.security.UserDetailsServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

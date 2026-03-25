@@ -1,8 +1,8 @@
 package com.api.wishoria.service;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
-import com.api.wishoria.dto.payload.request.user.SignInRequest;
-import com.api.wishoria.dto.payload.request.user.SignUpRequest;
+import com.api.wishoria.dto.user.request.SignInRequest;
+import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
 import com.api.wishoria.entity.ConfirmationToken;
 import com.api.wishoria.entity.RefreshToken;

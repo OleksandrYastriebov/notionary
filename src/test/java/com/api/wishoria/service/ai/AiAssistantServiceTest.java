@@ -1,36 +1,30 @@
 package com.api.wishoria.service.ai;
 
+import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.ai.GiftSuggestionsDto;
-import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
+import com.api.wishoria.dto.ai.request.GenerateDescriptionRequest;
 import com.api.wishoria.dto.wishlist.WishListDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
-import com.api.wishoria.exception.UserNotFoundException;
 import com.api.wishoria.service.UserService;
 import com.api.wishoria.service.WishListItemService;
 import com.api.wishoria.service.WishListService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Answers;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import com.api.wishoria.dto.PagedResponse;
 import org.mockito.ArgumentMatchers;
 
-import java.time.Instant;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;

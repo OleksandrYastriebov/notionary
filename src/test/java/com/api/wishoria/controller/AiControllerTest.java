@@ -1,7 +1,7 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.ai.GiftSuggestionsDto;
-import com.api.wishoria.dto.payload.request.ai.GenerateDescriptionRequest;
+import com.api.wishoria.dto.ai.request.GenerateDescriptionRequest;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
 import com.api.wishoria.exception.EntityNotFoundException;

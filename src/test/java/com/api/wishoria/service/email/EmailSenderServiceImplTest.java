@@ -3,7 +3,6 @@ package com.api.wishoria.service.email;
 import com.api.wishoria.dto.rabbitMq.EmailPayloadDto;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.entity.UserRole;
-import com.api.wishoria.service.email.impl.EmailSenderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

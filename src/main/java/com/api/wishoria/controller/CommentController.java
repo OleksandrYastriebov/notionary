@@ -6,7 +6,7 @@ import com.api.wishoria.controller.docs.ApiUnauthorizedErrorDoc;
 import com.api.wishoria.dto.ApiResponseWrapper;
 import com.api.wishoria.dto.PagedResponse;
 import com.api.wishoria.dto.comment.CommentDto;
-import com.api.wishoria.dto.payload.request.comment.CreateCommentRequest;
+import com.api.wishoria.dto.comment.request.CreateCommentRequest;
 import com.api.wishoria.entity.User;
 import com.api.wishoria.security.interceptor.RateLimitPlan;
 import com.api.wishoria.security.interceptor.RateLimited;

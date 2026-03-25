@@ -1,7 +1,7 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
-import com.api.wishoria.dto.payload.request.user.ResendConfirmationTokenRequest;
+import com.api.wishoria.dto.user.request.ResendConfirmationTokenRequest;
 import com.api.wishoria.exception.GlobalExceptionHandler;
 import com.api.wishoria.service.AuthenticationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
