@@ -13,18 +13,17 @@ import org.springframework.stereotype.Component;
 public class ServiceLoggingAspect {
 
     @Pointcut("execution(public * com.api.wishoria.service..*(..))")
-    public void servicePublicMethods() {
-    }
+    public void servicePublicMethods() {}
 
     @Around("servicePublicMethods()")
-    public Object logServiceMethod(ProceedingJoinPoint pjp) throws Throwable {
-        String className = pjp.getTarget().getClass().getSimpleName();
-        String methodName = pjp.getSignature().getName();
+    public Object logServiceMethod(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+        String className = proceedingJoinPoint.getTarget().getClass().getSimpleName();
+        String methodName = proceedingJoinPoint.getSignature().getName();
         long start = System.currentTimeMillis();
 
         log.debug("[{}#{}] started", className, methodName);
         try {
-            Object result = pjp.proceed();
+            Object result = proceedingJoinPoint.proceed();
             log.debug("[{}#{}] completed in {}ms", className, methodName, System.currentTimeMillis() - start);
             return result;
         } catch (Exception ex) {

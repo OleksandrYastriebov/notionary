@@ -47,7 +47,7 @@ spring:
   main:
     lazy-initialization: ${SPRING_MAIN_LAZY_INITIALIZATION:false}
   datasource:
-    url: jdbc:postgresql://ep-divine-mouse-alb0as1v-pooler.c-3.eu-central-1.aws.neon.tech:5432/${DATABASE_NAME}?sslmode=require
+    url: jdbc:postgresql://wishoria-wishoria.i.aivencloud.com:10919/${DATABASE_NAME}?sslmode=require
     username: ${DATABASE_LOGIN}
     password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
