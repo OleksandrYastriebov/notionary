@@ -39,10 +39,10 @@ public record UpdateWishListItemRequest(
 ) {
     public void updateEntity(WishListItem existingItem) {
         if (this.title != null) existingItem.setTitle(this.title);
-        if (this.url != null) existingItem.setUrl(this.url);
+        if (this.url != null) existingItem.setUrl(this.url.isEmpty() ? null : this.url);
         if (this.price != null) existingItem.setPrice(this.price);
-        if (this.description != null) existingItem.setDescription(this.description);
+        if (this.description != null) existingItem.setDescription(this.description.isEmpty() ? null : this.description);
         if (this.isChecked != null) existingItem.setChecked(this.isChecked);
-        if (this.imageUrl != null) existingItem.setImageUrl(this.imageUrl);
+        if (this.imageUrl != null) existingItem.setImageUrl(this.imageUrl.isEmpty() ? null : this.imageUrl);
     }
 }
