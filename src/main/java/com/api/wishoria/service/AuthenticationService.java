@@ -1,5 +1,6 @@
 package com.api.wishoria.service;
 
+import com.api.wishoria.config.CacheConfig;
 import com.api.wishoria.dto.user.request.SignInRequest;
 import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
@@ -15,6 +16,7 @@ import com.api.wishoria.exception.UserAlreadyActivatedException;
 import com.api.wishoria.repository.UserRepository;
 import com.api.wishoria.util.EmailNormalizer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final CacheManager cacheManager;
 
     @Transactional
     public ApiResponseWrapper signUp(SignUpRequest request) {
@@ -96,6 +99,11 @@ public class AuthenticationService {
 
         user.setEnabled(true);
         confirmationTokenService.deleteTokenFromDatabase(confirmationToken);
+
+        var cache = cacheManager.getCache(CacheConfig.USERS_BY_EMAIL_CACHE);
+        if (cache != null) {
+            cache.evict(EmailNormalizer.normalize(user.getEmail()));
+        }
 
         return new ApiResponseWrapper("Account is successfully activated.");
     }
