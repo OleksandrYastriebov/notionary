@@ -1,6 +1,7 @@
 package com.api.wishoria.controller;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
+import com.api.wishoria.dto.user.SignUpResponseDto;
 import com.api.wishoria.dto.user.request.SignInRequest;
 import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
@@ -61,11 +62,11 @@ class UserAuthenticationControllerTest {
     @Test
     void signUp_shouldReturnOkWithServiceResponse() {
         SignUpRequest request = new SignUpRequest("John", "Doe", "user@wishoria.app", "password123");
-        ApiResponseWrapper serviceResponse = new ApiResponseWrapper("User registered successfully");
+        SignUpResponseDto serviceResponse = new SignUpResponseDto("User registered successfully", 1L);
 
         when(authenticationService.signUp(any(SignUpRequest.class))).thenReturn(serviceResponse);
 
-        ResponseEntity<ApiResponseWrapper> response = controller.signUp(request);
+        ResponseEntity<SignUpResponseDto> response = controller.signUp(request);
 
         verify(authenticationService).signUp(request);
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
@@ -77,7 +78,7 @@ class UserAuthenticationControllerTest {
     void signUp_viaHttp_withValidRequest_shouldReturn200() throws Exception {
         SignUpRequest request = new SignUpRequest("John", "Doe", "john@wishoria.app", "password123");
         when(authenticationService.signUp(any(SignUpRequest.class)))
-                .thenReturn(new ApiResponseWrapper("Check your email to confirm your account."));
+                .thenReturn(new SignUpResponseDto("Check your email to confirm your account.", 1L));
 
         mockMvc.perform(post("/api/v1/sign-up")
                         .contentType(MediaType.APPLICATION_JSON)

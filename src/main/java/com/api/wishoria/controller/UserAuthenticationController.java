@@ -7,6 +7,7 @@ import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
 import com.api.wishoria.dto.token.JwtDto;
 import com.api.wishoria.dto.ApiResponseWrapper;
+import com.api.wishoria.dto.user.SignUpResponseDto;
 import com.api.wishoria.dto.token.TokenRefreshDto;
 import com.api.wishoria.exception.TokenRefreshException;
 import com.api.wishoria.security.interceptor.RateLimitPlan;
@@ -44,7 +45,7 @@ public class UserAuthenticationController {
 
     @Operation(summary = "Register a new user", description = "Creates a new user account and sends a confirmation email.")
     @PostMapping(path = "/sign-up")
-    public ResponseEntity<ApiResponseWrapper> signUp(@Valid @RequestBody SignUpRequest request) {
+    public ResponseEntity<SignUpResponseDto> signUp(@Valid @RequestBody SignUpRequest request) {
         return ResponseEntity.ok(authenticationService.signUp(request));
     }
 

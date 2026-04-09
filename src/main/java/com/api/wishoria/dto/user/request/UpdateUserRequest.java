@@ -34,7 +34,10 @@ public record UpdateUserRequest(
         @Schema(description = "User's date of birth", example = "1995-06-15")
         @Past(message = "Date of birth must be in the past")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate dateOfBirth
+        LocalDate dateOfBirth,
+
+        @Schema(description = "Whether the user consents to marketing emails", example = "true")
+        Boolean emailMarketingConsent
 ) {
     public void updateEntity(User user) {
         if (this.firstName != null) user.setFirstName(this.firstName);
@@ -43,5 +46,6 @@ public record UpdateUserRequest(
         if (this.profileDescription != null) user.setProfileDescription(this.profileDescription);
         if (this.isPrivate != null) user.setPrivateProfile(this.isPrivate);
         if (this.dateOfBirth != null) user.setDateOfBirth(this.dateOfBirth);
+        if (this.emailMarketingConsent != null) user.setEmailMarketingConsent(this.emailMarketingConsent);
     }
 }

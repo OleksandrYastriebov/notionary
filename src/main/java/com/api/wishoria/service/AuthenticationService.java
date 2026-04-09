@@ -5,6 +5,7 @@ import com.api.wishoria.dto.user.request.SignInRequest;
 import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
 import com.api.wishoria.dto.ApiResponseWrapper;
+import com.api.wishoria.dto.user.SignUpResponseDto;
 import com.api.wishoria.entity.ConfirmationToken;
 import com.api.wishoria.entity.RefreshToken;
 import com.api.wishoria.entity.User;
@@ -41,13 +42,16 @@ public class AuthenticationService {
     private final CacheManager cacheManager;
 
     @Transactional
-    public ApiResponseWrapper signUp(SignUpRequest request) {
+    public SignUpResponseDto signUp(SignUpRequest request) {
         User user = request.toEntity();
         String confirmationToken = userService.signUpUser(user);
 
         eventPublisher.publishEvent(new UserRegisteredEvent(this, user, confirmationToken));
 
-        return new ApiResponseWrapper("User registered successfully. Please check your email to activate your account.");
+        return new SignUpResponseDto(
+                "User registered successfully. Please check your email to activate your account.",
+                user.getId()
+        );
     }
 
     @Transactional

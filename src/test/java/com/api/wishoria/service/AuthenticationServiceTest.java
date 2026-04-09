@@ -1,6 +1,7 @@
 package com.api.wishoria.service;
 
 import com.api.wishoria.dto.ApiResponseWrapper;
+import com.api.wishoria.dto.user.SignUpResponseDto;
 import com.api.wishoria.dto.user.request.SignInRequest;
 import com.api.wishoria.dto.user.request.SignUpRequest;
 import com.api.wishoria.dto.token.AuthResultDto;
@@ -76,7 +77,7 @@ class AuthenticationServiceTest {
         SignUpRequest request = new SignUpRequest("John", "Doe", "john@example.com", "password123");
         when(userService.signUpUser(any(User.class))).thenReturn("confirmation-token");
 
-        ApiResponseWrapper result = authenticationService.signUp(request);
+        SignUpResponseDto result = authenticationService.signUp(request);
 
         assertThat(result.message()).contains("registered successfully");
         assertThat(result.message()).contains("email");

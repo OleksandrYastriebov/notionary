@@ -35,7 +35,10 @@ public record UserProfileDto(
 
         @Schema(description = "User's date of birth", example = "1995-06-15")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        LocalDate dateOfBirth
+        LocalDate dateOfBirth,
+
+        @Schema(description = "Whether the user has opted in to marketing emails", example = "true")
+        boolean emailMarketingConsent
 ) {
     public UserProfileDto(User user) {
         this(
@@ -47,7 +50,8 @@ public record UserProfileDto(
                 user.getCreatedAt(),
                 user.getProfileDescription(),
                 user.isPrivateProfile(),
-                user.getDateOfBirth()
+                user.getDateOfBirth(),
+                user.isEmailMarketingConsent()
         );
     }
 }
