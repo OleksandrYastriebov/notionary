@@ -82,7 +82,7 @@ public class User implements UserDetails {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Column(name = "email_marketing_consent")
+    @Column(name = "email_marketing_consent", nullable = false)
     private boolean emailMarketingConsent = true;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
