@@ -38,7 +38,13 @@ public record UserProfileDto(
         LocalDate dateOfBirth,
 
         @Schema(description = "Whether the user has opted in to marketing emails", example = "true")
-        boolean emailMarketingConsent
+        boolean emailMarketingConsent,
+
+        @Schema(description = "Phone number in E.164 format", example = "+14155552671")
+        String phoneNumber,
+
+        @Schema(description = "Whether the user has opted in to marketing SMS/phone calls", example = "true")
+        boolean phoneMarketingConsent
 ) {
     public UserProfileDto(User user) {
         this(
@@ -51,7 +57,9 @@ public record UserProfileDto(
                 user.getProfileDescription(),
                 user.isPrivateProfile(),
                 user.getDateOfBirth(),
-                user.isEmailMarketingConsent()
+                user.isEmailMarketingConsent(),
+                user.getPhoneNumber(),
+                user.isPhoneMarketingConsent()
         );
     }
 }

@@ -85,6 +85,12 @@ public class User implements UserDetails {
     @Column(name = "email_marketing_consent", nullable = false)
     private boolean emailMarketingConsent = true;
 
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
+    @Column(name = "phone_marketing_consent", nullable = false)
+    private boolean phoneMarketingConsent = true;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<WishList> wishlists = new ArrayList<>();

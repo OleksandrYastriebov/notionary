@@ -4,6 +4,7 @@ import com.api.wishoria.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
@@ -37,7 +38,14 @@ public record UpdateUserRequest(
         LocalDate dateOfBirth,
 
         @Schema(description = "Whether the user consents to marketing emails", example = "true")
-        Boolean emailMarketingConsent
+        Boolean emailMarketingConsent,
+
+        @Schema(description = "Phone number in E.164 format", example = "+14155552671")
+        @Pattern(regexp = "^\\+[1-9]\\d{1,14}$", message = "Phone number must be in E.164 format (e.g. +14155552671)")
+        String phoneNumber,
+
+        @Schema(description = "Whether the user consents to marketing SMS/phone calls", example = "true")
+        Boolean phoneMarketingConsent
 ) {
     public void updateEntity(User user) {
         if (this.firstName != null) user.setFirstName(this.firstName);
@@ -47,5 +55,7 @@ public record UpdateUserRequest(
         if (this.isPrivate != null) user.setPrivateProfile(this.isPrivate);
         if (this.dateOfBirth != null) user.setDateOfBirth(this.dateOfBirth);
         if (this.emailMarketingConsent != null) user.setEmailMarketingConsent(this.emailMarketingConsent);
+        if (this.phoneNumber != null) user.setPhoneNumber(this.phoneNumber);
+        if (this.phoneMarketingConsent != null) user.setPhoneMarketingConsent(this.phoneMarketingConsent);
     }
 }

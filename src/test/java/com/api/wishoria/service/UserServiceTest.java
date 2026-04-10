@@ -159,7 +159,7 @@ class UserServiceTest {
     @Test
     void updateUser_shouldApplyRequestAndReturnDto() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UpdateUserRequest request = new UpdateUserRequest("Jane", "Smith", "https://example.com/avatar.jpg", null, null, null, null);
+        UpdateUserRequest request = new UpdateUserRequest("Jane", "Smith", "https://example.com/avatar.jpg", null, null, null, null, null, null);
 
         UserProfileDto result = userService.updateUser(user, request);
 
@@ -249,7 +249,7 @@ class UserServiceTest {
     @Test
     void updateUser_whenProfileDescriptionProvided_shouldUpdateIt() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UpdateUserRequest request = new UpdateUserRequest(null, null, null, "I love coffee and tech", null, null, null);
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, "I love coffee and tech", null, null, null, null, null);
 
         UserProfileDto result = userService.updateUser(user, request);
 
@@ -260,7 +260,7 @@ class UserServiceTest {
     @Test
     void updateUser_whenIsPrivateSet_shouldUpdatePrivateProfile() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, true, null, null);
+        UpdateUserRequest request = new UpdateUserRequest(null, null, null, null, true, null, null, null, null);
 
         userService.updateUser(user, request);
 
